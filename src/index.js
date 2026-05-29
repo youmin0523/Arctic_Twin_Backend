@@ -360,7 +360,8 @@ const WEATHER_SCRIPT_PATH = path.join(
 function runWeatherPipeline() {
   console.log('[Scheduler] Running weather pipeline (Open-Meteo, all routes)...');
   const { cmd, args } = uvCommand([WEATHER_SCRIPT_PATH]);
-  execFile(cmd, args, { env: uvEnv(), timeout: 180000 }, (err, stdout, stderr) => {
+  // timeout 30분: Open-Meteo + Copernicus(북극 파고/SST) 폴백이 항로별로 돌아 실측 ~22분 소요
+  execFile(cmd, args, { env: uvEnv(), timeout: 1800000 }, (err, stdout, stderr) => {
     if (err) console.error('[Scheduler] Weather pipeline error:', err.message);
     if (stdout) console.log('[Weather]', stdout.trim().slice(-500));
     if (stderr) console.error('[Weather] stderr:', stderr.trim().slice(-200));

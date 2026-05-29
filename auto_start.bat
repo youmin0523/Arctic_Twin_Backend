@@ -19,28 +19,27 @@ set "MODELS=%BASE%\services"
 timeout /t 15 /nobreak >nul
 
 :: ── 포트 중복 프로세스 정리 ──────────────────────────────────────
-echo [1/5] 기존 프로세스 정리 중...
-for %%p in (8001 8002 8003 8004) do (
+echo [1/4] 기존 프로세스 정리 중...
+for %%p in (8000 8001 8002 8004 8005) do (
     for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%%p " 2^>nul') do (
         taskkill /PID %%a /F >nul 2>&1
     )
 )
 timeout /t 3 /nobreak >nul
 
-:: ── RL-Pipeline (8001) ───────────────────────────────────────────
-echo [2/5] RL-Pipeline (8001) 시작 중...
-start "RL-Pipeline-8001" /D "%MODELS%\rl-pipeline" /MIN cmd /c "%UVRUN% uvicorn server:app --host 0.0.0.0 --port 8001 >> %BASE%\logs\rl_server.log 2>&1"
+:: ── Node API 서버 (8000) ─────────────────────────────────────────
+::  - /api/ice·/api/weather 등 직접 서빙 + /api/rl·/api/report 프록시
+::  - fetcher 스케줄러(해빙·빙산·SAR·기상) 구동
+::  - 부팅 시 RL(8001)·Report(8002) Python 서버를 자식 프로세스로 자동 기동 (별도 start 불필요)
+echo [2/4] Node API 서버 (8000) 시작 중...
+start "Node-API-8000" /D "%BASE%" /MIN cmd /c "node src\index.js >> %BASE%\logs\node_api.log 2>&1"
 
-:: ── Report-Service (8002) ────────────────────────────────────────
-echo [3/5] Report-Service (8002) 시작 중...
-start "Report-Service-8002" /D "%MODELS%\report-service" /MIN cmd /c "%UVRUN% uvicorn server:app --host 0.0.0.0 --port 8002 >> %BASE%\logs\report_server.log 2>&1"
-
-:: ── SAR Server (8003) ────────────────────────────────────────────
-echo [4/5] SAR-Server (8003) 시작 중...
-start "SAR-Server-8003" /D "%BASE%" /MIN cmd /c "%UVRUN% python sar_server.py >> %BASE%\logs\sar_server.log 2>&1"
+:: ── SAR Server (8005) ────────────────────────────────────────────
+echo [3/4] SAR-Server (8005) 시작 중...
+start "SAR-Server-8005" /D "%BASE%" /MIN cmd /c "%UVRUN% python sar_server.py >> %BASE%\logs\sar_server.log 2>&1"
 
 :: ── ML Training Service (8004) ───────────────────────────────────
-echo [5/5] ML-Training-Service (8004) 시작 중...
+echo [4/4] ML-Training-Service (8004) 시작 중...
 start "ML-Training-8004" /D "%MODELS%\ml-pipeline" /MIN cmd /c "%UVRUN% uvicorn train_server:app --host 0.0.0.0 --port 8004 >> %BASE%\logs\ml_server.log 2>&1"
 
 :: ── 서버 기동 대기 ───────────────────────────────────────────────
