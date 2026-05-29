@@ -11,6 +11,8 @@ import logging
 from datetime import date, timedelta
 from dataclasses import asdict
 
+from modules import db
+
 logger = logging.getLogger("report-service.whatif_tools")
 
 
@@ -237,18 +239,8 @@ class WhatIfToolExecutor:
         ice_stats = latest.get("stats", {})
         berg_stats = bergs.get("stats", {})
 
-        # SAR 탐지 현황 확인
-        import json
-        sar_file = self.loader.data_dir / "sar_detections_latest.json"
-        sar_info = {}
-        if sar_file.exists():
-            with open(sar_file, encoding="utf-8") as f:
-                sar_data = json.load(f)
-                sar_info = {
-                    "sar_detected": sar_data.get("total_detected", 0),
-                    "sar_detection_time": sar_data.get("detection_time", ""),
-                    "sar_products_processed": sar_data.get("products_processed", 0),
-                }
+        # SAR 탐지 현황 확인 — DB(sar_detections) 최신 배치 우선, 실패 시 파일 폴백
+        sar_info = self._get_sar_info()
 
         return {
             "ice": {
@@ -271,6 +263,43 @@ class WhatIfToolExecutor:
                 if isinstance(summary, dict)
             },
         }
+
+    def _get_sar_info(self) -> dict:
+        """SAR 탐지 현황. DB(sar_detections 최신 배치) 우선, 실패 시 파일 폴백."""
+        # DB 우선
+        if db.db_available():
+            try:
+                rows = db.fetch_all(
+                    """
+                    SELECT count(*)::int AS total_detected,
+                           to_char(max(detection_time),
+                                   'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS detection_time,
+                           max(products_processed) AS products_processed
+                      FROM sar_detections
+                     WHERE detection_time = (SELECT max(detection_time) FROM sar_detections)
+                    """
+                )
+                if rows and rows[0]["total_detected"]:
+                    return {
+                        "sar_detected": rows[0]["total_detected"],
+                        "sar_detection_time": rows[0]["detection_time"] or "",
+                        "sar_products_processed": rows[0]["products_processed"] or 0,
+                    }
+            except Exception as e:
+                logger.warning("SAR DB 조회 실패 → 파일 폴백: %s", e)
+
+        # 폴백: sar_detections_latest.json
+        import json
+        sar_file = self.loader.data_dir / "sar_detections_latest.json"
+        if sar_file.exists():
+            with open(sar_file, encoding="utf-8") as f:
+                sar_data = json.load(f)
+            return {
+                "sar_detected": sar_data.get("total_detected", 0),
+                "sar_detection_time": sar_data.get("detection_time", ""),
+                "sar_products_processed": sar_data.get("products_processed", 0),
+            }
+        return {}
 
     @staticmethod
     def _summarize_scores(route: str, ice_class: str, scores: list) -> dict:

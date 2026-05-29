@@ -7,7 +7,6 @@
 ```
 ml-pipeline/
 ├── train_fuel_model.py       # 메인 실행 스크립트
-├── requirements.txt          # Python 의존성
 ├── README.md
 ├── modules/
 │   ├── config.py             # 선박 제원, 모델 하이퍼파라미터, 상수
@@ -24,15 +23,12 @@ ml-pipeline/
 
 ### 1. 환경 설정
 
+모든 백엔드 Python 서비스는 **`backend/.venv` 하나**를 공유하며, 의존성은
+**`backend/requirements.txt` 한 파일**로 통합되어 있습니다 (서비스별 requirements.txt 없음).
+
 ```bash
-cd Digital_twin/ml-pipeline
-
-# 가상환경 생성 (권장)
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-
-# 의존성 설치
-pip install -r requirements.txt
+# backend 루트에서 1회만 설치
+uv pip install --python backend/.venv -r backend/requirements.txt
 ```
 
 ### 2. 모델 학습 실행

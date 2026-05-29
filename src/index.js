@@ -17,6 +17,7 @@ const weatherRouter = require('./routes/weather');
 const sentinel1Router = require('./routes/sentinel1');
 const reportRouter = require('./routes/report');
 const collabRouter = require('./routes/collab'); // SAR-RL 콜라보 (신규)
+const simulationsRouter = require('./routes/simulations'); // 시뮬레이션 결과 DB 서빙 (신규)
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -33,6 +34,7 @@ app.use('/api/pipeline', pipelineRouter);
 app.use('/api/weather', weatherRouter);
 app.use('/api/sentinel1', sentinel1Router);
 app.use('/api/collab', collabRouter); // SAR-RL 콜라보 (신규)
+app.use('/api/simulations', simulationsRouter); // 시뮬레이션 결과 DB 서빙 (신규)
 app.use('/proxy', proxyRouter);
 
 // 기존 arctic-hybrid.html 호환 프록시
@@ -282,6 +284,11 @@ app.use(createProxyMiddleware('/api/fuel', {
   },
 }));
 
+// ── JSON → DB 동기화 ─────────────────────────────────────────────
+// fetcher 들이 backend/data/*.json 을 갱신한 뒤 호출되어 DB 를 최신화한다.
+// 실제 실행/동시성 제어/캐시 무효화는 services/dbSync.js 가 담당(collab.js 와 공용).
+const { runMigrate } = require('./services/dbSync');
+
 // ── Iceberg pipeline scheduler ──────────────────────────────────
 const SCRIPT_PATH = path.join(__dirname, '..', 'scripts', 'update_icebergs.py');
 
@@ -296,6 +303,7 @@ function runIcebergPipeline() {
     if (err) console.error('[Scheduler] Pipeline error:', err.message);
     if (stdout) console.log('[Scheduler]', stdout.trim());
     if (stderr) console.error('[Scheduler] stderr:', stderr.trim());
+    runMigrate('icebergs'); // copernicus_icebergs.json → icebergs 테이블
   });
 }
 
@@ -311,6 +319,7 @@ function runBergFetcher() {
     if (err) console.error('[Scheduler] Berg fetcher error:', err.message);
     if (stdout) console.log('[BergFetcher]', stdout.trim().slice(-500));
     if (stderr) console.error('[BergFetcher] stderr:', stderr.trim().slice(-200));
+    runMigrate('bergs'); // realBergData_latest.json → bergs 테이블
   });
 }
 
@@ -349,6 +358,7 @@ function runSentinel1Fetcher() {
     if (err) console.error('[Scheduler] Sentinel-1 fetcher error:', err.message);
     if (stdout) console.log('[Sentinel1]', stdout.trim().slice(-500));
     if (stderr) console.error('[Sentinel1] stderr:', stderr.trim().slice(-200));
+    runMigrate('sentinel1'); // sentinel1_catalog_latest.json → sentinel1_products 테이블
   });
 }
 
@@ -365,6 +375,7 @@ function runWeatherPipeline() {
     if (err) console.error('[Scheduler] Weather pipeline error:', err.message);
     if (stdout) console.log('[Weather]', stdout.trim().slice(-500));
     if (stderr) console.error('[Weather] stderr:', stderr.trim().slice(-200));
+    runMigrate('weather_api_usage'); // weather_api_usage.json → weather_api_usage 테이블
   });
 }
 
@@ -408,6 +419,8 @@ setTimeout(runBergFetcher, 90000);
 setTimeout(runIceFetcher, 120000);
 // 서버 시작 150초 후 Sentinel-1 빙하 아카이브 1회 실행
 setTimeout(runSentinel1Fetcher, 150000);
+// 서버 시작 10초 후 기존 backend/data/*.json 으로 DB 1회 동기화 (부팅 직후 최신화)
+setTimeout(() => runMigrate('startup'), 10000);
 
 app.listen(PORT, () => {
   console.log(`[Server] Arctic Digital Twin API running on http://localhost:${PORT}`);
@@ -421,10 +434,12 @@ app.listen(PORT, () => {
 });
 
 // 프로세스 종료 시 모든 서버 정리
+const { close: closeDb } = require('./services/db');
 function cleanupProcesses() {
   rlServer.kill();
   reportServer.kill();
   mlServer.kill();
+  closeDb().catch(() => {});
 }
 process.on('exit', cleanupProcesses);
 process.on('SIGINT', () => { cleanupProcesses(); process.exit(); });

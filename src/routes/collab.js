@@ -18,6 +18,7 @@ const express = require('express');
 const path = require('path');
 const { spawn } = require('child_process');
 const { uvEnv, uvCommand } = require('../services/uvPython');
+const { runMigrate } = require('../services/dbSync');
 const router = express.Router();
 
 const { getIcebergData, getCopernicusIcebergData } = require('../services/dataStore');
@@ -132,6 +133,12 @@ router.post('/sar-detect-trigger', (req, res) => {
       stdio: 'ignore',
       env: uvEnv(),
     });
+    // 탐지 완료 시(성공 종료) DB 동기화 → DB-우선 읽기에도 새 탐지 결과 반영.
+    // (DB 미설정이면 runMigrate 는 no-op 이고 파일 폴백으로 이미 반영됨)
+    proc.on('close', (code) => {
+      clearSarCache();
+      if (code === 0) runMigrate('sar-trigger');
+    });
     proc.unref();
   } catch (err) {
     return res.status(500).json({ error: `spawn failed: ${err.message}` });
@@ -142,7 +149,7 @@ router.post('/sar-detect-trigger', (req, res) => {
     message: 'SAR detection triggered (background)',
     pid: proc.pid,
     args: args.slice(1),
-    note: 'Result will appear in /api/collab/sar-icebergs once detection finishes.',
+    note: 'Result will appear in /api/collab/sar-icebergs once detection finishes (DB 모드는 탐지 후 자동 동기화).',
   });
 });
 

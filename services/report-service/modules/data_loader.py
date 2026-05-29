@@ -18,6 +18,8 @@ from typing import Any
 
 import numpy as np
 
+from modules import db
+
 logger = logging.getLogger("report-service.data_loader")
 
 # 두 가지 레이아웃 지원:
@@ -103,14 +105,15 @@ class DataLoader:
 
     # ── 빙산 ───────────────────────────────────────────────────
     def load_icebergs(self) -> dict:
-        """빙산 현황 로드."""
-        fpath = self.data_dir / "realBergData_latest.json"
-        if not fpath.exists():
-            logger.warning("빙산 파일 없음: %s", fpath)
-            return {"bergs": [], "stats": {}}
-
-        with open(fpath, encoding="utf-8") as f:
-            data = json.load(f)
+        """빙산 현황 로드. DB(bergs 테이블) 우선, 실패 시 JSON 파일 폴백."""
+        data = self._load_icebergs_from_db()
+        if data is None:
+            fpath = self.data_dir / "realBergData_latest.json"
+            if not fpath.exists():
+                logger.warning("빙산 파일 없음: %s", fpath)
+                return {"bergs": [], "stats": {}}
+            with open(fpath, encoding="utf-8") as f:
+                data = json.load(f)
 
         bergs = data.get("bergs", [])
         # 북극권 빙산만 필터 (위도 > 60)
@@ -130,6 +133,46 @@ class DataLoader:
             data["stats"]["types"][t] = data["stats"]["types"].get(t, 0) + 1
 
         return data
+
+    def _load_icebergs_from_db(self) -> dict[str, Any] | None:
+        """bergs 테이블에서 빙산 현황 조회. DB 불가/실패 시 None 반환(파일 폴백)."""
+        if not db.db_available():
+            return None
+        try:
+            rows = db.fetch_all(
+                """
+                SELECT id, lat, lon, length_m, width_m, type,
+                       to_char(last_update, 'MM/DD/YYYY') AS last_update,
+                       data_source, to_char(data_date, 'YYYY-MM-DD') AS data_date
+                  FROM bergs
+                 ORDER BY id
+                """
+            )
+        except Exception as e:
+            logger.warning("빙산 DB 조회 실패 → 파일 폴백: %s", e)
+            return None
+
+        if not rows:
+            return None
+
+        # 원본 realBergData_latest.json 구조 복원 (stats 는 호출측에서 계산).
+        return {
+            "source": rows[0].get("data_source"),
+            "date": rows[0].get("data_date"),
+            "berg_count": len(rows),
+            "bergs": [
+                {
+                    "id": r["id"],
+                    "lat": r["lat"],
+                    "lon": r["lon"],
+                    "length_m": r["length_m"],
+                    "width_m": r["width_m"],
+                    "type": r["type"],
+                    "last_update": r["last_update"],
+                }
+                for r in rows
+            ],
+        }
 
     # ── 기상 ───────────────────────────────────────────────────
     def load_weather(self) -> dict:

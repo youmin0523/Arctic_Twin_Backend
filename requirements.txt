@@ -27,6 +27,9 @@ idna==3.11
 certifi==2026.2.25
 charset-normalizer==3.4.7
 
+# ── PostgreSQL (report-service 가 Neon DB 정형 데이터 조회) ──
+psycopg2-binary>=2.9.9
+
 # ── 데이터 / 수치 (rl-pipeline, ml-pipeline, report) ─────
 numpy==2.4.4
 pandas==3.0.2
@@ -46,6 +49,7 @@ onnx>=1.16.0
 
 # ── 강화학습 (rl-pipeline, report-service) ──────────────
 torch==2.11.0
+torchvision==0.26.0          # report-service(SAR)·pipeline(ultralytics) 이미지 처리
 gymnasium==1.2.3
 stable_baselines3==2.8.0
 Farama-Notifications==0.0.4

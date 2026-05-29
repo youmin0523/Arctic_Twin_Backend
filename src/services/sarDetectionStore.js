@@ -10,6 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { hasDb, query } = require('./db');
 
 const SAR_FILE = path.join(__dirname, '..', '..', 'data', 'sar_detections_latest.json');
 
@@ -36,6 +37,48 @@ async function getSarDetectionRaw() {
   if (_cache && now - _cacheTime < CACHE_TTL_MS) {
     return _cache;
   }
+
+  // DB(sar_detections 테이블) 우선 — 최신 배치(detection_time 최대)만 조회.
+  if (hasDb()) {
+    try {
+      const { rows } = await query(
+        `SELECT detection_id, lat, lon, length_m, width_m, type, source, confidence,
+                to_char(last_update, 'MM/DD/YYYY') AS last_update,
+                to_char(detection_time, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS detection_time,
+                confidence_threshold, products_processed
+           FROM sar_detections
+          WHERE detection_time = (SELECT max(detection_time) FROM sar_detections)
+          ORDER BY pk`
+      );
+      if (rows.length > 0) {
+        // 원본 파일 구조 복원.
+        const parsed = {
+          detection_time: rows[0].detection_time,
+          products_processed: rows[0].products_processed,
+          total_detected: rows.length,
+          confidence_threshold: rows[0].confidence_threshold,
+          detections: rows.map((r) => ({
+            id: r.detection_id,
+            lat: r.lat,
+            lon: r.lon,
+            length_m: r.length_m,
+            width_m: r.width_m,
+            type: r.type,
+            source: r.source,
+            confidence: r.confidence,
+            last_update: r.last_update,
+          })),
+        };
+        _cache = parsed;
+        _cacheTime = now;
+        return parsed;
+      }
+      // DB 에 행이 없으면 파일 폴백 시도
+    } catch (err) {
+      console.warn('[sarDetectionStore] DB 조회 실패 → 파일 폴백:', err.message);
+    }
+  }
+
   try {
     const raw = await fs.promises.readFile(SAR_FILE, 'utf-8');
     const parsed = JSON.parse(raw);

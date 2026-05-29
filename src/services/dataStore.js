@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { hasDb, query } = require('./db');
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data');
 
@@ -66,17 +67,56 @@ async function getIceData(type, month) {
 }
 
 // 빙산 데이터 (NIC/IIP — 남극 필터링)
+// DB(bergs 테이블) 우선 조회, 실패 시 realBergData_latest.json 폴백.
 async function getIcebergData() {
   const cacheKey = 'icebergs_latest';
   const cached = getCached(cacheKey);
   if (cached) return cached;
 
-  const data = await readJsonFile(path.join(DATA_DIR, 'realBergData_latest.json'));
-  if (data && data.bergs) {
-    // 남극 빙산(lat < 0) 필터링
-    data.bergs = data.bergs.filter(b => b.lat >= 0);
-    data.berg_count = data.bergs.length;
+  let data = null;
+
+  if (hasDb()) {
+    try {
+      // lat >= 0 (남극 제외) 필터를 SQL 로 이동. last_update 는 원본 MM/DD/YYYY 문자열로 복원.
+      const { rows } = await query(
+        `SELECT id, lat, lon, length_m, width_m, type,
+                to_char(last_update, 'MM/DD/YYYY') AS last_update,
+                data_source, to_char(data_date, 'YYYY-MM-DD') AS data_date
+           FROM bergs
+          WHERE lat >= 0
+          ORDER BY id`
+      );
+      // 원본 파일 구조 복원: { source, date, berg_count, bergs:[{id,lat,lon,length_m,width_m,type,last_update}] }
+      const bergs = rows.map((r) => ({
+        id: r.id,
+        lat: r.lat,
+        lon: r.lon,
+        length_m: r.length_m,
+        width_m: r.width_m,
+        type: r.type,
+        last_update: r.last_update,
+      }));
+      data = {
+        source: rows[0]?.data_source ?? null,
+        date: rows[0]?.data_date ?? null,
+        berg_count: bergs.length,
+        bergs,
+      };
+    } catch (err) {
+      console.warn('[DataStore] bergs DB 조회 실패 → 파일 폴백:', err.message);
+      data = null;
+    }
   }
+
+  if (!data) {
+    data = await readJsonFile(path.join(DATA_DIR, 'realBergData_latest.json'));
+    if (data && data.bergs) {
+      // 남극 빙산(lat < 0) 필터링
+      data.bergs = data.bergs.filter(b => b.lat >= 0);
+      data.berg_count = data.bergs.length;
+    }
+  }
+
   if (data) setCache(cacheKey, data);
   return data;
 }
@@ -87,6 +127,31 @@ let copDataCache = null;
 let copFileMtime = 0;
 
 async function getCopernicusIcebergData() {
+  // DB(icebergs 테이블) 우선 조회. TTL 캐시(copDataCache) 재사용.
+  if (hasDb()) {
+    const cached = getCached('copernicus_icebergs_db');
+    if (cached) return cached;
+    try {
+      const { rows } = await query(
+        `SELECT id, lat, lon, source, period FROM icebergs ORDER BY id`
+      );
+      const { rows: meta } = await query(
+        `SELECT count(*)::int AS count, max(imported_at) AS updated_at FROM icebergs`
+      );
+      // 원본 파일 구조 복원: { count, updated_at, icebergs:[{id,lat,lon,source,period}] }
+      const data = {
+        count: meta[0]?.count ?? rows.length,
+        updated_at: meta[0]?.updated_at ? new Date(meta[0].updated_at).toISOString() : null,
+        icebergs: rows,
+      };
+      setCache('copernicus_icebergs_db', data);
+      return data;
+    } catch (err) {
+      console.warn('[DataStore] icebergs DB 조회 실패 → 파일 폴백:', err.message);
+    }
+  }
+
+  // 폴백: 파일 변경 감지로 자동 갱신
   try {
     const stat = await fs.promises.stat(COP_FILE);
     const mtime = stat.mtimeMs;
@@ -108,6 +173,36 @@ let s1DataCache = null;
 let s1FileMtime = 0;
 
 async function getSentinel1Catalog() {
+  // DB(sentinel1_products 테이블) 우선 조회. TTL 캐시 재사용.
+  if (hasDb()) {
+    const cached = getCached('sentinel1_catalog_db');
+    if (cached) return cached;
+    try {
+      // sentinel1.js 가 sensing_start 를 문자열 범위 비교에 사용하므로 ISO 문자열로 직렬화.
+      const { rows } = await query(
+        `SELECT id, name,
+                to_char(sensing_start, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS sensing_start,
+                to_char(sensing_stop,  'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS sensing_stop,
+                aoi, orbit_direction, polarization, file_path, file_size_mb,
+                to_char(download_timestamp, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS download_timestamp
+           FROM sentinel1_products
+          ORDER BY sensing_start DESC NULLS LAST`
+      );
+      // 원본 파일 구조 복원: { source, product_count, products:[...] }
+      // source 는 원본 sentinel1_catalog_latest.json 의 값과 동일하게 맞춤.
+      const data = {
+        source: 'Copernicus Data Space Ecosystem (CDSE)',
+        product_count: rows.length,
+        products: rows,
+      };
+      setCache('sentinel1_catalog_db', data);
+      return data;
+    } catch (err) {
+      console.warn('[DataStore] sentinel1 DB 조회 실패 → 파일 폴백:', err.message);
+    }
+  }
+
+  // 폴백: 파일 변경 감지로 자동 갱신
   try {
     const stat = await fs.promises.stat(S1_FILE);
     const mtime = stat.mtimeMs;
@@ -139,4 +234,11 @@ async function getWeatherData() {
   return data;
 }
 
-module.exports = { getIceData, getIcebergData, getCopernicusIcebergData, getWeatherData, getSentinel1Catalog };
+// 모든 읽기 캐시 무효화 (DB 동기화 직후 호출 → 다음 조회가 최신 DB 반영)
+function clearCache() {
+  cache.clear();
+  copDataCache = null; copFileMtime = 0;
+  s1DataCache = null; s1FileMtime = 0;
+}
+
+module.exports = { getIceData, getIcebergData, getCopernicusIcebergData, getWeatherData, getSentinel1Catalog, clearCache };
