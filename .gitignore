@@ -58,6 +58,8 @@ data/archive/
 # Downloaded data caches (regenerable .nc fetches)
 pipeline/cache/
 pipeline/fetchers/cache/
+# Legacy/archived code & assets (kept locally, not pushed)
+_archive/
 
 # ---- Keep dependency manifests (override the *.txt rule above) ----
 !requirements.txt
