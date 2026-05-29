@@ -35,22 +35,28 @@ async function getIceData(type, month) {
   const cached = getCached(cacheKey);
   if (cached) return cached;
 
-  let fileName;
+  // 월별 레퍼런스는 data/monthly/, latest 라이브 데이터는 data/ 최상위
+  const MONTHLY_DIR = path.join(DATA_DIR, 'monthly');
+
+  let filePath;
   if (month === 'latest') {
-    fileName = 'realIceData_latest.json';
+    filePath = path.join(DATA_DIR, 'realIceData_latest.json');
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(month)) {
+    // 날짜별 적산 아카이브: "2026-05-26" → archive/daily/realIceData_20260526.json
+    filePath = path.join(DATA_DIR, 'archive', 'daily', `realIceData_${month.replace(/-/g, '')}.json`);
   } else {
-    // month 형식: "2023-03" → "03"
+    // 월별: "2023-03" 또는 "month-03" → "03"
     const mm = month.includes('-') ? month.split('-')[1] : month;
-    fileName = `realIceData_month${mm}.json`;
+    filePath = path.join(MONTHLY_DIR, `realIceData_month${mm}.json`);
   }
 
-  let data = await readJsonFile(path.join(DATA_DIR, fileName));
+  let data = await readJsonFile(filePath);
 
   // latest 파일이 없으면 월별 파일 중 가장 최근(12→1 순) 것으로 폴백
   if (!data && month === 'latest') {
     for (let m = 12; m >= 1; m--) {
       const mm = String(m).padStart(2, '0');
-      data = await readJsonFile(path.join(DATA_DIR, `realIceData_month${mm}.json`));
+      data = await readJsonFile(path.join(MONTHLY_DIR, `realIceData_month${mm}.json`));
       if (data) { console.log(`[DataStore] realIceData_latest.json 없음 → month${mm} 폴백`); break; }
     }
   }

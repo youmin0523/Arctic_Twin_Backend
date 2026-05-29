@@ -135,11 +135,11 @@ class IceField:
 
     @classmethod
     def from_month(cls, month: int, data_dir: Path | None = None) -> "IceField":
-        """backend/data/realIceData_monthNN.json 로드."""
+        """backend/data/monthly/realIceData_monthNN.json 로드."""
         if data_dir is None:
             # backend/pipeline/icebreaker/ -> backend/data/
             data_dir = Path(__file__).resolve().parents[2] / "data"
-        path = data_dir / f"realIceData_month{month:02d}.json"
+        path = data_dir / "monthly" / f"realIceData_month{month:02d}.json"
         if not path.exists():
             raise FileNotFoundError(f"Ice snapshot not found: {path}")
         with open(path, "r", encoding="utf-8") as f:

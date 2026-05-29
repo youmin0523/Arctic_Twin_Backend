@@ -63,7 +63,7 @@ def month_interval(m: int) -> str:
 
 def load_month(m: int) -> dict:
     """월별 JSON 파일 로드."""
-    path = DATA_DIR / f'realIceData_month{m:02d}.json'
+    path = DATA_DIR / 'monthly' / f'realIceData_month{m:02d}.json'
     with open(path, encoding='utf-8') as f:
         return json.load(f)
 

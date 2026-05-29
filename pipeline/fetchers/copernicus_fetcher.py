@@ -14,7 +14,7 @@ Copernicus Marine Service - Arctic Sea Ice 자동 수집 파이프라인
   python copernicus_fetcher.py --date 2025-03-20 # 특정 날짜 수집
   python copernicus_fetcher.py --dry-run         # 실제 다운로드 없이 설정만 확인
 
-출력: output/realIceData_latest.json (+ output/archive/realIceData_YYYYMMDD.json)
+출력: output/realIceData_latest.json (+ output/archive/daily/realIceData_YYYYMMDD.json)
 """
 
 import argparse
@@ -53,7 +53,7 @@ MIN_LAT = 60.0
 STEP = 3  # 6km * 3 = 18km 간격 다운샘플링 (파일 크기 관리)
 MIN_CONC = 0.05
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
-ARCHIVE_DIR = os.path.join(OUTPUT_DIR, "archive")
+ARCHIVE_DIR = os.path.join(OUTPUT_DIR, "archive", "daily")
 
 
 def check_credentials():

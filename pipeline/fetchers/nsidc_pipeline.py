@@ -224,10 +224,11 @@ def process_nc(nc_path, date_str, month, step=2, min_conc=0.05, min_lat=60.0):
 
 
 def save_json(data, month, output_dir="output"):
-    """JSON 파일 저장."""
-    os.makedirs(output_dir, exist_ok=True)
+    """JSON 파일 저장 (월별은 output_dir/monthly/ 하위에 저장)."""
+    monthly_dir = os.path.join(output_dir, "monthly")
+    os.makedirs(monthly_dir, exist_ok=True)
     fname = f"realIceData_month{month:02d}.json"
-    out_path = os.path.join(output_dir, fname)
+    out_path = os.path.join(monthly_dir, fname)
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
     size_mb = os.path.getsize(out_path) / (1024 * 1024)
@@ -296,7 +297,7 @@ def main():
                 sys.exit(1)
 
     print(f"\n완료! JSON 파일을 arctic-hybrid.html과 같은 폴더에 복사하세요.")
-    print(f"  cp {args.output_dir}/realIceData_month*.json <html 폴더>/")
+    print(f"  cp {args.output_dir}/monthly/realIceData_month*.json <html 폴더>/")
 
 
 if __name__ == "__main__":

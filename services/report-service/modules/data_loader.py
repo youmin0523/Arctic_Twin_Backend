@@ -47,7 +47,7 @@ class DataLoader:
 
         result = {}
         for m in months:
-            fpath = self.data_dir / f"realIceData_month{m:02d}.json"
+            fpath = self.data_dir / "monthly" / f"realIceData_month{m:02d}.json"
             if not fpath.exists():
                 logger.warning("월별 해빙 파일 없음: %s", fpath.name)
                 continue
