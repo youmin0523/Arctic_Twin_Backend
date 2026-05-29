@@ -1,0 +1,97 @@
+{
+  "detection_time": "2026-05-27T12:00:00.000000",
+  "products_processed": 1,
+  "total_detected": 8,
+  "confidence_threshold": 0.4,
+  "_note": "데모용 샘플. 실제 iceberg_detector.py 실행 시 덮어쓰여짐.",
+  "detections": [
+    {
+      "id": "SAR_DEMO_001",
+      "lon": 30.5,
+      "lat": 78.2,
+      "length_m": 1200,
+      "width_m": 800,
+      "type": "growler",
+      "source": "sentinel1_sar",
+      "confidence": 0.87,
+      "last_update": "05/27/2026"
+    },
+    {
+      "id": "SAR_DEMO_002",
+      "lon": 35.1,
+      "lat": 76.5,
+      "length_m": 2400,
+      "width_m": 1500,
+      "type": "small",
+      "source": "sentinel1_sar",
+      "confidence": 0.92,
+      "last_update": "05/27/2026"
+    },
+    {
+      "id": "SAR_DEMO_003",
+      "lon": 40.8,
+      "lat": 75.3,
+      "length_m": 800,
+      "width_m": 500,
+      "type": "growler",
+      "source": "sentinel1_sar",
+      "confidence": 0.71,
+      "last_update": "05/27/2026"
+    },
+    {
+      "id": "SAR_DEMO_004",
+      "lon": 25.4,
+      "lat": 79.8,
+      "length_m": 3500,
+      "width_m": 2100,
+      "type": "medium",
+      "source": "sentinel1_sar",
+      "confidence": 0.89,
+      "last_update": "05/27/2026"
+    },
+    {
+      "id": "SAR_DEMO_005",
+      "lon": 50.2,
+      "lat": 74.1,
+      "length_m": 1800,
+      "width_m": 1100,
+      "type": "small",
+      "source": "sentinel1_sar",
+      "confidence": 0.78,
+      "last_update": "05/27/2026"
+    },
+    {
+      "id": "SAR_DEMO_006",
+      "lon": 60.7,
+      "lat": 72.9,
+      "length_m": 1500,
+      "width_m": 900,
+      "type": "small",
+      "source": "sentinel1_sar",
+      "confidence": 0.83,
+      "last_update": "05/27/2026"
+    },
+    {
+      "id": "SAR_DEMO_007",
+      "lon": -45.3,
+      "lat": 70.5,
+      "length_m": 5200,
+      "width_m": 3000,
+      "type": "large",
+      "source": "sentinel1_sar",
+      "confidence": 0.94,
+      "last_update": "05/27/2026"
+    },
+    {
+      "id": "SAR_DEMO_008",
+      "lon": -55.8,
+      "lat": 68.2,
+      "length_m": 2800,
+      "width_m": 1700,
+      "type": "medium",
+      "source": "sentinel1_sar",
+      "confidence": 0.81,
+      "last_update": "05/27/2026"
+    }
+  ]
+}

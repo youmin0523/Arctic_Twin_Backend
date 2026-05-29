@@ -1,0 +1,247 @@
+{
+  "fuel": {
+    "is_training": false,
+    "progress": 0,
+    "stage": "대기 중",
+    "result": null,
+    "error": null,
+    "started_at": null,
+    "finished_at": null,
+    "metrics": {},
+    "mode": "idle",
+    "iteration": 0,
+    "max_iterations": 0,
+    "iterative_status": {}
+  },
+  "whatif": {
+    "is_running": false,
+    "progress": 100,
+    "stage": "반복 완료 (3회)",
+    "result": {
+      "total_iterations": 3,
+      "converged": false,
+      "best_quality": {
+        "scenarios_count": 3,
+        "avg_rio_spread": 0.431,
+        "recommendations_dist": {
+          "추천": 1,
+          "조건부": 1,
+          "비추천": 0
+        },
+        "tool_efficiency": 1.0,
+        "comparison_text_len": 40
+      },
+      "best_iteration": 3,
+      "history": [
+        {
+          "iteration": 1,
+          "config": {
+            "route": "NSR",
+            "ice_class": "PC5",
+            "departure_date": "2026-04-14",
+            "forecast_days": 30
+          },
+          "quality": {
+            "scenarios_count": 3,
+            "avg_rio_spread": 0.343,
+            "recommendations_dist": {
+              "추천": 1,
+              "조건부": 1,
+              "비추천": 0
+            },
+            "tool_efficiency": 1.0,
+            "comparison_text_len": 40
+          },
+          "signals": [
+            "insufficient_scenarios",
+            "shallow_analysis"
+          ],
+          "improved": true,
+          "converged": false,
+          "duration_seconds": 0.8,
+          "result_path": "C:\\cccc\\Digital_twin\\report-service\\data\\whatif_iter1_result.json",
+          "timestamp": "2026-04-14T17:20:43.110283"
+        },
+        {
+          "iteration": 2,
+          "config": {
+            "route": "NWP",
+            "ice_class": "PC5",
+            "departure_date": "2026-04-14",
+            "forecast_days": 60
+          },
+          "quality": {
+            "scenarios_count": 3,
+            "avg_rio_spread": 0.261,
+            "recommendations_dist": {
+              "추천": 1,
+              "조건부": 1,
+              "비추천": 0
+            },
+            "tool_efficiency": 1.0,
+            "comparison_text_len": 40
+          },
+          "signals": [
+            "insufficient_scenarios",
+            "shallow_analysis",
+            "no_improvement"
+          ],
+          "improved": false,
+          "converged": false,
+          "duration_seconds": 1.1,
+          "result_path": "C:\\cccc\\Digital_twin\\report-service\\data\\whatif_iter2_result.json",
+          "timestamp": "2026-04-14T17:20:44.257061"
+        },
+        {
+          "iteration": 3,
+          "config": {
+            "route": "TSR",
+            "ice_class": "PC5",
+            "departure_date": "2026-04-14",
+            "forecast_days": 90
+          },
+          "quality": {
+            "scenarios_count": 3,
+            "avg_rio_spread": 0.431,
+            "recommendations_dist": {
+              "추천": 1,
+              "조건부": 1,
+              "비추천": 0
+            },
+            "tool_efficiency": 1.0,
+            "comparison_text_len": 40
+          },
+          "signals": [
+            "insufficient_scenarios",
+            "shallow_analysis"
+          ],
+          "improved": true,
+          "converged": false,
+          "duration_seconds": 1.0,
+          "result_path": "C:\\cccc\\Digital_twin\\report-service\\data\\whatif_iter3_result.json",
+          "timestamp": "2026-04-14T17:20:45.232181"
+        }
+      ],
+      "finished_at": "2026-04-14T17:20:45.236833"
+    },
+    "error": null,
+    "started_at": "2026-04-14T17:20:42.147034",
+    "finished_at": "2026-04-14T17:20:45.236833",
+    "scenarios_count": 3,
+    "route": "NSR",
+    "ice_class": "PC6",
+    "mode": "iterative",
+    "iteration": 0,
+    "max_iterations": 3,
+    "iterative_status": {
+      "iterations_done": 3,
+      "converged": false,
+      "best_quality": {
+        "scenarios_count": 3,
+        "avg_rio_spread": 0.431,
+        "recommendations_dist": {
+          "추천": 1,
+          "조건부": 1,
+          "비추천": 0
+        },
+        "tool_efficiency": 1.0,
+        "comparison_text_len": 40
+      },
+      "best_iteration": 3,
+      "last_signals": [
+        "insufficient_scenarios",
+        "shallow_analysis"
+      ],
+      "history": [
+        {
+          "iteration": 1,
+          "config": {
+            "route": "NSR",
+            "ice_class": "PC5",
+            "departure_date": "2026-04-14",
+            "forecast_days": 30
+          },
+          "quality": {
+            "scenarios_count": 3,
+            "avg_rio_spread": 0.343,
+            "recommendations_dist": {
+              "추천": 1,
+              "조건부": 1,
+              "비추천": 0
+            },
+            "tool_efficiency": 1.0,
+            "comparison_text_len": 40
+          },
+          "signals": [
+            "insufficient_scenarios",
+            "shallow_analysis"
+          ],
+          "improved": true,
+          "converged": false,
+          "duration_seconds": 0.8,
+          "result_path": "C:\\cccc\\Digital_twin\\report-service\\data\\whatif_iter1_result.json",
+          "timestamp": "2026-04-14T17:20:43.110283"
+        },
+        {
+          "iteration": 2,
+          "config": {
+            "route": "NWP",
+            "ice_class": "PC5",
+            "departure_date": "2026-04-14",
+            "forecast_days": 60
+          },
+          "quality": {
+            "scenarios_count": 3,
+            "avg_rio_spread": 0.261,
+            "recommendations_dist": {
+              "추천": 1,
+              "조건부": 1,
+              "비추천": 0
+            },
+            "tool_efficiency": 1.0,
+            "comparison_text_len": 40
+          },
+          "signals": [
+            "insufficient_scenarios",
+            "shallow_analysis",
+            "no_improvement"
+          ],
+          "improved": false,
+          "converged": false,
+          "duration_seconds": 1.1,
+          "result_path": "C:\\cccc\\Digital_twin\\report-service\\data\\whatif_iter2_result.json",
+          "timestamp": "2026-04-14T17:20:44.257061"
+        },
+        {
+          "iteration": 3,
+          "config": {
+            "route": "TSR",
+            "ice_class": "PC5",
+            "departure_date": "2026-04-14",
+            "forecast_days": 90
+          },
+          "quality": {
+            "scenarios_count": 3,
+            "avg_rio_spread": 0.431,
+            "recommendations_dist": {
+              "추천": 1,
+              "조건부": 1,
+              "비추천": 0
+            },
+            "tool_efficiency": 1.0,
+            "comparison_text_len": 40
+          },
+          "signals": [
+            "insufficient_scenarios",
+            "shallow_analysis"
+          ],
+          "improved": true,
+          "converged": false,
+          "duration_seconds": 1.0,
+          "result_path": "C:\\cccc\\Digital_twin\\report-service\\data\\whatif_iter3_result.json",
+          "timestamp": "2026-04-14T17:20:45.232181"
+        }
+      ]
+    }
+  }
+}

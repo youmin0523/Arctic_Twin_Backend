@@ -1,0 +1,5070 @@
+{
+  "icebergs": [
+    {
+      "id": "COP-SAR-0001",
+      "lat": 71.1714,
+      "lon": 27.401,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0002",
+      "lat": 71.0921,
+      "lon": 26.3655,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0003",
+      "lat": 71.0538,
+      "lon": 26.361,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0004",
+      "lat": 71.05,
+      "lon": 26.3603,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0005",
+      "lat": 70.9816,
+      "lon": 26.3696,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0006",
+      "lat": 70.9795,
+      "lon": 26.34,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0007",
+      "lat": 70.8624,
+      "lon": 28.6076,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0008",
+      "lat": 70.6052,
+      "lon": 28.3752,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0009",
+      "lat": 70.441,
+      "lon": 31.977,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0010",
+      "lat": 69.274,
+      "lon": -54.1285,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0011",
+      "lat": 69.2714,
+      "lon": -54.1265,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0012",
+      "lat": 69.1368,
+      "lon": -54.4044,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0013",
+      "lat": 69.051,
+      "lon": -56.1499,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0014",
+      "lat": 69.0908,
+      "lon": -54.9173,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0015",
+      "lat": 69.0744,
+      "lon": -55.1695,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0016",
+      "lat": 69.0939,
+      "lon": -54.1101,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0017",
+      "lat": 68.9308,
+      "lon": -57.9986,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0018",
+      "lat": 68.9856,
+      "lon": -56.4902,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0019",
+      "lat": 68.9843,
+      "lon": -55.9365,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0020",
+      "lat": 68.9435,
+      "lon": -56.8501,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0021",
+      "lat": 68.955,
+      "lon": -54.0736,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0022",
+      "lat": 68.8567,
+      "lon": -56.6316,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0023",
+      "lat": 68.8734,
+      "lon": -55.4721,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0024",
+      "lat": 68.8511,
+      "lon": -55.3369,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0025",
+      "lat": 68.8012,
+      "lon": -55.2766,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0026",
+      "lat": 68.7336,
+      "lon": -56.6896,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0027",
+      "lat": 68.6978,
+      "lon": -56.6937,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0028",
+      "lat": 68.6713,
+      "lon": -56.7572,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0029",
+      "lat": 68.7219,
+      "lon": -54.0452,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0030",
+      "lat": 68.7077,
+      "lon": -54.4053,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0031",
+      "lat": 68.6853,
+      "lon": -54.9276,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0032",
+      "lat": 68.6503,
+      "lon": -55.7004,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0033",
+      "lat": 68.6018,
+      "lon": -56.9517,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0034",
+      "lat": 68.6588,
+      "lon": -55.457,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0035",
+      "lat": 68.6452,
+      "lon": -55.161,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0036",
+      "lat": 68.6522,
+      "lon": -54.8132,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0037",
+      "lat": 68.5407,
+      "lon": -57.4678,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0038",
+      "lat": 68.5376,
+      "lon": -56.938,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0039",
+      "lat": 68.5619,
+      "lon": -55.4908,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0040",
+      "lat": 68.5596,
+      "lon": -55.3338,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0041",
+      "lat": 68.5251,
+      "lon": -55.6441,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0042",
+      "lat": 68.4716,
+      "lon": -55.0166,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0043",
+      "lat": 68.4731,
+      "lon": -54.8037,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0044",
+      "lat": 68.4557,
+      "lon": -54.3866,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0045",
+      "lat": 68.4354,
+      "lon": -54.8895,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0046",
+      "lat": 68.3546,
+      "lon": -55.8661,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0047",
+      "lat": 68.3495,
+      "lon": -55.57,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0048",
+      "lat": 68.364,
+      "lon": -55.0534,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0049",
+      "lat": 68.2991,
+      "lon": -56.6695,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0050",
+      "lat": 68.2867,
+      "lon": -56.3344,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0051",
+      "lat": 68.309,
+      "lon": -55.4187,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0052",
+      "lat": 68.2821,
+      "lon": -56.0102,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0053",
+      "lat": 68.263,
+      "lon": -56.4507,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0054",
+      "lat": 68.189,
+      "lon": -56.366,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0055",
+      "lat": 68.2303,
+      "lon": -54.7859,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0056",
+      "lat": 68.1995,
+      "lon": -54.7356,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0057",
+      "lat": 68.1772,
+      "lon": -54.8588,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0058",
+      "lat": 68.1655,
+      "lon": -54.526,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0059",
+      "lat": 67.9443,
+      "lon": -53.8906,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0060",
+      "lat": 67.786,
+      "lon": -56.1086,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0061",
+      "lat": 67.7699,
+      "lon": -54.6718,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0062",
+      "lat": 67.7687,
+      "lon": -54.6178,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0063",
+      "lat": 67.3799,
+      "lon": -54.6522,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0064",
+      "lat": 66.992,
+      "lon": -54.1271,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0065",
+      "lat": 66.5798,
+      "lon": -53.6488,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0066",
+      "lat": 66.5548,
+      "lon": -53.7288,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0067",
+      "lat": 66.2252,
+      "lon": -53.7951,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0068",
+      "lat": 66.0398,
+      "lon": -57.7414,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0069",
+      "lat": 65.8263,
+      "lon": -53.1485,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0070",
+      "lat": 65.4935,
+      "lon": -53.1932,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0071",
+      "lat": 65.3014,
+      "lon": -52.6118,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0072",
+      "lat": 65.2418,
+      "lon": -52.6777,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0073",
+      "lat": 65.148,
+      "lon": -52.6657,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0074",
+      "lat": 65.0776,
+      "lon": -52.3813,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0075",
+      "lat": 65.0557,
+      "lon": -52.5235,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0076",
+      "lat": 64.9887,
+      "lon": -52.4753,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0077",
+      "lat": 64.9839,
+      "lon": -52.4782,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0078",
+      "lat": 64.9366,
+      "lon": -52.2866,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0079",
+      "lat": 64.8831,
+      "lon": -52.2645,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0080",
+      "lat": 64.8739,
+      "lon": -52.2686,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0081",
+      "lat": 64.8407,
+      "lon": -52.2643,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0082",
+      "lat": 64.838,
+      "lon": -52.2639,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0083",
+      "lat": 64.8357,
+      "lon": -52.2621,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0084",
+      "lat": 64.8254,
+      "lon": -52.2863,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0085",
+      "lat": 64.7997,
+      "lon": -52.2354,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0086",
+      "lat": 64.7893,
+      "lon": -52.2653,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0087",
+      "lat": 64.7232,
+      "lon": -52.1993,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0088",
+      "lat": 64.7196,
+      "lon": -52.1962,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0089",
+      "lat": 64.7179,
+      "lon": -52.1918,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0090",
+      "lat": 64.5673,
+      "lon": -52.231,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0091",
+      "lat": 64.4319,
+      "lon": -52.2923,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0092",
+      "lat": 64.4174,
+      "lon": -52.337,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0093",
+      "lat": 64.417,
+      "lon": -52.28,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0094",
+      "lat": 64.3561,
+      "lon": -52.2539,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0095",
+      "lat": 63.819,
+      "lon": -51.7587,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0096",
+      "lat": 63.7868,
+      "lon": -51.8148,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0097",
+      "lat": 63.7954,
+      "lon": -51.5938,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0098",
+      "lat": 63.5033,
+      "lon": -51.4557,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0099",
+      "lat": 63.5016,
+      "lon": -51.448,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0100",
+      "lat": 63.3995,
+      "lon": -51.2013,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0101",
+      "lat": 63.3822,
+      "lon": -51.2786,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0102",
+      "lat": 63.3817,
+      "lon": -51.283,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0103",
+      "lat": 63.3728,
+      "lon": -51.2199,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0104",
+      "lat": 63.3368,
+      "lon": -51.2564,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0105",
+      "lat": 63.3366,
+      "lon": -51.2513,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0106",
+      "lat": 63.3088,
+      "lon": -51.2714,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0107",
+      "lat": 63.3084,
+      "lon": -51.2665,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0108",
+      "lat": 63.2941,
+      "lon": -51.2527,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0109",
+      "lat": 63.2856,
+      "lon": -51.2386,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0110",
+      "lat": 63.2828,
+      "lon": -51.2392,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0111",
+      "lat": 63.2748,
+      "lon": -51.2337,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0112",
+      "lat": 63.1107,
+      "lon": -51.111,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0113",
+      "lat": 63.0022,
+      "lon": -50.7871,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0114",
+      "lat": 62.8931,
+      "lon": -50.6352,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0115",
+      "lat": 62.8087,
+      "lon": -50.507,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0116",
+      "lat": 62.8085,
+      "lon": -50.4856,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0117",
+      "lat": 62.6874,
+      "lon": -50.4617,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0118",
+      "lat": 62.5483,
+      "lon": -50.3587,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0119",
+      "lat": 62.5353,
+      "lon": -50.4011,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0120",
+      "lat": 62.5382,
+      "lon": -50.3671,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0121",
+      "lat": 62.5281,
+      "lon": -50.3567,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0122",
+      "lat": 62.3113,
+      "lon": -50.1049,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0123",
+      "lat": 60.0032,
+      "lon": -45.3633,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0124",
+      "lat": 59.9932,
+      "lon": -44.9899,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0125",
+      "lat": 60.1558,
+      "lon": -42.9785,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0126",
+      "lat": 59.9164,
+      "lon": -45.0928,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0127",
+      "lat": 60.1058,
+      "lon": -43.0158,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0128",
+      "lat": 59.8562,
+      "lon": -45.3005,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0129",
+      "lat": 59.8629,
+      "lon": -44.7997,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0130",
+      "lat": 59.8522,
+      "lon": -44.174,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0131",
+      "lat": 59.8444,
+      "lon": -44.1857,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0132",
+      "lat": 59.9905,
+      "lon": -42.5451,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0133",
+      "lat": 59.819,
+      "lon": -44.1669,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0134",
+      "lat": 59.8178,
+      "lon": -44.1708,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0135",
+      "lat": 59.814,
+      "lon": -44.1713,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0136",
+      "lat": 59.8614,
+      "lon": -43.44,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0137",
+      "lat": 59.8079,
+      "lon": -43.7137,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0138",
+      "lat": 59.7536,
+      "lon": -43.935,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0139",
+      "lat": 59.0644,
+      "lon": -45.3127,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0140",
+      "lat": 58.4407,
+      "lon": -46.7452,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0141",
+      "lat": 73.9989,
+      "lon": -9.8803,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0142",
+      "lat": 72.9545,
+      "lon": -8.7623,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0143",
+      "lat": 72.932,
+      "lon": -8.7266,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0144",
+      "lat": 56.8251,
+      "lon": -168.012,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0145",
+      "lat": 56.719,
+      "lon": -167.8804,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0146",
+      "lat": 56.8425,
+      "lon": -170.3247,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0147",
+      "lat": 56.5449,
+      "lon": -168.021,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0148",
+      "lat": 56.2214,
+      "lon": -165.4542,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0149",
+      "lat": 56.4683,
+      "lon": -162.5159,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0150",
+      "lat": 56.0528,
+      "lon": -164.834,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0151",
+      "lat": 55.464,
+      "lon": -163.2019,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0152",
+      "lat": 55.2413,
+      "lon": -161.8513,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0153",
+      "lat": 55.1671,
+      "lon": -163.5094,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0154",
+      "lat": 54.9528,
+      "lon": -161.9032,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0155",
+      "lat": 55.0741,
+      "lon": -163.4489,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0156",
+      "lat": 57.2905,
+      "lon": -162.2104,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0157",
+      "lat": 57.2829,
+      "lon": -162.2097,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0158",
+      "lat": 57.2693,
+      "lon": -162.1924,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0159",
+      "lat": 76.7677,
+      "lon": 1.76,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0160",
+      "lat": 76.938,
+      "lon": 19.7383,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0161",
+      "lat": 75.2006,
+      "lon": 24.3401,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0162",
+      "lat": 74.8315,
+      "lon": 16.1788,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0163",
+      "lat": 74.7744,
+      "lon": 15.8601,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0164",
+      "lat": 74.7409,
+      "lon": 16.1124,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0165",
+      "lat": 73.8217,
+      "lon": 19.2537,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0166",
+      "lat": 73.8337,
+      "lon": 19.4637,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0167",
+      "lat": 72.535,
+      "lon": 20.384,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0168",
+      "lat": 72.523,
+      "lon": 20.3423,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0169",
+      "lat": 72.484,
+      "lon": 20.2346,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0170",
+      "lat": 72.4802,
+      "lon": 20.276,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0171",
+      "lat": 72.288,
+      "lon": 22.3607,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0172",
+      "lat": 72.3706,
+      "lon": 26.9672,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0173",
+      "lat": 72.0612,
+      "lon": 25.2576,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0174",
+      "lat": 71.8024,
+      "lon": 23.2641,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0175",
+      "lat": 71.7522,
+      "lon": 25.886,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0176",
+      "lat": 71.691,
+      "lon": 26.0338,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0177",
+      "lat": 71.6519,
+      "lon": 26.0053,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0178",
+      "lat": 71.6199,
+      "lon": 25.8731,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0179",
+      "lat": 71.6261,
+      "lon": 26.1641,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0180",
+      "lat": 71.3208,
+      "lon": 22.2534,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0181",
+      "lat": 71.3109,
+      "lon": 22.25,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0182",
+      "lat": 71.2402,
+      "lon": 21.726,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0183",
+      "lat": 71.677,
+      "lon": 29.7128,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0184",
+      "lat": 71.1944,
+      "lon": 24.9361,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0185",
+      "lat": 71.1952,
+      "lon": 25.1527,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0186",
+      "lat": 69.3156,
+      "lon": 33.5223,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0187",
+      "lat": 71.8607,
+      "lon": -60.0096,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0188",
+      "lat": 71.7094,
+      "lon": -59.0286,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0189",
+      "lat": 71.5643,
+      "lon": -57.8758,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0190",
+      "lat": 71.6596,
+      "lon": -58.958,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0191",
+      "lat": 71.7296,
+      "lon": -59.6256,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0192",
+      "lat": 71.5181,
+      "lon": -58.4232,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0193",
+      "lat": 71.6548,
+      "lon": -59.6597,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0194",
+      "lat": 71.4594,
+      "lon": -58.0967,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0195",
+      "lat": 71.6612,
+      "lon": -60.0761,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0196",
+      "lat": 71.4258,
+      "lon": -58.4371,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0197",
+      "lat": 71.3843,
+      "lon": -58.1329,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0198",
+      "lat": 71.3641,
+      "lon": -58.1149,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0199",
+      "lat": 71.3624,
+      "lon": -58.2701,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0200",
+      "lat": 71.3945,
+      "lon": -58.624,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0201",
+      "lat": 71.4038,
+      "lon": -58.7783,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0202",
+      "lat": 71.3637,
+      "lon": -58.802,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0203",
+      "lat": 71.4804,
+      "lon": -59.9793,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0204",
+      "lat": 71.3638,
+      "lon": -59.1286,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0205",
+      "lat": 71.2184,
+      "lon": -58.8001,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0206",
+      "lat": 71.2629,
+      "lon": -59.2691,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0207",
+      "lat": 71.2235,
+      "lon": -59.0867,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0208",
+      "lat": 71.1407,
+      "lon": -58.7559,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0209",
+      "lat": 71.1558,
+      "lon": -58.9028,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0210",
+      "lat": 71.0856,
+      "lon": -58.5886,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0211",
+      "lat": 71.0941,
+      "lon": -58.6913,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0212",
+      "lat": 71.0087,
+      "lon": -59.121,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0213",
+      "lat": 70.9431,
+      "lon": -58.6587,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0214",
+      "lat": 70.9763,
+      "lon": -58.9452,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0215",
+      "lat": 66.6877,
+      "lon": -53.5319,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0216",
+      "lat": 66.6172,
+      "lon": -53.6015,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0217",
+      "lat": 62.1356,
+      "lon": -49.8343,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0218",
+      "lat": 62.0836,
+      "lon": -49.781,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0219",
+      "lat": 61.9714,
+      "lon": -49.5003,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0220",
+      "lat": 61.9633,
+      "lon": -49.5848,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0221",
+      "lat": 61.9263,
+      "lon": -49.7196,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0222",
+      "lat": 61.9248,
+      "lon": -49.729,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0223",
+      "lat": 61.9223,
+      "lon": -49.6897,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0224",
+      "lat": 61.9231,
+      "lon": -49.7253,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0225",
+      "lat": 61.8646,
+      "lon": -50.2877,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0226",
+      "lat": 61.4502,
+      "lon": -48.9099,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0227",
+      "lat": 61.45,
+      "lon": -49.0981,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0228",
+      "lat": 61.4368,
+      "lon": -49.0243,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0229",
+      "lat": 61.4204,
+      "lon": -49.1077,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0230",
+      "lat": 61.4107,
+      "lon": -49.111,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0231",
+      "lat": 61.4073,
+      "lon": -49.1161,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0232",
+      "lat": 61.3968,
+      "lon": -49.1291,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0233",
+      "lat": 61.3729,
+      "lon": -49.0237,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0234",
+      "lat": 61.3442,
+      "lon": -48.9173,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0235",
+      "lat": 61.3408,
+      "lon": -48.9156,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0236",
+      "lat": 61.083,
+      "lon": -48.466,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0237",
+      "lat": 60.9265,
+      "lon": -48.2525,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0238",
+      "lat": 60.8546,
+      "lon": -48.4367,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0239",
+      "lat": 60.8388,
+      "lon": -48.4482,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0240",
+      "lat": 60.8363,
+      "lon": -48.4172,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0241",
+      "lat": 60.8333,
+      "lon": -48.4261,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0242",
+      "lat": 60.8249,
+      "lon": -48.3882,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0243",
+      "lat": 60.7898,
+      "lon": -48.4853,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0244",
+      "lat": 60.7875,
+      "lon": -48.4676,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0245",
+      "lat": 60.7305,
+      "lon": -48.2156,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0246",
+      "lat": 60.7509,
+      "lon": -48.4778,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0247",
+      "lat": 60.6047,
+      "lon": -47.5789,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0248",
+      "lat": 60.5809,
+      "lon": -47.5774,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0249",
+      "lat": 60.5776,
+      "lon": -47.576,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0250",
+      "lat": 80.792,
+      "lon": 20.6739,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0251",
+      "lat": 80.8704,
+      "lon": 19.7084,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0252",
+      "lat": 67.9761,
+      "lon": -3.4392,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0253",
+      "lat": 67.9796,
+      "lon": -4.2802,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0254",
+      "lat": 67.877,
+      "lon": -4.3586,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0255",
+      "lat": 80.7493,
+      "lon": 13.5166,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0256",
+      "lat": 80.699,
+      "lon": 13.6736,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0257",
+      "lat": 80.6568,
+      "lon": 13.7681,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0258",
+      "lat": 72.9326,
+      "lon": 15.355,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0259",
+      "lat": 72.7221,
+      "lon": 17.6591,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0260",
+      "lat": 72.739,
+      "lon": 15.6753,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0261",
+      "lat": 72.4402,
+      "lon": 17.0634,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0262",
+      "lat": 72.1176,
+      "lon": 19.6054,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0263",
+      "lat": 72.2786,
+      "lon": 15.9057,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0264",
+      "lat": 71.7042,
+      "lon": 16.5004,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0265",
+      "lat": 71.4721,
+      "lon": 16.6403,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0266",
+      "lat": 71.2021,
+      "lon": 18.1265,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0267",
+      "lat": 70.8908,
+      "lon": 35.5063,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0268",
+      "lat": 70.0785,
+      "lon": 35.114,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0269",
+      "lat": 70.1133,
+      "lon": 33.9005,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0270",
+      "lat": 70.11,
+      "lon": 33.6135,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0271",
+      "lat": 70.0459,
+      "lon": 33.0977,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0272",
+      "lat": 70.2113,
+      "lon": 30.8965,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0273",
+      "lat": 70.056,
+      "lon": 30.1611,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0274",
+      "lat": 69.8817,
+      "lon": 31.9119,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0275",
+      "lat": 69.882,
+      "lon": 31.9051,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0276",
+      "lat": 69.8786,
+      "lon": 31.9094,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0277",
+      "lat": 70.029,
+      "lon": 30.0566,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0278",
+      "lat": 69.8536,
+      "lon": 31.6914,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0279",
+      "lat": 69.9116,
+      "lon": 29.9265,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0280",
+      "lat": 69.7906,
+      "lon": 30.0814,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0281",
+      "lat": 55.8426,
+      "lon": -159.7529,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0282",
+      "lat": 55.9104,
+      "lon": -158.8308,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0283",
+      "lat": 55.5479,
+      "lon": -161.5844,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0284",
+      "lat": 55.545,
+      "lon": -161.6022,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0285",
+      "lat": 55.4044,
+      "lon": -161.6305,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0286",
+      "lat": 55.3914,
+      "lon": -161.6171,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0287",
+      "lat": 55.3865,
+      "lon": -161.6175,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0288",
+      "lat": 55.3833,
+      "lon": -161.6147,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0289",
+      "lat": 55.3815,
+      "lon": -161.6149,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0290",
+      "lat": 55.5955,
+      "lon": -159.1607,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0291",
+      "lat": 54.9784,
+      "lon": -164.1244,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0292",
+      "lat": 54.9998,
+      "lon": -163.3339,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0293",
+      "lat": 54.9915,
+      "lon": -163.3257,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0294",
+      "lat": 55.1628,
+      "lon": -161.3168,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0295",
+      "lat": 55.0775,
+      "lon": -161.5062,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0296",
+      "lat": 54.9859,
+      "lon": -161.7582,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0297",
+      "lat": 54.985,
+      "lon": -161.7512,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0298",
+      "lat": 54.9817,
+      "lon": -161.7479,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0299",
+      "lat": 55.0145,
+      "lon": -161.4396,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0300",
+      "lat": 54.9612,
+      "lon": -161.7683,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0301",
+      "lat": 54.8979,
+      "lon": -162.1449,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0302",
+      "lat": 55.0776,
+      "lon": -160.5175,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0303",
+      "lat": 54.9073,
+      "lon": -162.0378,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0304",
+      "lat": 54.8626,
+      "lon": -162.1221,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0305",
+      "lat": 54.8808,
+      "lon": -161.8985,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0306",
+      "lat": 54.8786,
+      "lon": -161.9003,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0307",
+      "lat": 54.8663,
+      "lon": -161.9006,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0308",
+      "lat": 54.8535,
+      "lon": -161.847,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0309",
+      "lat": 54.8347,
+      "lon": -161.9399,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0310",
+      "lat": 54.8056,
+      "lon": -162.1588,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0311",
+      "lat": 54.7724,
+      "lon": -162.3714,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0312",
+      "lat": 54.7924,
+      "lon": -162.1815,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0313",
+      "lat": 54.7913,
+      "lon": -162.1753,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0314",
+      "lat": 54.823,
+      "lon": -161.8503,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0315",
+      "lat": 54.6045,
+      "lon": -163.5854,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0316",
+      "lat": 54.6008,
+      "lon": -163.5842,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0317",
+      "lat": 54.7714,
+      "lon": -162.1917,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0318",
+      "lat": 54.809,
+      "lon": -161.8186,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0319",
+      "lat": 54.7789,
+      "lon": -162.0618,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0320",
+      "lat": 54.7612,
+      "lon": -162.2016,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0321",
+      "lat": 54.76,
+      "lon": -162.2074,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0322",
+      "lat": 54.7582,
+      "lon": -162.2218,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0323",
+      "lat": 54.7715,
+      "lon": -162.0906,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0324",
+      "lat": 54.7616,
+      "lon": -162.1473,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0325",
+      "lat": 54.783,
+      "lon": -161.8941,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0326",
+      "lat": 54.7436,
+      "lon": -162.2085,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0327",
+      "lat": 54.7559,
+      "lon": -162.1053,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0328",
+      "lat": 54.7691,
+      "lon": -161.9198,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0329",
+      "lat": 54.7393,
+      "lon": -162.1697,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0330",
+      "lat": 54.7656,
+      "lon": -161.9153,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0331",
+      "lat": 54.7418,
+      "lon": -162.0732,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0332",
+      "lat": 54.7081,
+      "lon": -162.2391,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0333",
+      "lat": 54.6989,
+      "lon": -162.3084,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0334",
+      "lat": 54.7097,
+      "lon": -162.1652,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0335",
+      "lat": 54.6841,
+      "lon": -162.3215,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0336",
+      "lat": 54.6915,
+      "lon": -162.1548,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0337",
+      "lat": 54.7269,
+      "lon": -161.8574,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0338",
+      "lat": 54.6878,
+      "lon": -162.1623,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0339",
+      "lat": 54.686,
+      "lon": -162.169,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0340",
+      "lat": 54.6753,
+      "lon": -162.245,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0341",
+      "lat": 54.6545,
+      "lon": -162.4048,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0342",
+      "lat": 54.6525,
+      "lon": -162.405,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0343",
+      "lat": 54.6651,
+      "lon": -162.2027,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0344",
+      "lat": 54.6529,
+      "lon": -162.2799,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0345",
+      "lat": 54.6332,
+      "lon": -162.4074,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0346",
+      "lat": 54.6335,
+      "lon": -162.4046,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0347",
+      "lat": 54.6545,
+      "lon": -162.2131,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0348",
+      "lat": 54.6216,
+      "lon": -162.3329,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0349",
+      "lat": 54.6188,
+      "lon": -162.3356,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0350",
+      "lat": 54.6137,
+      "lon": -162.1319,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0351",
+      "lat": 54.6149,
+      "lon": -162.0708,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0352",
+      "lat": 54.38,
+      "lon": -162.9368,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0353",
+      "lat": 54.2853,
+      "lon": -163.4432,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0354",
+      "lat": 73.5753,
+      "lon": -57.6178,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0355",
+      "lat": 73.5307,
+      "lon": -57.6375,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0356",
+      "lat": 73.52,
+      "lon": -57.6558,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0357",
+      "lat": 73.5219,
+      "lon": -57.708,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0358",
+      "lat": 73.5003,
+      "lon": -57.617,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0359",
+      "lat": 73.4622,
+      "lon": -57.5898,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0360",
+      "lat": 73.4538,
+      "lon": -57.7083,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0361",
+      "lat": 65.3544,
+      "lon": -33.1215,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0362",
+      "lat": 66.7097,
+      "lon": -29.8253,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0363",
+      "lat": 68.8031,
+      "lon": 37.407,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0364",
+      "lat": 60.7256,
+      "lon": -47.1918,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0365",
+      "lat": 60.7098,
+      "lon": -47.0834,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0366",
+      "lat": 60.6357,
+      "lon": -46.6204,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0367",
+      "lat": 60.6441,
+      "lon": -46.5,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0368",
+      "lat": 60.6216,
+      "lon": -46.7081,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0369",
+      "lat": 60.6559,
+      "lon": -46.2832,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0370",
+      "lat": 60.6412,
+      "lon": -46.2869,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0371",
+      "lat": 60.6047,
+      "lon": -46.2014,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0372",
+      "lat": 60.3779,
+      "lon": -45.5587,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0373",
+      "lat": 60.2935,
+      "lon": -45.4968,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0374",
+      "lat": 60.2808,
+      "lon": -45.5073,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0375",
+      "lat": 60.2676,
+      "lon": -45.6471,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0376",
+      "lat": 60.2523,
+      "lon": -45.5178,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0377",
+      "lat": 60.2538,
+      "lon": -45.501,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0378",
+      "lat": 60.2487,
+      "lon": -45.5365,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0379",
+      "lat": 60.3842,
+      "lon": -43.097,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0380",
+      "lat": 70.3851,
+      "lon": 54.2702,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0381",
+      "lat": 68.2161,
+      "lon": -53.6637,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0382",
+      "lat": 68.1106,
+      "lon": -53.7281,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0383",
+      "lat": 68.0948,
+      "lon": -53.7461,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0384",
+      "lat": 67.9245,
+      "lon": -53.7869,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0385",
+      "lat": 67.9084,
+      "lon": -53.7304,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0386",
+      "lat": 68.8038,
+      "lon": 38.3559,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0387",
+      "lat": 58.5716,
+      "lon": -47.4798,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0388",
+      "lat": 57.9852,
+      "lon": -48.4479,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0389",
+      "lat": 57.842,
+      "lon": -48.2036,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0390",
+      "lat": 57.6934,
+      "lon": -48.5853,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0391",
+      "lat": 63.5379,
+      "lon": -28.3471,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0392",
+      "lat": 62.1377,
+      "lon": -31.6008,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0393",
+      "lat": 69.9187,
+      "lon": -10.3163,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0394",
+      "lat": 60.6167,
+      "lon": -178.3069,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0395",
+      "lat": 60.224,
+      "lon": -175.2053,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0396",
+      "lat": 60.222,
+      "lon": -175.2008,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0397",
+      "lat": 59.9656,
+      "lon": -177.3872,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0398",
+      "lat": 58.7219,
+      "lon": -173.4225,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0399",
+      "lat": 57.5363,
+      "lon": -168.9362,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0400",
+      "lat": 57.015,
+      "lon": -171.2015,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0401",
+      "lat": 56.882,
+      "lon": -171.5224,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0402",
+      "lat": 71.6081,
+      "lon": 34.6246,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0403",
+      "lat": 71.4209,
+      "lon": 32.1012,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0404",
+      "lat": 71.0938,
+      "lon": 39.7548,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0405",
+      "lat": 76.0133,
+      "lon": 30.8807,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0406",
+      "lat": 75.3367,
+      "lon": 39.4868,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0407",
+      "lat": 75.1474,
+      "lon": 38.863,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0408",
+      "lat": 71.6279,
+      "lon": 43.9229,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0409",
+      "lat": 71.6158,
+      "lon": 43.8633,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0410",
+      "lat": 71.1618,
+      "lon": 40.9049,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0411",
+      "lat": 71.1261,
+      "lon": 40.4521,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0412",
+      "lat": 71.0877,
+      "lon": 40.4784,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0413",
+      "lat": 71.0667,
+      "lon": 40.4914,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0414",
+      "lat": 71.022,
+      "lon": 40.3239,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0415",
+      "lat": 70.8441,
+      "lon": 40.2179,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0416",
+      "lat": 69.6339,
+      "lon": 42.9413,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0417",
+      "lat": 69.5648,
+      "lon": 42.9738,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0418",
+      "lat": 69.5642,
+      "lon": 42.9663,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0419",
+      "lat": 69.6392,
+      "lon": 46.5205,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0420",
+      "lat": 69.5757,
+      "lon": 44.9239,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0421",
+      "lat": 69.6515,
+      "lon": 46.9857,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0422",
+      "lat": 69.3572,
+      "lon": 43.079,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0423",
+      "lat": 69.8806,
+      "lon": 43.0495,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0424",
+      "lat": 69.8526,
+      "lon": 42.9648,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0425",
+      "lat": 70.3664,
+      "lon": -54.1905,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0426",
+      "lat": 70.3761,
+      "lon": -54.3439,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0427",
+      "lat": 70.3459,
+      "lon": -54.0868,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0428",
+      "lat": 70.3972,
+      "lon": -54.55,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0429",
+      "lat": 70.3597,
+      "lon": -54.3008,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0430",
+      "lat": 70.3666,
+      "lon": -54.3668,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0431",
+      "lat": 70.3525,
+      "lon": -54.281,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0432",
+      "lat": 70.3919,
+      "lon": -54.6336,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0433",
+      "lat": 70.4815,
+      "lon": -55.5835,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0434",
+      "lat": 70.5137,
+      "lon": -56.0106,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0435",
+      "lat": 70.449,
+      "lon": -55.8526,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0436",
+      "lat": 70.4611,
+      "lon": -56.0057,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0437",
+      "lat": 70.4012,
+      "lon": -55.4704,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0438",
+      "lat": 70.3798,
+      "lon": -55.5136,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0439",
+      "lat": 70.366,
+      "lon": -55.4147,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0440",
+      "lat": 70.3609,
+      "lon": -55.4205,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0441",
+      "lat": 70.4947,
+      "lon": -57.0107,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0442",
+      "lat": 70.2947,
+      "lon": -55.0971,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0443",
+      "lat": 70.3538,
+      "lon": -55.9988,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0444",
+      "lat": 70.392,
+      "lon": -56.3727,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0445",
+      "lat": 70.3088,
+      "lon": -55.9114,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0446",
+      "lat": 70.1229,
+      "lon": -55.2952,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0447",
+      "lat": 70.1194,
+      "lon": -55.4586,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0448",
+      "lat": 70.3308,
+      "lon": -57.6235,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0449",
+      "lat": 70.1613,
+      "lon": -56.51,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0450",
+      "lat": 70.1532,
+      "lon": -58.18,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0451",
+      "lat": 69.8244,
+      "lon": -55.2573,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0452",
+      "lat": 69.8153,
+      "lon": -55.4039,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0453",
+      "lat": 69.8253,
+      "lon": -55.5237,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0454",
+      "lat": 69.7883,
+      "lon": -55.4032,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0455",
+      "lat": 69.7863,
+      "lon": -55.398,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0456",
+      "lat": 69.7775,
+      "lon": -55.4035,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0457",
+      "lat": 50.2521,
+      "lon": -59.0828,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0458",
+      "lat": 79.6844,
+      "lon": 19.2799,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0459",
+      "lat": 79.5405,
+      "lon": 19.043,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0460",
+      "lat": 79.5416,
+      "lon": 19.0311,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0461",
+      "lat": 57.4232,
+      "lon": -167.5212,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0462",
+      "lat": 57.402,
+      "lon": -167.3558,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0463",
+      "lat": 57.3395,
+      "lon": -167.4337,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0464",
+      "lat": 57.3558,
+      "lon": -167.0625,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0465",
+      "lat": 57.3227,
+      "lon": -167.0536,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0466",
+      "lat": 57.3257,
+      "lon": -166.9802,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0467",
+      "lat": 57.3013,
+      "lon": -167.034,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0468",
+      "lat": 57.3409,
+      "lon": -165.9992,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0469",
+      "lat": 57.2757,
+      "lon": -166.8125,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0470",
+      "lat": 57.3179,
+      "lon": -166.1018,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0471",
+      "lat": 57.2781,
+      "lon": -166.6191,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0472",
+      "lat": 57.2917,
+      "lon": -166.2923,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0473",
+      "lat": 57.2893,
+      "lon": -166.2502,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0474",
+      "lat": 57.2958,
+      "lon": -166.0747,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0475",
+      "lat": 57.2792,
+      "lon": -166.2572,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0476",
+      "lat": 57.2725,
+      "lon": -166.289,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0477",
+      "lat": 57.2901,
+      "lon": -166.004,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0478",
+      "lat": 57.2811,
+      "lon": -166.0969,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0479",
+      "lat": 57.2429,
+      "lon": -166.2583,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0480",
+      "lat": 55.3138,
+      "lon": -169.2993,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-SAR-0481",
+      "lat": 54.626,
+      "lon": -165.3218,
+      "source": "Copernicus SAR (Radarsat)",
+      "period": "2026-01-28 / 2026-02-01"
+    },
+    {
+      "id": "COP-EW-0001",
+      "lat": 58.1712,
+      "lon": -57.8993,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0002",
+      "lat": 58.6768,
+      "lon": -58.1719,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0003",
+      "lat": 58.7242,
+      "lon": -58.4562,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0004",
+      "lat": 58.9042,
+      "lon": -58.3199,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0005",
+      "lat": 58.9047,
+      "lon": -58.9347,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0006",
+      "lat": 59.05,
+      "lon": -59.253,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0007",
+      "lat": 59.3995,
+      "lon": -58.7907,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0008",
+      "lat": 59.3919,
+      "lon": -59.3925,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0009",
+      "lat": 59.9714,
+      "lon": -59.793,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0010",
+      "lat": 60.0212,
+      "lon": -59.642,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0011",
+      "lat": 60.1809,
+      "lon": -59.8307,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0012",
+      "lat": 60.2209,
+      "lon": -59.6721,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0013",
+      "lat": 60.3344,
+      "lon": -59.0402,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0014",
+      "lat": 60.5822,
+      "lon": -58.746,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0015",
+      "lat": 61.0086,
+      "lon": -59.9491,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0016",
+      "lat": 61.0944,
+      "lon": -59.8451,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0023",
+      "lat": 65.2085,
+      "lon": -54.4719,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0024",
+      "lat": 65.4226,
+      "lon": -53.2086,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0025",
+      "lat": 60.7041,
+      "lon": -47.3537,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0027",
+      "lat": 60.6832,
+      "lon": -47.6544,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0028",
+      "lat": 60.7092,
+      "lon": -47.446,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0030",
+      "lat": 60.7012,
+      "lon": -47.5724,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0034",
+      "lat": 60.67,
+      "lon": -48.0801,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0039",
+      "lat": 60.3653,
+      "lon": -51.1852,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0043",
+      "lat": 60.7126,
+      "lon": -48.6555,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0049",
+      "lat": 60.8383,
+      "lon": -50.0074,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0053",
+      "lat": 61.1427,
+      "lon": -48.5258,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0054",
+      "lat": 61.1626,
+      "lon": -48.6115,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0055",
+      "lat": 61.1137,
+      "lon": -50.4799,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0057",
+      "lat": 61.2874,
+      "lon": -49.0696,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0059",
+      "lat": 61.3324,
+      "lon": -48.9698,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0060",
+      "lat": 61.194,
+      "lon": -50.3869,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0065",
+      "lat": 61.4589,
+      "lon": -49.2945,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0066",
+      "lat": 61.4691,
+      "lon": -49.2157,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0068",
+      "lat": 61.5235,
+      "lon": -49.4766,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0069",
+      "lat": 61.5223,
+      "lon": -49.7086,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0070",
+      "lat": 61.6326,
+      "lon": -49.4875,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0072",
+      "lat": 61.6576,
+      "lon": -49.7325,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0074",
+      "lat": 61.8525,
+      "lon": -49.5765,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0075",
+      "lat": 61.7774,
+      "lon": -50.5835,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0077",
+      "lat": 62.0663,
+      "lon": -51.5405,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0085",
+      "lat": 63.1534,
+      "lon": -51.189,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0086",
+      "lat": 63.157,
+      "lon": -51.2654,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0088",
+      "lat": 63.2932,
+      "lon": -51.4527,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0090",
+      "lat": 63.3786,
+      "lon": -51.8927,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0091",
+      "lat": 63.4463,
+      "lon": -51.9998,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0092",
+      "lat": 63.5564,
+      "lon": -51.5837,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0095",
+      "lat": 63.8861,
+      "lon": -51.9511,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0096",
+      "lat": 57.5927,
+      "lon": -46.3232,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0097",
+      "lat": 58.8633,
+      "lon": -47.0608,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0098",
+      "lat": 58.9247,
+      "lon": -46.965,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0099",
+      "lat": 59.4066,
+      "lon": -45.6158,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0100",
+      "lat": 59.5055,
+      "lon": -45.8055,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0101",
+      "lat": 59.6122,
+      "lon": -45.7611,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0102",
+      "lat": 59.6083,
+      "lon": -46.1836,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0103",
+      "lat": 59.6379,
+      "lon": -46.2744,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0104",
+      "lat": 59.7068,
+      "lon": -45.6964,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0105",
+      "lat": 59.948,
+      "lon": -45.7064,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0107",
+      "lat": 59.9617,
+      "lon": -45.8768,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0108",
+      "lat": 59.9068,
+      "lon": -46.8112,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0110",
+      "lat": 60.079,
+      "lon": -46.0004,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0111",
+      "lat": 60.0897,
+      "lon": -46.0794,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0112",
+      "lat": 59.9908,
+      "lon": -47.3297,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0114",
+      "lat": 60.1459,
+      "lon": -45.8225,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0115",
+      "lat": 60.1022,
+      "lon": -46.4692,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0116",
+      "lat": 60.2141,
+      "lon": -46.2993,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0118",
+      "lat": 60.2681,
+      "lon": -45.7907,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0119",
+      "lat": 60.2422,
+      "lon": -46.3674,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0120",
+      "lat": 60.2612,
+      "lon": -46.152,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0121",
+      "lat": 60.1048,
+      "lon": -48.2557,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0122",
+      "lat": 60.2872,
+      "lon": -46.3116,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0123",
+      "lat": 60.2831,
+      "lon": -46.4228,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0124",
+      "lat": 60.3257,
+      "lon": -46.2413,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0125",
+      "lat": 60.3025,
+      "lon": -46.6597,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0126",
+      "lat": 60.3398,
+      "lon": -46.5588,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0127",
+      "lat": 60.2544,
+      "lon": -47.6621,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0128",
+      "lat": 60.418,
+      "lon": -45.9261,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0129",
+      "lat": 60.3609,
+      "lon": -46.6972,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0131",
+      "lat": 60.4198,
+      "lon": -46.1055,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0132",
+      "lat": 60.4635,
+      "lon": -46.013,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0133",
+      "lat": 60.4821,
+      "lon": -45.8454,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0136",
+      "lat": 60.4711,
+      "lon": -46.1886,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0138",
+      "lat": 60.4894,
+      "lon": -46.0728,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0140",
+      "lat": 60.4441,
+      "lon": -46.8358,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0144",
+      "lat": 60.4626,
+      "lon": -46.755,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0145",
+      "lat": 60.2953,
+      "lon": -48.7099,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0147",
+      "lat": 60.5243,
+      "lon": -46.2412,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0149",
+      "lat": 60.5389,
+      "lon": -46.1603,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0150",
+      "lat": 60.1247,
+      "lon": -50.6213,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0155",
+      "lat": 60.5479,
+      "lon": -46.3892,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0157",
+      "lat": 60.5874,
+      "lon": -46.0452,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0159",
+      "lat": 60.575,
+      "lon": -46.2603,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0160",
+      "lat": 60.599,
+      "lon": -45.9277,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0161",
+      "lat": 60.1368,
+      "lon": -51.0432,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0163",
+      "lat": 60.6145,
+      "lon": -46.0955,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0164",
+      "lat": 60.562,
+      "lon": -46.8542,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0166",
+      "lat": 60.5818,
+      "lon": -46.953,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0167",
+      "lat": 60.5831,
+      "lon": -47.0066,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0168",
+      "lat": 60.4511,
+      "lon": -48.5265,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0171",
+      "lat": 60.6359,
+      "lon": -46.4414,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0179",
+      "lat": 60.5352,
+      "lon": -47.7782,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0182",
+      "lat": 60.6225,
+      "lon": -46.8208,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0183",
+      "lat": 60.6185,
+      "lon": -46.8921,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0187",
+      "lat": 60.6141,
+      "lon": -47.1006,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0189",
+      "lat": 60.6169,
+      "lon": -47.2156,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0192",
+      "lat": 60.6528,
+      "lon": -46.9569,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0194",
+      "lat": 60.662,
+      "lon": -47.1566,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0200",
+      "lat": 64.4111,
+      "lon": -36.6049,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0202",
+      "lat": 64.7695,
+      "lon": -37.9558,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0203",
+      "lat": 58.6317,
+      "lon": -38.829,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0204",
+      "lat": 58.7397,
+      "lon": -40.1405,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0205",
+      "lat": 59.2866,
+      "lon": -37.3469,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0206",
+      "lat": 59.3885,
+      "lon": -36.8415,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0207",
+      "lat": 59.274,
+      "lon": -38.8288,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0208",
+      "lat": 59.9151,
+      "lon": -37.1106,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0209",
+      "lat": 60.0801,
+      "lon": -36.7878,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0210",
+      "lat": 60.6706,
+      "lon": -35.3392,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0211",
+      "lat": 60.5392,
+      "lon": -37.0742,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0212",
+      "lat": 60.5088,
+      "lon": -38.0603,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0213",
+      "lat": 60.5094,
+      "lon": -38.1654,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0217",
+      "lat": 60.6046,
+      "lon": -37.9807,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0218",
+      "lat": 60.6054,
+      "lon": -38.0452,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0219",
+      "lat": 60.6025,
+      "lon": -38.1495,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0220",
+      "lat": 60.6092,
+      "lon": -38.2289,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0221",
+      "lat": 60.5893,
+      "lon": -38.4743,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0223",
+      "lat": 60.6209,
+      "lon": -38.3348,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0225",
+      "lat": 60.6731,
+      "lon": -38.367,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0226",
+      "lat": 60.6956,
+      "lon": -38.2332,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0228",
+      "lat": 60.6826,
+      "lon": -38.5383,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0229",
+      "lat": 60.7087,
+      "lon": -38.6026,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0231",
+      "lat": 60.7851,
+      "lon": -38.4575,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0235",
+      "lat": 60.8272,
+      "lon": -38.5177,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0236",
+      "lat": 60.8352,
+      "lon": -38.5719,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0238",
+      "lat": 60.8329,
+      "lon": -38.7312,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0241",
+      "lat": 60.9067,
+      "lon": -38.4125,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0247",
+      "lat": 60.8832,
+      "lon": -38.8071,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0250",
+      "lat": 60.8976,
+      "lon": -38.7179,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0255",
+      "lat": 60.9111,
+      "lon": -38.8855,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0258",
+      "lat": 60.9467,
+      "lon": -38.8072,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0260",
+      "lat": 60.9383,
+      "lon": -39.0172,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0261",
+      "lat": 60.9479,
+      "lon": -39.1509,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0263",
+      "lat": 61.0066,
+      "lon": -39.0892,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0264",
+      "lat": 61.0184,
+      "lon": -39.0216,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0267",
+      "lat": 61.0145,
+      "lon": -39.1812,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0272",
+      "lat": 61.0757,
+      "lon": -39.1017,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0274",
+      "lat": 61.1158,
+      "lon": -38.9279,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0277",
+      "lat": 61.1331,
+      "lon": -39.1246,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0278",
+      "lat": 61.1781,
+      "lon": -38.7298,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0285",
+      "lat": 61.1791,
+      "lon": -38.8562,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0289",
+      "lat": 61.2354,
+      "lon": -38.7711,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0290",
+      "lat": 61.2013,
+      "lon": -39.0774,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0294",
+      "lat": 61.2336,
+      "lon": -38.8726,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0301",
+      "lat": 61.2701,
+      "lon": -38.9911,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0302",
+      "lat": 61.2971,
+      "lon": -38.8899,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0303",
+      "lat": 61.3188,
+      "lon": -38.7685,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0304",
+      "lat": 61.2779,
+      "lon": -39.1595,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0306",
+      "lat": 61.348,
+      "lon": -39.0483,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0307",
+      "lat": 57.6811,
+      "lon": -174.2559,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0308",
+      "lat": 57.2622,
+      "lon": -172.6505,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0309",
+      "lat": 57.2964,
+      "lon": -173.3101,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0310",
+      "lat": 57.0091,
+      "lon": -173.0701,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0311",
+      "lat": 56.7184,
+      "lon": -171.834,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0312",
+      "lat": 56.7518,
+      "lon": -173.261,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0313",
+      "lat": 56.4197,
+      "lon": -171.2806,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0314",
+      "lat": 56.151,
+      "lon": -170.9465,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0315",
+      "lat": 68.6742,
+      "lon": -6.0704,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0316",
+      "lat": 67.9176,
+      "lon": -6.299,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0317",
+      "lat": 67.8242,
+      "lon": -8.3359,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0318",
+      "lat": 67.9056,
+      "lon": -9.4278,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0319",
+      "lat": 67.6123,
+      "lon": -6.6273,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0320",
+      "lat": 71.5829,
+      "lon": -7.7937,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0321",
+      "lat": 79.8842,
+      "lon": 11.492,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0322",
+      "lat": 76.4704,
+      "lon": 29.8675,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0323",
+      "lat": 75.1822,
+      "lon": 31.1372,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0324",
+      "lat": 74.7552,
+      "lon": 28.2963,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0325",
+      "lat": 76.9661,
+      "lon": 57.0198,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0326",
+      "lat": 55.4466,
+      "lon": -51.6518,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0327",
+      "lat": 59.6961,
+      "lon": -41.429,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0328",
+      "lat": 59.7003,
+      "lon": -41.5005,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0329",
+      "lat": 59.775,
+      "lon": -41.5395,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0330",
+      "lat": 59.8693,
+      "lon": -41.8463,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0332",
+      "lat": 59.9211,
+      "lon": -41.7255,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0333",
+      "lat": 59.9286,
+      "lon": -41.6702,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0334",
+      "lat": 60.1354,
+      "lon": -42.445,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0335",
+      "lat": 60.3668,
+      "lon": -41.3696,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0336",
+      "lat": 63.2021,
+      "lon": -29.7895,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0337",
+      "lat": 67.3437,
+      "lon": -17.8595,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0338",
+      "lat": 67.0838,
+      "lon": -17.2952,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0339",
+      "lat": 67.1603,
+      "lon": -20.918,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0340",
+      "lat": 67.1616,
+      "lon": -22.5858,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0341",
+      "lat": 67.0672,
+      "lon": -22.0549,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0342",
+      "lat": 67.0854,
+      "lon": -22.5979,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0343",
+      "lat": 67.0312,
+      "lon": -22.3323,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0344",
+      "lat": 67.0234,
+      "lon": -24.8849,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0345",
+      "lat": 70.5915,
+      "lon": 41.3157,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0346",
+      "lat": 70.5058,
+      "lon": 41.3663,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0347",
+      "lat": 70.3378,
+      "lon": 41.5403,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0348",
+      "lat": 70.0064,
+      "lon": 42.2719,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0349",
+      "lat": 69.8728,
+      "lon": 42.044,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0350",
+      "lat": 69.7652,
+      "lon": 38.2579,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0351",
+      "lat": 69.6765,
+      "lon": 39.2843,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0352",
+      "lat": 69.5393,
+      "lon": 40.4922,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0353",
+      "lat": 69.6112,
+      "lon": 38.9567,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0354",
+      "lat": 69.5375,
+      "lon": 38.3653,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0355",
+      "lat": 69.2935,
+      "lon": 36.5219,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0356",
+      "lat": 68.9797,
+      "lon": 36.9256,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0357",
+      "lat": 68.5033,
+      "lon": 40.5951,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0358",
+      "lat": 67.2528,
+      "lon": 41.2451,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0359",
+      "lat": 70.8872,
+      "lon": 49.4161,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0360",
+      "lat": 63.5052,
+      "lon": -57.3503,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0361",
+      "lat": 64.1176,
+      "lon": -56.5727,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0362",
+      "lat": 54.9362,
+      "lon": -42.8262,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0363",
+      "lat": 54.7351,
+      "lon": -41.2677,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0364",
+      "lat": 59.5596,
+      "lon": -43.2905,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0365",
+      "lat": 59.3774,
+      "lon": -43.4029,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0366",
+      "lat": 58.7147,
+      "lon": -43.5162,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0367",
+      "lat": 58.5731,
+      "lon": -57.5265,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0368",
+      "lat": 56.9881,
+      "lon": -57.0681,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0369",
+      "lat": 57.0339,
+      "lon": -56.7474,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0370",
+      "lat": 60.0052,
+      "lon": -179.4573,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0371",
+      "lat": 59.9524,
+      "lon": -179.5832,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0372",
+      "lat": 59.9285,
+      "lon": -179.439,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0373",
+      "lat": 59.8105,
+      "lon": -179.8873,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0374",
+      "lat": 59.2653,
+      "lon": -177.0313,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0375",
+      "lat": 59.3876,
+      "lon": -178.5446,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0376",
+      "lat": 59.0845,
+      "lon": -177.9236,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0379",
+      "lat": 59.0359,
+      "lon": -177.9865,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0381",
+      "lat": 58.8966,
+      "lon": -176.9081,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0382",
+      "lat": 59.0222,
+      "lon": -178.076,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0384",
+      "lat": 58.9955,
+      "lon": -178.1555,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0385",
+      "lat": 59.0085,
+      "lon": -178.3088,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0386",
+      "lat": 59.0357,
+      "lon": -178.6819,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0387",
+      "lat": 58.9945,
+      "lon": -178.4621,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0389",
+      "lat": 58.9641,
+      "lon": -178.8045,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0391",
+      "lat": 58.9251,
+      "lon": -178.9403,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0392",
+      "lat": 58.8291,
+      "lon": -179.6597,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0394",
+      "lat": 58.7984,
+      "lon": -179.4811,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0396",
+      "lat": 58.7885,
+      "lon": -179.5913,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0397",
+      "lat": 61.1598,
+      "lon": -179.0535,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0398",
+      "lat": 60.3816,
+      "lon": -177.9289,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0399",
+      "lat": 60.1805,
+      "lon": -177.0054,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    },
+    {
+      "id": "COP-EW-0400",
+      "lat": 60.2923,
+      "lon": -178.1195,
+      "source": "Copernicus SAR (Sentinel-1 EW)",
+      "period": "2026-04-01 / 2026-04-05"
+    }
+  ],
+  "count": 723,
+  "sources": [
+    "Copernicus SAR Radarsat (2026-01-28~02-01)",
+    "Copernicus SAR Sentinel-1 EW (2026-04-01~04-05)"
+  ]
+}

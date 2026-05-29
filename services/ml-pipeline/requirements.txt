@@ -1,0 +1,18 @@
+# ml-pipeline 의존성 — server.py 임포트 + 연료 모델(XGBoost .pkl) 기준
+# 버전은 프로젝트 표준(hf-space/requirements.txt)에 맞춰 핀
+# (루트에 ml-pipeline/venv 가 없어 pip freeze 대신 소스 기반으로 작성)
+
+# ── 웹 프레임워크 ──
+fastapi==0.135.3
+uvicorn==0.44.0
+pydantic==2.12.5
+
+# ── 머신러닝 (연료 예측 모델 추론) ──
+xgboost==3.2.0
+scikit-learn==1.8.0
+
+# ── 수치 / 데이터 / 모델 로드 ──
+numpy==2.4.4
+pandas==3.0.2
+joblib==1.5.3
+matplotlib==3.10.8

@@ -1,0 +1,25 @@
+{
+  "obs_dims": 22,
+  "action_dims": 2,
+  "obs_normalization": {
+    "lon_scale": 180.0,
+    "lat_scale": 90.0,
+    "speed_scale": 15.0,
+    "distance_scale_wp": 100.0,
+    "distance_scale_berg": 50.0,
+    "bearing_scale": 180.0,
+    "visibility_scale": 20.0,
+    "wave_scale": 8.0,
+    "deviation_scale": 50.0
+  },
+  "action_ranges": {
+    "heading_delta": {
+      "min": -15.0,
+      "max": 15.0
+    },
+    "speed_factor": {
+      "min": 0.5,
+      "max": 1.0
+    }
+  }
+}

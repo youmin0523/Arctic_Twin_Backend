@@ -1,0 +1,118 @@
+# ==========================================================
+# Arctic Digital Twin — 백엔드 통합 의존성 (로컬/Windows)
+#  - 모든 백엔드 Python(rl/report/ml/sar 서비스 + 데이터 파이프라인)을
+#    단일 환경 backend/.venv 하나로 통일. uv 로만 실행.
+#  - hf-space/requirements.txt(배포 표준) 기준, 로컬 Windows 용으로 pywin32 복원
+#  - 데이터 파이프라인(backend/pipeline) geo 스택까지 포함 → execFile/spawn 도 동일 환경 사용
+# ==========================================================
+
+# ── 공통: 웹 프레임워크 ─────────────────────────────────
+fastapi==0.135.3
+uvicorn[standard]==0.44.0
+starlette==1.0.0
+pydantic==2.12.5
+pydantic_core==2.41.5
+pydantic-settings==2.14.0
+python-multipart==0.0.27
+python-dotenv==1.2.2
+
+# ── 프록시(app.py)가 사용 ──────────────────────────────
+httpx==0.28.1
+httpcore==1.0.9
+sse-starlette==3.4.1
+anyio==4.13.0
+h11==0.16.0
+sniffio==1.3.1
+idna==3.11
+certifi==2026.2.25
+charset-normalizer==3.4.7
+
+# ── 데이터 / 수치 (rl-pipeline, ml-pipeline, report) ─────
+numpy==2.4.4
+pandas==3.0.2
+scipy==1.17.1
+matplotlib==3.10.8
+joblib==1.5.3
+cloudpickle==3.1.2
+
+# ── 머신러닝 (ml-pipeline, report-service) ──────────────
+scikit-learn==1.8.0
+threadpoolctl==3.6.0
+xgboost==3.2.0
+
+# ── ONNX (report-service 출항 모델 29종 추론 + rl 모델 export) ──
+onnxruntime>=1.17.0
+onnx>=1.16.0
+
+# ── 강화학습 (rl-pipeline, report-service) ──────────────
+torch==2.11.0
+gymnasium==1.2.3
+stable_baselines3==2.8.0
+Farama-Notifications==0.0.4
+sympy==1.14.0
+mpmath==1.3.0
+networkx==3.6.1
+filelock==3.25.2
+fsspec==2026.3.0
+
+# ── SAR 빙산 탐지 (sar_server → ultralytics YOLOv8) ─────
+# ultralytics 가 자체적으로 opencv-python-headless, PyYAML, tqdm 등을 pull 함
+ultralytics>=8.0.0
+
+# ── 보고서 / Claude AI (report-service) ─────────────────
+anthropic==0.92.0
+claude-agent-sdk==0.1.71
+mcp==1.27.0
+reportlab==4.4.10
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+referencing==0.37.0
+rpds-py==0.30.0
+attrs==26.1.0
+docstring_parser==0.17.0
+jiter==0.13.0
+distro==1.9.0
+PyJWT==2.12.1
+nest-asyncio==1.6.0
+
+# ── 보조 / 유틸 ────────────────────────────────────────
+pillow==12.2.0
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.62.1
+kiwisolver==1.5.0
+pyparsing==3.3.2
+packaging==26.0
+python-dateutil==2.9.0.post0
+pytz==2025.2
+six==1.17.0
+tzdata==2026.1
+typing_extensions==4.15.0
+typing-inspection==0.4.2
+annotated-types==0.7.0
+colorama==0.4.6
+click==8.3.2
+setuptools==81.0.0
+requests==2.33.1
+urllib3==2.6.3
+
+# ── 보안 / 암호화 (anthropic SDK 가 의존) ───────────────
+cryptography==47.0.0
+cffi==2.0.0
+pycparser==3.0
+
+# ── 데이터 파이프라인 / 지오 스택 (backend/pipeline fetchers·processors) ──
+# Node 가 execFile/spawn 으로 돌리는 빙산·해빙·기상 수집 및 SAR 탐지 스크립트용.
+# Python 3.13 휠 제공됨 (GDAL 시스템 설치 불필요).
+netCDF4>=1.6.0
+copernicusmarine>=2.0.0
+rasterio>=1.4.0
+scikit-image>=0.21.0
+opencv-python-headless>=4.8.0
+shapely>=2.0.0
+pyproj>=3.6.0
+
+# ── Windows 전용 (로컬 한정; HF/Linux 배포본에서는 제외됨) ──
+pywin32==311 ; sys_platform == "win32"

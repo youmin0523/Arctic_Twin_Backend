@@ -1,0 +1,64 @@
+node_modules
+.env
+__pycache__
+*.log
+*.txt
+
+sentinel1_iw_fetcher.log
+
+
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE / Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Distribution / build
+dist/
+build/
+
+# Temporary files
+*.tmp
+tmp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+# 쇄빙선 에스코트 시뮬 출력
+data/simulations/*.json
+
+# ---- Large / regenerable data — NOT for git (use external storage or Git LFS) ----
+# Raw Sentinel-1 SAR archives (~47GB)
+data/sentinel1_archive/
+# Training datasets (~365MB)
+data/datasets/
+# Processed ice-data snapshots (~89MB)
+data/archive/
+# NOTE: backend/model/ is intentionally tracked (RL models incl. replay_buffer.pkl)
+# Downloaded data caches (regenerable .nc fetches)
+pipeline/cache/
+pipeline/fetchers/cache/
+
+# ---- Keep dependency manifests (override the *.txt rule above) ----
+!requirements.txt
+!**/requirements.txt

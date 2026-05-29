@@ -1,0 +1,27 @@
+[
+  {
+    "iteration": 1,
+    "weights": {
+      "prohibitive_penalty": -10.0,
+      "success_bonus": 50.0,
+      "efficiency_penalty": -5.0
+    },
+    "pre_metrics": {
+      "success_rate": 1.0,
+      "prohibitive_rate": 0.0,
+      "mean_rio": 60.86690666666666,
+      "mean_transit_days": 14.0
+    },
+    "post_metrics": {
+      "success_rate": 1.0,
+      "prohibitive_rate": 0.0,
+      "mean_rio": 61.108293333333336,
+      "mean_transit_days": 14.0
+    },
+    "signals": [
+      "converging"
+    ],
+    "duration_seconds": 84075.67171049118,
+    "converged": true
+  }
+]

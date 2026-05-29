@@ -1,0 +1,16 @@
+# RL Iceberg Avoidance Pipeline
+fastapi>=0.100.0
+uvicorn>=0.23.0
+pydantic>=2.0.0
+
+# RL 학습
+gymnasium>=0.29.0
+stable-baselines3[extra]>=2.1.0
+numpy>=1.24.0
+
+# PyTorch (CUDA 사용 시 별도 설치 권장)
+torch>=2.0.0
+
+# 모델 내보내기 (선택)
+# onnx>=1.14.0
+# onnxruntime>=1.15.0

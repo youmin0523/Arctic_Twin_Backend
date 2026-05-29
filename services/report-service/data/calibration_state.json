@@ -1,0 +1,10 @@
+{
+  "thresholds": {
+    "open_water": 0.10,
+    "grey_white": 0.40,
+    "thin_fy": 0.70,
+    "medium_fy": 0.85
+  },
+  "learning_rate": 0.01,
+  "episode_count": 0
+}
