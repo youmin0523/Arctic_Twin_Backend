@@ -55,6 +55,10 @@ data/datasets/
 # data/archive/: 일별 자동 적산(archive/daily/realIceData_YYYYMMDD.json)은 재생성 가능 → 전체 제외
 # (월별 레퍼런스 realIceData_month01~12.json 는 data/ 최상위에 있어 추적됨)
 data/archive/
+# 해안선 마스크 원본/생성물 (~36MB, Natural Earth + 생성 landGrid.bin) — 재생성 가능
+data/coastline/
+# 사용자 편집 항로 런타임 공유 상태 (서버가 기록)
+data/edited_routes.json
 # NOTE: backend/model/ is intentionally tracked (RL models incl. replay_buffer.pkl)
 # Downloaded data caches (regenerable .nc fetches)
 pipeline/cache/
