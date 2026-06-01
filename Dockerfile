@@ -38,9 +38,12 @@ RUN npm ci --omit=dev
 #   torch/torchvision 은 CPU 휠로 받아 이미지 크기를 줄인다
 #   (==2.11.0 핀은 PEP440 상 2.11.0+cpu 로컬버전과 매칭됨).
 COPY requirements.txt ./
+#   --index-strategy unsafe-best-match: torch CPU 휠은 pytorch 인덱스, 그 외(idna 등)는
+#   PyPI 에서 핀 버전을 찾도록 모든 인덱스에서 최적 버전을 선택 (단일 인덱스 정책 우회).
 RUN uv venv .venv --python 3.11 \
     && uv pip install --python .venv \
         --extra-index-url https://download.pytorch.org/whl/cpu \
+        --index-strategy unsafe-best-match \
         -r requirements.txt
 
 # --- 3) 애플리케이션 소스 + 학습 모델(~591MB) ---
