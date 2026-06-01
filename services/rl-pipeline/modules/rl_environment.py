@@ -238,6 +238,7 @@ class IcebergAvoidanceEnv(gym.Env):
         return self._get_obs(), {}
 
     def _get_progress(self) -> float:
+        assert self.ship is not None
         # 각 sub-segment별 거리와 along-track fraction 수집
         seg_dists: list[float] = []
         seg_fracs: list[float] = []
@@ -269,6 +270,7 @@ class IcebergAvoidanceEnv(gym.Env):
         return min(1.0, best_cum / total_dist)
 
     def _get_cross_track(self) -> float:
+        assert self.ship is not None
         best_xt = float("inf")
         for i in range(self.segment_start_idx, self.segment_end_idx):
             wp1 = self.route_wps[i]
@@ -279,6 +281,7 @@ class IcebergAvoidanceEnv(gym.Env):
         return best_xt
 
     def _nearest_icebergs(self, n: int = 3) -> list[tuple[float, float, float]]:
+        assert self.ship is not None
         dists = []
         for berg in self.icebergs:
             d = approx_dist_km(self.ship.lat, self.ship.lon, berg.lat, berg.lon)
@@ -292,6 +295,7 @@ class IcebergAvoidanceEnv(gym.Env):
         return result
 
     def _get_obs(self) -> np.ndarray:
+        assert self.ship is not None
         obs = np.zeros(22, dtype=np.float32)
 
         obs[0] = self.ship.lon / 180.0
@@ -340,6 +344,7 @@ class IcebergAvoidanceEnv(gym.Env):
         return obs
 
     def step(self, action: np.ndarray):
+        assert self.ship is not None
         heading_delta = float(np.clip(action[0], -15.0, 15.0))
         speed_factor = float(np.clip(action[1], 0.5, 1.0))
 
@@ -418,6 +423,7 @@ class IcebergAvoidanceEnv(gym.Env):
         return obs, reward, terminated, truncated, info
 
     def get_ship_state(self) -> dict:
+        assert self.ship is not None
         return {
             "lon": self.ship.lon,
             "lat": self.ship.lat,

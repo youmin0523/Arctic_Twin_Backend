@@ -188,7 +188,7 @@ def _inject_global_weights_into_trainers():
         return
 
     try:
-        from modules import rl_reward
+        from modules import rl_reward  # type: ignore[attr-defined]
         weights_dict = json.loads(weights_path.read_text(encoding="utf-8"))
         new_weights = rl_reward.RewardWeights(**weights_dict)
 

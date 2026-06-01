@@ -31,7 +31,7 @@ def export_to_onnx(agent, output_path: str | None = None) -> str | None:
         dummy_input = torch.randn(1, 22)
 
         torch.onnx.export(
-            actor, dummy_input, onnx_path,
+            actor, (dummy_input,), onnx_path,
             input_names=["observation"],
             output_names=["mean_action", "log_std"],
             dynamic_axes={

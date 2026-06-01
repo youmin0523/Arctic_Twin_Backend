@@ -10,7 +10,10 @@ import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor, Future
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from modules.rl.departure_iterative_trainer import DepartureIterativeTrainer
 
 logger = logging.getLogger("report-service.rl.multi_model_trainer")
 
@@ -47,7 +50,7 @@ class ModelStatus:
     label: str
     is_running: bool = False
     current_iteration: int = 0
-    latest_metrics: dict = None
+    latest_metrics: Optional[dict] = None
     converged: bool = False
     error: Optional[str] = None
 
@@ -83,7 +86,7 @@ class MultiModelIterativeTrainer:
         self.is_running = False
         self.stop_requested = False
         # 조합별 트레이너 인스턴스 (stop 전달용)
-        self._trainers: dict[str, object] = {}
+        self._trainers: dict[str, "DepartureIterativeTrainer"] = {}
 
     # ── 학습 시작 ─────────────────────────────────────────────
     def start(self,

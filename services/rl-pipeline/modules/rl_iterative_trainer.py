@@ -14,7 +14,7 @@ import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Optional, cast
 
 from .rl_reward import RewardWeights
 from .rl_trainer import RLTrainer
@@ -424,4 +424,4 @@ class IterativeTrainer:
                                if self.history else {}),
             "history": [dataclasses.asdict(r) for r in self.history[-5:]],
         }
-        return _clean_nan(status)
+        return cast(dict, _clean_nan(status))

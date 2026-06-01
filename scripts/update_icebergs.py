@@ -13,6 +13,7 @@ import shutil
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import cast
 
 # ── Logging ──────────────────────────────────────────────────────
 LOG_DIR = Path(__file__).resolve().parent.parent / "logs"
@@ -95,7 +96,7 @@ def find_shapefiles(directory: str) -> list[str]:
 
 def shapefile_to_icebergs(shp_path: str, source_label: str, id_prefix: str) -> list[dict]:
     """Convert a shapefile to iceberg JSON entries."""
-    import geopandas as gpd
+    import geopandas as gpd  # type: ignore[import]
 
     log.info(f"  Reading {shp_path}")
     gdf = gpd.read_file(shp_path)
@@ -121,7 +122,7 @@ def shapefile_to_icebergs(shp_path: str, source_label: str, id_prefix: str) -> l
                 break
 
         icebergs.append({
-            "id": f"{id_prefix}-{idx + 1:04d}",
+            "id": f"{id_prefix}-{cast(int, idx) + 1:04d}",
             "lat": round(lat, 4),
             "lon": round(lon, 4),
             "source": source_label,

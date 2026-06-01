@@ -260,7 +260,7 @@ def run_once(target_date=None, step=STEP, dry_run=False):
 def run_scheduled():
     """매일 06:00 UTC에 자동 실행."""
     try:
-        import schedule
+        import schedule  # type: ignore[import]
         import time
     except ImportError:
         log.error("schedule not installed. Run: pip install schedule")

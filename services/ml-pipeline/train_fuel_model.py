@@ -19,7 +19,7 @@ import numpy as np
 # 프로젝트 루트 기준 모듈 임포트
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from modules import config as cfg
+from modules import config as cfg  # type: ignore[attr-defined]
 from modules.data_generator import generate_dataset
 from modules.model_trainer import FuelModelTrainer
 

@@ -21,7 +21,7 @@ def train_collision_avoidance():
     print(">>> Collision Avoidance (RL-C) 학습 시작 시도...")
     logger.info("=== Collision Avoidance (RL-C) 학습 시작 ===")
     try:
-        from modules.rl_trainer import RLTrainer
+        from modules.rl_trainer import RLTrainer  # type: ignore[import]
         trainer = RLTrainer()
         print(">>> RLTrainer 초기화 완료. train_curriculum 실행...")
         results = trainer.train_curriculum()

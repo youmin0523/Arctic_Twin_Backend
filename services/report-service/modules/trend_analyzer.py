@@ -74,7 +74,7 @@ class TrendAnalyzer:
                 system=SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": user_prompt}],
             )
-            return response.content[0].text
+            return getattr(response.content[0], "text", "")
         except Exception as e:
             logger.error("Claude API 호출 실패: %s", e)
             return None

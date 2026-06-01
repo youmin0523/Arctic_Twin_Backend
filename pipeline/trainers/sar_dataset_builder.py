@@ -394,6 +394,8 @@ def _build_from_real_tiles(tiles_dir: Path, output_dir: Path):
             max_lat = meta.get("max_lat")
 
             if None not in (min_lon, max_lon, min_lat, max_lat):
+                assert min_lon is not None and max_lon is not None
+                assert min_lat is not None and max_lat is not None
                 lon_range = max_lon - min_lon
                 lat_range = max_lat - min_lat
                 if lon_range > 0 and lat_range > 0:

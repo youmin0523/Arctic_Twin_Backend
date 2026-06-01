@@ -91,6 +91,7 @@ class IcebergDetector:
             tile_uint8 = (tile_hwc * 255).astype(np.uint8)
 
             # 추론
+            assert self.model is not None
             results = self.model.predict(
                 tile_uint8,
                 conf=self.confidence,

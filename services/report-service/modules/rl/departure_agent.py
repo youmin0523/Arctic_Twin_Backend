@@ -147,6 +147,7 @@ class DepartureAgent:
                 verbose=0,
             )
             cb = CallbackList([checkpoint_cb, callback]) if callback else checkpoint_cb
+            assert self.model is not None  # train()에서 create_model로 보장됨
             self.model.learn(total_timesteps=timesteps, callback=cb)
         except _StopTraining:
             logger.info("출항 RL 중단 요청으로 학습 종료")
@@ -160,6 +161,7 @@ class DepartureAgent:
     def save(self):
         """모델 저장."""
         MODEL_DIR.mkdir(parents=True, exist_ok=True)
+        assert self.model is not None  # 학습 후에만 호출됨
         self.model.save(str(self.model_path))
         logger.info("출항 RL 모델 저장: %s", self.model_path)
 
@@ -170,7 +172,7 @@ class DepartureAgent:
             if arr.ndim == 1:
                 arr = arr[None, :]  # (28,) -> (1, 28)
             out = self._onnx_session.run(None, {self._onnx_input_name: arr})
-            action = out[0][0]  # (1, 1) -> (1,)
+            action = out[0][0]  # type: ignore[index]  # (1, 1) -> (1,)
             return action, None
         if self.model is None:
             return None, None

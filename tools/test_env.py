@@ -14,7 +14,7 @@ try:
     
     # 육지 마스크 테스트
     sys.path.append(os.path.join(os.getcwd(), 'backend', 'services', 'rl-pipeline'))
-    from modules.rl_land_mask import LandMask
+    from modules.rl_land_mask import LandMask  # type: ignore[import]
     lm = LandMask()
     print("LandMask initialized successfully")
     

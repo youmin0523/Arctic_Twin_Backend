@@ -284,6 +284,7 @@ class IcebergIterativeTrainer:
 
         from ultralytics import YOLO
         from pathlib import Path as _Path
+        assert trainer.model is not None
         trainer.results = trainer.model.train(
             data=str(yaml_path),
             epochs=params["epochs"],

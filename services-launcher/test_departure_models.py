@@ -33,6 +33,7 @@ def main():
     md = a.get_metadata()
     if a.is_trained:
         action, _ = a.predict(DUMMY_OBS)
+        assert action is not None
         print(f"{'PC5':<10} {'default':<10} OK      {float(action[0]):+8.4f}  {md['model_format']}")
         ok_count += 1
     else:
@@ -50,6 +51,7 @@ def main():
                     fail_count += 1
                     continue
                 action, _ = a.predict(DUMMY_OBS)
+                assert action is not None
                 print(f"{ic:<10} {st:<10} OK      {float(action[0]):+8.4f}  {md['model_format']}")
                 ok_count += 1
             except Exception as e:

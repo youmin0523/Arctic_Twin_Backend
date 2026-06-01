@@ -447,6 +447,8 @@ class DepartureIterativeTrainer:
         from modules.rl.departure_env import DepartureSchedulingEnv
         import time as _time
 
+        assert self._agent is not None  # 호출 전 반드시 초기화됨
+
         stages = [
             {"difficulty": "easy",   "timesteps": int(base_timesteps * 0.5)},
             {"difficulty": "medium", "timesteps": base_timesteps},
