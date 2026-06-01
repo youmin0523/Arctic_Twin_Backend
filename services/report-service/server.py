@@ -80,7 +80,7 @@ from modules.rl.departure_iterative_trainer import DepartureIterativeTrainer
 from modules.rl.multi_model_trainer import MultiModelIterativeTrainer, ALL_COMBINATIONS, SHIP_TYPES
 from modules.rl.prediction_calibrator import PredictionCalibrator
 from modules.rl import existing_rl_client
-from modules.whatif_generator_max import WhatIfGeneratorMax
+from modules.whatif_generator_openai import WhatIfGeneratorOpenAI
 
 # ── 싱글톤 초기화 ────────────────────────────────────────────
 data_loader = DataLoader()
@@ -92,7 +92,7 @@ departure_trainer = DepartureTrainer()
 departure_iterative_trainer = DepartureIterativeTrainer(departure_trainer=departure_trainer)
 multi_model_trainer = MultiModelIterativeTrainer()
 calibrator = PredictionCalibrator()
-whatif_generator = WhatIfGeneratorMax(route_scorer, data_loader)  # v3.2: Max OAuth + RIO + 6~8개 보장
+whatif_generator = WhatIfGeneratorOpenAI(route_scorer, data_loader)  # v4: OpenAI gpt-4o-mini + RIO + 6~8개 보장
 
 OUTPUT_DIR = Path(__file__).parent / "output"
 

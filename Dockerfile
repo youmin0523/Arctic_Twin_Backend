@@ -9,7 +9,7 @@ FROM node:20-bookworm-slim
 # --- 런타임 시스템 라이브러리 ---
 #   libgomp1        : torch / xgboost / scikit-learn 의 OpenMP 런타임
 #   libglib2.0-0    : opencv(headless) / ultralytics 의존
-#   ca-certificates : 외부 API(Copernicus/CDSE/Anthropic) HTTPS
+#   ca-certificates : 외부 API(Copernicus/CDSE/OpenAI) HTTPS
 #   curl            : uv 설치 + HEALTHCHECK
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \

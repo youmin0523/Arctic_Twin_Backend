@@ -63,7 +63,10 @@ fsspec==2026.3.0
 # ultralytics 가 자체적으로 opencv-python-headless, PyYAML, tqdm 등을 pull 함
 ultralytics>=8.0.0
 
-# ── 보고서 / Claude AI (report-service) ─────────────────
+# ── 보고서 / What-If AI (report-service) ─────────────────
+# What-If 시나리오: OpenAI gpt-4o-mini function calling (헤드리스 배포 호환)
+openai>=1.40.0
+# (레거시) Claude Agent SDK + Max OAuth 기반 생성기 — 로컬 전용, 배포 미사용
 anthropic==0.92.0
 claude-agent-sdk==0.1.71
 mcp==1.27.0

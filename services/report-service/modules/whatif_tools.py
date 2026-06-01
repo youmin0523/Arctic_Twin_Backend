@@ -36,8 +36,13 @@ TOOL_DEFINITIONS = [
                 "ice_class": {
                     "type": "string",
                     "enum": ["PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7",
-                             "IA Super", "IA", "IB", "IC", "None"],
-                    "description": "선박 Ice Class",
+                             "IA Super", "IA", "IB", "IC", "None",
+                             "Arc4", "Arc5", "Arc6", "Arc7", "Arc8", "Arc9"],
+                    "description": (
+                        "선박 Ice Class. IACS Polar Class(PC1~PC7), Baltic(IA Super~IC), "
+                        "러시아 RMRS Arc(Arc4~Arc9) 표기 모두 지원 — Arc 는 가장 가까운 "
+                        "IACS PC 등가로 자동 환산된다."
+                    ),
                 },
                 "departure_date": {
                     "type": "string",

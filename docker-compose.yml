@@ -12,7 +12,7 @@ services:
     ports:
       - "8000:8000"            # Vercel rewrite 대상 / nginx·ALB 가 앞단이면 127.0.0.1:8000 으로 좁혀도 됨
     env_file:
-      - .env                   # ANTHROPIC_API_KEY, COPERNICUS_*, CDSE_*, DATABASE_URL 등
+      - .env                   # OPENAI_API_KEY(What-If), COPERNICUS_*, CDSE_*, DATABASE_URL 등
     environment:
       - NODE_ENV=production
       - PORT=8000

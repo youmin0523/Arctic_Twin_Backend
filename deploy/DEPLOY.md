@@ -39,7 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/youmin0523/Arctic_Twin_Backend/main
 
 # .env 편집 (키 입력)
 nano ~/Arctic_Twin_Backend/.env
-#   ANTHROPIC_API_KEY=...        (What-If 분석)
+#   OPENAI_API_KEY=...           (What-If 분석 — gpt-4o-mini)
 #   COPERNICUS_MARINE_USER/_PASSWORD   (해양·기상 fetch)
 #   CDSE_USER/CDSE_PASSWORD      (Sentinel-1 SAR)
 #   DATABASE_URL=postgresql://...?sslmode=require   (Neon — 읽기 1차 소스)

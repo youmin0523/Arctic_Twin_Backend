@@ -177,6 +177,37 @@ RIV_TABLE: dict[str, dict[str, int]] = {
 }
 
 
+# ── 러시아 RMRS Arc 빙급 → IACS Polar Class 등가 정규화 ──────────────────────────
+# POLARIS RIV_TABLE 은 IACS PC1~PC7 / Baltic(IA Super~IC) / None 만 정의한다.
+# 러시아 선급(RMRS) 표기(Arc4~Arc9, Ice1~Ice3)는 가장 가까운 IACS 등가 클래스로
+# 정규화한다. RS↔IACS 등가표는 근사치이므로 보수적으로 채택한다.
+#   Arc4≈PC7  Arc5≈PC6  Arc6≈PC5  Arc7≈PC4  Arc8≈PC3  Arc9≈PC2
+#   Ice1≈IC   Ice2≈IB   Ice3≈IA
+ICE_CLASS_ALIASES: dict[str, str] = {
+    "ARC4": "PC7",
+    "ARC5": "PC6",
+    "ARC6": "PC5",
+    "ARC7": "PC4",
+    "ARC8": "PC3",
+    "ARC9": "PC2",
+    "ICE1": "IC",
+    "ICE2": "IB",
+    "ICE3": "IA",
+}
+
+
+def normalize_ice_class(ice_class: str) -> str:
+    """입력 빙급을 RIV_TABLE 키로 정규화한다.
+
+    이미 표준 키면 그대로 반환하고, 러시아 RMRS Arc/Ice 표기는 IACS 등가로 매핑한다.
+    매핑 불가한 값은 원본을 그대로 반환(이후 calculate_rio 가 ValueError 발생).
+    """
+    if ice_class in RIV_TABLE:
+        return ice_class
+    key = (ice_class or "").strip().upper().replace(" ", "")
+    return ICE_CLASS_ALIASES.get(key, ice_class)
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # 2. RIO CALCULATION MODULE
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -220,6 +251,7 @@ def calculate_rio(ice_class: str, ice_conditions: list[IceCondition]) -> float:
     ValueError
         If ice_class or any ice type is not found in RIV_TABLE.
     """
+    ice_class = normalize_ice_class(ice_class)
     if ice_class not in RIV_TABLE:
         valid = ", ".join(f"'{k}'" for k in RIV_TABLE)
         raise ValueError(f"Unknown ice_class '{ice_class}'. Valid values: {valid}")
