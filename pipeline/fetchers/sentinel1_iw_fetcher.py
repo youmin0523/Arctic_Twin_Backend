@@ -61,7 +61,10 @@ MAX_BACKOFF = 300.0  # 5분 캡
 RETRYABLE_CODES = {429, 500, 502, 503, 529}
 
 # 디스크 관리
-DEFAULT_MAX_DISK_GB = 50
+# 주의: 이 값은 루트 디스크 용량보다 충분히 작아야 한다. 과거 50GB(>실디스크 40GB)로
+# 설정돼 정리가 영영 트리거되지 않아 archive 가 디스크를 100% 채운 사고가 있었다.
+# 이미지(~13GB)+OS(~6GB)+기타 볼륨을 빼면 SAR 원본에 8GB 정도만 할당한다.
+DEFAULT_MAX_DISK_GB = 8
 
 # Arctic 빙하 AOI (관심 지역)
 ARCTIC_AOIS = {
@@ -485,6 +488,16 @@ def get_archive_size_gb():
 
 def cleanup_old_products(max_gb):
     """디스크 제한 초과 시 가장 오래된 파일부터 삭제 (FIFO)."""
+    # 끊긴 다운로드 찌꺼기(.zip.tmp)는 get_archive_size_gb 가 세지 않아 영영 누수된다.
+    # 매 실행 시 무조건 정리한다.
+    for tmp in ARCHIVE_DIR.rglob("*.zip.tmp"):
+        try:
+            size_mb = tmp.stat().st_size / (1024 * 1024)
+            tmp.unlink()
+            log.info(f"  [DELETE tmp] {tmp.name} ({size_mb:.0f}MB)")
+        except OSError:
+            pass
+
     current_gb = get_archive_size_gb()
     if current_gb <= max_gb:
         return
