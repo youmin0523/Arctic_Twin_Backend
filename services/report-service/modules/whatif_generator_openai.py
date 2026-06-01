@@ -28,7 +28,10 @@ import os
 import random
 from datetime import date
 
+from typing import Any, cast
+
 from openai import AsyncOpenAI
+from openai.types.chat import ChatCompletionMessageFunctionToolCall
 
 from .whatif_tools import WhatIfToolExecutor, TOOL_DEFINITIONS
 from .whatif_generator import WHATIF_SYSTEM_PROMPT, SCENARIO_PROMPT_TEMPLATE
@@ -104,8 +107,20 @@ class WhatIfGeneratorOpenAI:
 
         return result
 
-    async def _async_generate(self, route, ice_class, departure_date, forecast_days) -> str:
-        """OpenAI 도구 호출 루프를 돌려 AI 텍스트를 반환하고, 시나리오를 수집/보강한다."""
+    async def _async_generate(self, route, ice_class, departure_date, forecast_days,
+                              progress_cb=None) -> str:
+        """OpenAI 도구 호출 루프를 돌려 AI 텍스트를 반환하고, 시나리오를 수집/보강한다.
+
+        progress_cb(pct:int) 가 주어지면 tool-call 루프 진행에 따라 점진적으로 호출해
+        프론트 진행률이 한 지점에 멈춰 보이지 않도록 한다(체감 속도 개선).
+        """
+        def _p(pct: int):
+            if progress_cb:
+                try:
+                    progress_cb(pct)
+                except Exception:  # noqa: BLE001  진행률 갱신 실패는 본 작업에 영향 없음
+                    pass
+
         if not departure_date:
             departure_date = date.today().isoformat()
 
@@ -114,17 +129,18 @@ class WhatIfGeneratorOpenAI:
             departure_date=departure_date, forecast_days=forecast_days,
         )
 
-        messages = [
+        messages: list[dict[str, Any]] = [
             {"role": "system", "content": WHATIF_SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ]
 
+        _p(15)  # 첫 모델 호출 직전
         chunks = []
         for _turn in range(MAX_TOOL_TURNS):
             resp = await self.client.chat.completions.create(
                 model=OPENAI_MODEL,
-                messages=messages,
-                tools=self._tools,
+                messages=cast(Any, messages),
+                tools=cast(Any, self._tools),
                 tool_choice="auto",
                 temperature=0.7,
             )
@@ -134,7 +150,11 @@ class WhatIfGeneratorOpenAI:
 
             tool_calls = msg.tool_calls or []
             if not tool_calls:
+                _p(80)  # 모델이 최종 답변 → 생성 거의 완료
                 break  # 모델이 도구 없이 최종 답변 → 종료
+
+            # 매 턴 진행률 상승: 20 → 32 → 44 … (최대 78)
+            _p(min(20 + _turn * 12, 78))
 
             # assistant 메시지(도구 호출 포함)를 대화에 반영
             messages.append({
@@ -145,8 +165,8 @@ class WhatIfGeneratorOpenAI:
                         "id": tc.id,
                         "type": "function",
                         "function": {
-                            "name": tc.function.name,
-                            "arguments": tc.function.arguments,
+                            "name": cast(ChatCompletionMessageFunctionToolCall, tc).function.name,
+                            "arguments": cast(ChatCompletionMessageFunctionToolCall, tc).function.arguments,
                         },
                     }
                     for tc in tool_calls
@@ -155,11 +175,12 @@ class WhatIfGeneratorOpenAI:
 
             # 각 도구 실행 후 결과를 tool 메시지로 피드백
             for tc in tool_calls:
+                fn_tc = cast(ChatCompletionMessageFunctionToolCall, tc)
                 try:
-                    args = json.loads(tc.function.arguments or "{}")
+                    args = json.loads(fn_tc.function.arguments or "{}")
                 except json.JSONDecodeError:
                     args = {}
-                result = self._dispatch_tool(tc.function.name, args)
+                result = self._dispatch_tool(fn_tc.function.name, args)
                 messages.append({
                     "role": "tool",
                     "tool_call_id": tc.id,
@@ -184,4 +205,5 @@ class WhatIfGeneratorOpenAI:
             len(self.collected_route_summaries), target,
         )
 
+        _p(85)  # 풀 보강까지 완료 (이후 server.py 가 90→100 마무리)
         return chr(10).join(chunks)

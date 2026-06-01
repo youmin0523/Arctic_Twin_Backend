@@ -12,6 +12,7 @@ import sys
 import uuid
 from datetime import date, datetime
 from pathlib import Path
+from typing import cast
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, BackgroundTasks
@@ -516,7 +517,7 @@ async def rl_calibrate():
             if _router_path not in _sys.path:
                 _sys.path.insert(0, _router_path)
             break
-    from arctic_master_router import calculate_rio
+    from arctic_master_router import calculate_rio, IceCondition
 
     predicted_rios = []
     actual_rios = []
@@ -526,7 +527,7 @@ async def rl_calibrate():
         conc = route_scorer._get_segment_concentration(seg, cells)
         ice_conds = concentration_to_ice_conditions(conc)
         try:
-            pred_rio = calculate_rio("PC5", ice_conds)
+            pred_rio = calculate_rio("PC5", cast(list[IceCondition], ice_conds))
             predicted_rios.append(pred_rio)
             # 실제 RIO는 현재 데이터 기반으로 근사 (작은 노이즈 추가)
             import numpy as np
@@ -669,11 +670,16 @@ async def _run_whatif(job_id: str, req: WhatIfRequest):
         whatif_generator.collected_route_summaries = []
         whatif_generator.tool_calls_count = 0
 
+        # tool-call 루프 진행 상황을 10~85% 구간으로 실시간 반영 (체감 속도 개선)
+        def _progress(pct: int):
+            _update_job(job_id, max(10, min(85, pct)))
+
         ai_text = await whatif_generator._async_generate(
             route=req.route,
             ice_class=req.ice_class,
             departure_date=req.departure_date_start or date.today().isoformat(),
             forecast_days=req.forecast_days,
+            progress_cb=_progress,
         )
         result = parse_result_v3(ai_text, whatif_generator.collected_route_summaries)
         result.tool_calls_count = whatif_generator.tool_calls_count
