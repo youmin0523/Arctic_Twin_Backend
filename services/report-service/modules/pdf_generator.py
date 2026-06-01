@@ -55,13 +55,19 @@ FONT_SEARCH_PATHS = [
 ]
 
 _KO_FONT_NAME = "NanumGothic"
+# 실제로 사용 가능(등록 완료)한 폰트 이름. 한글 폰트를 못 찾으면 Helvetica로 폴백된다.
+# Helvetica는 ReportLab 내장 폰트라 bold/italic 패밀리 매핑이 기본 제공되므로
+# <para>/<b>/<i> 태그에서도 "Can't determine family" 에러가 나지 않는다.
+KOREAN_FONT = "Helvetica"
 _ko_font_registered = False
 
 
 def _register_korean_font():
-    global _ko_font_registered
+    """한글 폰트를 등록하고 실제 사용 가능한 폰트 이름을 반환한다."""
+    global _ko_font_registered, KOREAN_FONT
     if _ko_font_registered:
-        return
+        return KOREAN_FONT
+    _ko_font_registered = True  # 성공/실패와 무관하게 한 번만 시도
 
     for fpath in FONT_SEARCH_PATHS:
         if fpath.exists():
@@ -81,21 +87,23 @@ def _register_korean_font():
                 fm.fontManager.addfont(str(fpath))
                 plt.rcParams["font.family"] = fm.FontProperties(fname=str(fpath)).get_name()
                 plt.rcParams["axes.unicode_minus"] = False
-                _ko_font_registered = True
+                KOREAN_FONT = _KO_FONT_NAME
                 logger.info("한국어 폰트 등록: %s", fpath)
-                return
+                return KOREAN_FONT
             except Exception as e:
                 logger.warning("폰트 등록 실패 (%s): %s", fpath, e)
 
-    logger.warning("한국어 폰트를 찾지 못함 — PDF에서 한글이 깨질 수 있습니다.")
-    _ko_font_registered = True  # 재시도 방지
+    # 한글 폰트를 끝내 못 찾음 → Helvetica 폴백.
+    # (한글은 깨질 수 있으나 PDF 생성 자체는 크래시하지 않는다.)
+    KOREAN_FONT = "Helvetica"
+    logger.warning("한국어 폰트를 찾지 못함 — Helvetica로 폴백합니다. PDF에서 한글이 깨질 수 있습니다.")
+    return KOREAN_FONT
 
 
 def _get_styles():
     """PDF 스타일 정의."""
-    _register_korean_font()
+    font = _register_korean_font()
     styles = getSampleStyleSheet()
-    font = _KO_FONT_NAME if _ko_font_registered else "Helvetica"
 
     styles.add(ParagraphStyle(
         "KoTitle", fontName=font, fontSize=24, leading=30,
@@ -219,7 +227,7 @@ def chart_weather_radar(weather_routes: dict):
     return _fig_to_image(fig, width=CHART_WIDTH, height=CHART_WIDTH * 0.8)
 
 
-def chart_departure_calendar(calendar: list, rl_scores: dict = None):
+def chart_departure_calendar(calendar: list, rl_scores: dict | None = None):
     """차트4: 출항 캘린더 히트맵 (RIO + RL 신뢰도 오버레이)."""
     if not calendar:
         return None
@@ -282,7 +290,7 @@ def chart_segment_heatmap(calendar: list):
     return _fig_to_image(fig)
 
 
-def chart_rl_training_curve(training_history: list):
+def chart_rl_training_curve(training_history: list | None):
     """차트6: RL 학습 곡선."""
     if not training_history:
         return None
@@ -307,7 +315,7 @@ def chart_rl_training_curve(training_history: list):
     return _fig_to_image(fig)
 
 
-def chart_avoidance_difficulty(difficulties: dict):
+def chart_avoidance_difficulty(difficulties: dict | None):
     """차트7: 구간별 빙산 회피 난이도 (RL(C) bar)."""
     if not difficulties:
         return None
@@ -343,6 +351,8 @@ class PdfGenerator:
 
     def __init__(self):
         self.styles = _get_styles()
+        # 실제 등록된 폰트 이름 (한글 폰트 또는 Helvetica 폴백). 표 스타일에서 사용.
+        self.font = KOREAN_FONT
 
     @staticmethod
     def _chart_whatif_comparison(scenarios: list[dict]):
@@ -399,12 +409,12 @@ class PdfGenerator:
         ai_route: str,
         ai_conclusions: str,
         # RL 결과 (선택)
-        rl_departure_scores: dict = None,
-        rl_training_history: list = None,
-        rl_avoidance_difficulties: dict = None,
-        rl_model_info: dict = None,
-        rl_calibration_info: dict = None,
-        whatif_result: dict = None,
+        rl_departure_scores: dict | None = None,
+        rl_training_history: list | None = None,
+        rl_avoidance_difficulties: dict | None = None,
+        rl_model_info: dict | None = None,
+        rl_calibration_info: dict | None = None,
+        whatif_result: dict | None = None,
     ) -> Path:
         """PDF 보고서 생성."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -450,7 +460,7 @@ class PdfGenerator:
         table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a2a4a")),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("FONTNAME", (0, 0), (-1, -1), _KO_FONT_NAME),
+            ("FONTNAME", (0, 0), (-1, -1), self.font),
             ("FONTSIZE", (0, 0), (-1, -1), 9),
             ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c0d0e0")),
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
@@ -487,7 +497,7 @@ class PdfGenerator:
         table2.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a2a4a")),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("FONTNAME", (0, 0), (-1, -1), _KO_FONT_NAME),
+            ("FONTNAME", (0, 0), (-1, -1), self.font),
             ("FONTSIZE", (0, 0), (-1, -1), 8),
             ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c0d0e0")),
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
@@ -561,7 +571,7 @@ class PdfGenerator:
             wt.setStyle(TableStyle([
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a2a4a")),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, -1), _KO_FONT_NAME),
+                ("FONTNAME", (0, 0), (-1, -1), self.font),
                 ("FONTSIZE", (0, 0), (-1, -1), 8),
                 ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c0d0e0")),
                 ("ALIGN", (1, 1), (-1, -1), "CENTER"),
@@ -609,7 +619,7 @@ class PdfGenerator:
             mt.setStyle(TableStyle([
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a2a4a")),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, -1), _KO_FONT_NAME),
+                ("FONTNAME", (0, 0), (-1, -1), self.font),
                 ("FONTSIZE", (0, 0), (-1, -1), 9),
                 ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c0d0e0")),
             ]))
