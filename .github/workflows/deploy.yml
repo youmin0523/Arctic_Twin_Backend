@@ -1,0 +1,69 @@
+name: deploy-backend
+
+# ============================================================
+# backend → GitHub → AWS EC2  (SSH + git pull + docker compose)
+# ------------------------------------------------------------
+# main 에 push 되면 EC2 에 SSH 접속해 git 을 origin/main 으로 맞추고
+# docker compose 로 재빌드·기동한다. (최초 부트스트랩은 deploy/ec2-setup.sh)
+#
+# 레포 Settings → Secrets and variables → Actions 에 등록 필요:
+#   EC2_HOST     (필수)  EC2 퍼블릭 IP 또는 도메인  예: 13.51.x.x / api.arctictwin.com
+#   EC2_SSH_KEY  (필수)  EC2 접속용 *개인키* 전체 (-----BEGIN ... END----- 포함)
+#   EC2_USER     (선택)  기본 'ubuntu'
+#   EC2_PORT     (선택)  기본 22
+#   APP_DIR      (선택)  기본 ~/Arctic_Twin_Backend
+# ============================================================
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:        # 문서만 바뀌면 재배포하지 않음
+      - '**/*.md'
+      - 'docs/**'
+  workflow_dispatch: {}   # Actions 탭에서 수동 실행 버튼
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false   # 배포 중엔 취소하지 않음(반쯤 갱신 방지)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER || 'ubuntu' }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          command_timeout: 30m
+          script: |
+            set -euo pipefail
+            APP_DIR="${{ secrets.APP_DIR }}"
+            APP_DIR="${APP_DIR:-$HOME/Arctic_Twin_Backend}"
+            cd "$APP_DIR"
+
+            echo "==> [1/4] GitHub origin/main 으로 동기화"
+            git fetch --all --prune
+            # 서버 working tree 는 runtime 데이터가 docker 볼륨에 분리돼 있어 clean.
+            # CI/CD 는 GitHub 가 단일 진실원본이므로 origin/main 에 정확히 맞춘다.
+            git reset --hard origin/main
+
+            echo "==> [2/4] 재빌드 + 무중단에 가깝게 교체"
+            sudo docker compose up -d --build
+
+            echo "==> [3/4] dangling 이미지 정리(디스크 25GB 보호)"
+            sudo docker image prune -f
+
+            echo "==> [4/4] 헬스 체크 (모델 로드까지 대기, 최대 ~3.5분)"
+            for i in $(seq 1 21); do
+              if curl -fsS http://localhost:8000/api/health >/dev/null 2>&1; then
+                echo "✅ backend healthy"
+                exit 0
+              fi
+              echo "   대기 중... ($i/21)"; sleep 10
+            done
+            echo "❌ 헬스 체크 실패 — 최근 로그:"
+            sudo docker compose logs --tail=80 backend
+            exit 1

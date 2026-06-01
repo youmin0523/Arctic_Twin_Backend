@@ -393,15 +393,28 @@ schedule.scheduleJob('30 */6 * * *', runWeatherPipeline);
 // ── 시스템 리소스 모니터 (10분마다) ──────────────────────────────
 function logSystemResources() {
   const { exec } = require('child_process');
+  const os = require('os');
 
-  // CPU 사용량 (wmic)
-  exec('wmic cpu get loadpercentage /value', (err, stdout) => {
-    const cpuMatch = stdout && stdout.match(/LoadPercentage=(\d+)/);
-    const cpu = cpuMatch ? cpuMatch[1] + '%' : 'N/A';
+  // CPU 사용량: Windows 는 wmic, 그 외(Linux 컨테이너 등)는 os.loadavg() 기반.
+  // (wmic 는 Linux 에 없어 매번 실패 프로세스를 띄우므로 플랫폼 분기)
+  function reportCpu(cb) {
+    if (process.platform === 'win32') {
+      exec('wmic cpu get loadpercentage /value', (err, stdout) => {
+        const m = stdout && stdout.match(/LoadPercentage=(\d+)/);
+        cb(m ? m[1] + '%' : 'N/A');
+      });
+      return;
+    }
+    // load1 / 코어수 → 대략적 사용률(%)
+    const cores = os.cpus().length || 1;
+    const pct = Math.min(100, Math.round((os.loadavg()[0] / cores) * 100));
+    cb(`${pct}% (load1/${cores}c)`);
+  }
 
-    // GPU 사용량 (nvidia-smi)
+  reportCpu((cpu) => {
+    // GPU 사용량 (nvidia-smi 있으면, 없으면 N/A — Linux/Windows 공통)
     exec('nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits', (gpuErr, gpuStdout) => {
-      const gpu = (!gpuErr && gpuStdout.trim()) ? gpuStdout.trim() + '%' : 'N/A';
+      const gpu = (!gpuErr && gpuStdout && gpuStdout.trim()) ? gpuStdout.trim() + '%' : 'N/A';
       console.log(`[SystemMonitor] CPU: ${cpu} | GPU: ${gpu}`);
     });
   });
@@ -425,12 +438,13 @@ setTimeout(() => runMigrate('startup'), 10000);
 app.listen(PORT, () => {
   console.log(`[Server] Arctic Digital Twin API running on http://localhost:${PORT}`);
   console.log(`[Scheduler] Sentinel-1: 01:00 UTC | Ice: 02:00 UTC | SAR: 03:00 UTC | Berg: 04:00 UTC | Weather: every 6h`);
-  // RL 파이프라인 자동 기동
-  startRLServer();
-  // Report 서비스 자동 기동
-  startReportServer();
-  // ML 연료 예측 서비스 자동 기동
-  startMLServer();
+  // AI 서버 3종(RL/Report/ML)을 순차(stagger) 기동해 부팅 시 torch/모델 동시 로드 피크를 분산.
+  // t3.medium(4GB) 같은 작은 인스턴스에서 동시 로드가 RAM 을 순간 초과해 swap 으로 빠지는 것을 막는다.
+  // 큰 인스턴스에선 영향 미미(단지 ~50s 늦게 모두 기동). AI_STARTUP_STAGGER_MS=0 으로 동시 기동 복원 가능.
+  const STAGGER_MS = Number(process.env.AI_STARTUP_STAGGER_MS ?? 25000);
+  startRLServer();                            // t+0
+  setTimeout(startReportServer, STAGGER_MS);  // t+25s (기본)
+  setTimeout(startMLServer, STAGGER_MS * 2);  // t+50s (기본)
 });
 
 // 프로세스 종료 시 모든 서버 정리

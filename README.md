@@ -4,19 +4,19 @@
 > 강화학습 빙산 회피 + 실시간 해빙 모니터링 + 항로 최적화
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel)](https://digital-twin-omega-umber.vercel.app)
-[![Backend API](https://img.shields.io/badge/Backend%20API-HuggingFace-FFD21E?style=for-the-badge&logo=huggingface)](https://heejin-oh-arctic-digital-twin-backend.hf.space)
-[![Domain](https://img.shields.io/badge/Domain-arctic--twin.xyz-blue?style=for-the-badge)](https://arctic-twin.xyz)
+[![Backend API](https://img.shields.io/badge/Backend%20API-AWS%20EC2-FF9900?style=for-the-badge&logo=amazonaws)](https://arctictwin.com)
+[![Domain](https://img.shields.io/badge/Domain-arctictwin.com-blue?style=for-the-badge)](https://arctictwin.com)
 
 ---
 
 ## 🌐 Live Demo
 
-| 서비스 | URL |
-|--------|-----|
-| **Frontend (Vercel)** | https://digital-twin-omega-umber.vercel.app |
-| **Custom Domain** | https://arctic-twin.xyz |
-| **Backend API (HF Spaces)** | https://heejin-oh-arctic-digital-twin-backend.hf.space |
-| **Health Check** | [/health](https://heejin-oh-arctic-digital-twin-backend.hf.space/health) |
+| 서비스                      | URL                                                                      |
+| --------------------------- | ------------------------------------------------------------------------ |
+| **Frontend (Vercel)**       | https://digital-twin-omega-umber.vercel.app                              |
+| **Custom Domain**           | https://arctictwin.com                                                   |
+| **Backend API (AWS EC2)**   | 배포 도메인 설정 후 업데이트 (Vercel `/api/*` rewrite 경유)              |
+| **Health Check**            | `<백엔드 도메인>/health`                                                  |
 
 ---
 
@@ -24,13 +24,13 @@
 
 ### 🤖 AI 모델 4종 통합
 
-| 기능 | 모델 | 역할 |
-|------|------|------|
-| **빙산 회피** | Stable Baselines3 (SAC) | 강화학습 기반 실시간 충돌 회피 경로 생성 |
-| **출항 스케줄링** | Stable Baselines3 (SAC) | RL 기반 최적 출항 시점 결정 |
-| **빙산 탐지** | YOLOv8 | SAR 위성 영상에서 빙산 자동 탐지 |
-| **연료 예측** | XGBoost | 빙해 저항 기반 연료 소비량 회귀 |
-| **What-If 분석** | Claude Agent SDK + Pool | LLM 기반 시나리오 자동 생성 |
+| 기능              | 모델                    | 역할                                     |
+| ----------------- | ----------------------- | ---------------------------------------- |
+| **빙산 회피**     | Stable Baselines3 (SAC) | 강화학습 기반 실시간 충돌 회피 경로 생성 |
+| **출항 스케줄링** | Stable Baselines3 (SAC) | RL 기반 최적 출항 시점 결정              |
+| **빙산 탐지**     | YOLOv8                  | SAR 위성 영상에서 빙산 자동 탐지         |
+| **연료 예측**     | XGBoost                 | 빙해 저항 기반 연료 소비량 회귀          |
+| **What-If 분석**  | Claude Agent SDK + Pool | LLM 기반 시나리오 자동 생성              |
 
 ### 🎨 인터랙티브 프론트엔드
 
@@ -51,31 +51,30 @@
                                      ▼
                   ┌──────────────────────────────────┐
                   │  Vercel (Frontend - React+Cesium) │
-                  │  arctic-twin.xyz                  │
+                  │  arctictwin.com                   │
                   └────────────┬─────────────────────┘
                                │ /api/* rewrites
                                ▼
               ┌──────────────────────────────────────────┐
-              │  Hugging Face Spaces (Backend Container)  │
-              │  ┌──────────────────────────────────────┐ │
-              │  │  FastAPI Proxy (port 7860)            │ │
-              │  └──────┬─────────┬─────────┬──────────┘ │
-              │         │         │         │             │
-              │  ┌──────▼──┐ ┌────▼────┐ ┌─▼──────┐ ┌──▼─┐│
-              │  │ rl-pipe │ │ report  │ │ ml-pipe│ │ sar││
-              │  │ (8001)  │ │ (8002)  │ │ (8003) │ │8005││
-              │  └─────────┘ └─────────┘ └────────┘ └────┘│
-              │       SAC      Claude SDK   XGBoost  YOLOv8│
-              └──────────────────────────────────────────┘
-                               │
-                               ▼
-              ┌────────────────────────────────────────┐
-              │  External APIs                         │
-              │  - Copernicus Marine (해양 데이터)      │
-              │  - CDSE (Sentinel-1 SAR)               │
-              │  - NSIDC (해빙 농도)                    │
-              │  - Anthropic Claude (시나리오 생성)     │
-              └────────────────────────────────────────┘
+              │  AWS EC2 (Ubuntu · PM2)                    │
+              │  Nginx :443 → Node API Gateway :8000       │
+              │  └──────┬─────────┬─────────┬──────────┐   │
+              │         │         │         │          │   │
+              │  ┌──────▼──┐ ┌────▼────┐ ┌─▼──────┐ ┌──▼─┐ │
+              │  │ rl-pipe │ │ report  │ │ ml-pipe│ │ sar│ │
+              │  │ (8001)  │ │ (8002)  │ │ (8003) │ │8005│ │
+              │  └─────────┘ └─────────┘ └────────┘ └────┘ │
+              │       SAC      Claude SDK   XGBoost  YOLOv8 │
+              └──────────────────┬───────────────────────┘
+                       │ DATABASE_URL │
+                       ▼              ▼
+        ┌────────────────────┐  ┌────────────────────────────┐
+        │ Neon PostgreSQL    │  │  External APIs              │
+        │ (빙산·SAR·sentinel │  │  - Copernicus Marine        │
+        │  ·시뮬레이션 DB)   │  │  - CDSE (Sentinel-1 SAR)    │
+        │ + 파일 폴백         │  │  - NSIDC (해빙 농도)        │
+        └────────────────────┘  │  - Anthropic Claude         │
+                                 └────────────────────────────┘
 ```
 
 ---
@@ -83,30 +82,35 @@
 ## 🛠️ 기술 스택
 
 ### Frontend
+
 - **Framework**: React 18 + Vite
 - **3D**: Cesium.js, Three.js, Deck.gl
 - **Charts**: Recharts
 - **Hosting**: Vercel
 
 ### Backend
+
 - **API Framework**: FastAPI (Python 3.11)
 - **ML/AI**:
   - PyTorch 2.x + Stable Baselines3 (강화학습)
   - Ultralytics YOLOv8 (Computer Vision)
   - XGBoost (회귀)
   - Claude Agent SDK + MCP (LLM 도구)
-- **Container**: Docker (multi-process)
-- **Hosting**: Hugging Face Spaces (CPU 16GB Free)
+- **Process 관리**: PM2 / systemd (Node 진입점이 Python 서비스 자식 프로세스 기동)
+- **Hosting**: AWS EC2 (Ubuntu, t3.medium 4GB + swap 6GB / 추론 데모) + Nginx 리버스 프록시
 
 ### Data
+
 - **위성 데이터**: Sentinel-1 SAR (Copernicus CDSE)
 - **해빙 농도**: NSIDC (NASA)
 - **기상 데이터**: Copernicus Marine Service
+- **정형 데이터 DB**: Neon PostgreSQL (빙산·SAR·sentinel1·시뮬레이션) — 파일 폴백 지원
 - **모델 저장**: Git LFS (~200MB)
 
 ### DevOps
-- **CI/CD**: GitHub → Vercel/HF Spaces 자동 배포
-- **Secrets**: HF Secrets (API keys)
+
+- **CI/CD**: GitHub → Vercel(프론트) 자동 배포 / EC2(백엔드) git pull + PM2 reload
+- **Secrets**: EC2 `backend/.env` (API keys, DATABASE_URL)
 - **DNS**: Gabia + Vercel
 - **버전 관리**: Git LFS
 
@@ -115,6 +119,7 @@
 ## 🚀 로컬 실행 (팀원용 셋업 가이드)
 
 ### 0. 사전 준비
+
 - **Python 3.11 이상** (3.14도 OK — async 패치 적용됨)
 - **[uv](https://docs.astral.sh/uv/)** — 모든 백엔드 Python 실행/환경을 uv 로 통일 (`pip install uv` 또는 `winget install astral-sh.uv`)
 - **Node.js 20 이상**
@@ -129,6 +134,7 @@ git checkout Hijin   # 작업 브랜치
 ```
 
 클론 직후 다음이 있어야 합니다:
+
 - `backend/` — Node.js(Express) API 게이트웨이 (포트 8000) — 해빙·빙산·항로·기상 API + 정적 데이터
 - `backend/model/` — 학습된 모델 47개 (RL 회피 9 + 출항 ONNX 29 + 항법 6 + fuel 1 + yolo 1, 총 ~591MB)
 - `backend/data/` — 해빙·기상 데이터 일부 (없는 데이터는 외부 API에서 자동 fetch)
@@ -145,11 +151,12 @@ cp backend/.env.example backend/.env
 # .env 편집 — 키가 없으면 해당 기능만 비활성화, 다른 건 정상 동작
 ```
 
-| 키 | 용도 | 없을 때 영향 |
-|---|---|---|
-| `ANTHROPIC_API_KEY` | What-If Claude 분석 | What-If 탭 비활성 |
-| `COPERNICUS_MARINE_USER` / `_PASSWORD` | 실시간 해양 데이터 | 캐시된 데이터 사용 |
-| `CDSE_USER` / `CDSE_PASSWORD` | Sentinel-1 SAR | 샘플 이미지 사용 |
+| 키                                     | 용도                                                        | 없을 때 영향                                        |
+| -------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------- |
+| `ANTHROPIC_API_KEY`                    | What-If Claude 분석                                         | What-If 탭 비활성                                   |
+| `COPERNICUS_MARINE_USER` / `_PASSWORD` | 실시간 해양 데이터                                          | 캐시된 데이터 사용                                  |
+| `CDSE_USER` / `CDSE_PASSWORD`          | Sentinel-1 SAR                                              | 샘플 이미지 사용                                    |
+| `DATABASE_URL`                         | Neon PostgreSQL (빙산·SAR·sentinel1·시뮬레이션 정형 데이터) | **`backend/data/*.json` 파일로 자동 폴백** (무중단) |
 
 ### 3. Python 의존성 설치 (uv 단일 환경)
 
@@ -176,6 +183,7 @@ npm run dev        # → http://localhost:8000  (정지: Ctrl+C)
 ```
 
 > ⚠️ **로컬 AI 구동 방법은 둘 중 하나만 고르세요.** Node 백엔드는 공용 환경 `backend/.venv` 가 **있으면** RL/Report/Fuel(8001~8003)을 `uv run` 으로 자동 기동합니다.
+>
 > - **(A) Node 자동 기동**: step 3 으로 `backend/.venv` 만들어두고 위 `npm run dev` → 8001~8003 자동 실행.
 > - **(B) 수동 기동**: 아래 step 5 의 `services-launcher` 로 직접 실행. (launcher 도 `backend/.venv` 없으면 자동 생성)
 >
@@ -202,8 +210,9 @@ npm run dev        # → http://localhost:8000  (정지: Ctrl+C)
 > macOS/Linux (PowerShell 없이 직접 실행): `VIRTUAL_ENV=backend/.venv uv run --no-project --active uvicorn server:app --host 127.0.0.1 --port <port>` (해당 서비스 폴더에서). SAR 는 루트에서 `... uv run --no-project --active python sar_server.py`.
 
 각 서버 health check:
+
 - http://127.0.0.1:8001/api/rl/health
-- http://127.0.0.1:8002/api/report/health  → `rl_model_loaded: true` 떠야 정상
+- http://127.0.0.1:8002/api/report/health → `rl_model_loaded: true` 떠야 정상
 - http://127.0.0.1:8003/api/fuel/health
 - http://127.0.0.1:8005/api/sar/status
 
@@ -234,6 +243,7 @@ npm run dev
 브라우저에서 http://localhost:5173 열기.
 
 **프록시 설정** (`frontend/vite.config.js` 상단):
+
 - 기본값: `/api/rl`, `/api/report`, `/api/fuel` → HF Space (배포본)
 - `/api/sar` → localhost:8005 (로컬 서버)
 - `/api`(해빙·항로 등 일반)·`/data`·`/proxy` → localhost:8000 (Node 백엔드, step 4)
@@ -241,46 +251,136 @@ npm run dev
 
 ### 8. 문제 해결
 
-| 증상 | 원인 / 해결 |
-|------|------------|
-| `ECONNREFUSED` 가 vite proxy 에서 뜸 | 해당 백엔드가 안 떠있음. Node(step 4)·AI 서버(step 5) 확인. |
-| 8002 가 `rl_model_loaded: false` | `backend/model/report-service/*.onnx` 가 안 받아진 거 — `git lfs pull` 또는 git pull 재시도 |
-| `ModuleNotFoundError: gymnasium` 등 | step 3 의존성 설치 누락. `uv pip install --python backend/.venv -r backend/requirements.txt` 재실행. |
-| Python 3.14 에서 `NoEventLoopError` | 이미 패치됨. `anyio.to_thread` / `BackgroundTask` 가 server.py 상단에서 monkey-patch. |
-| What-If 가 0% 멈춤 | `ANTHROPIC_API_KEY` 가 backend/.env 에 있는지 확인. |
+| 증상                                 | 원인 / 해결                                                                                          |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `ECONNREFUSED` 가 vite proxy 에서 뜸 | 해당 백엔드가 안 떠있음. Node(step 4)·AI 서버(step 5) 확인.                                          |
+| 8002 가 `rl_model_loaded: false`     | `backend/model/report-service/*.onnx` 가 안 받아진 거 — `git lfs pull` 또는 git pull 재시도          |
+| `ModuleNotFoundError: gymnasium` 등  | step 3 의존성 설치 누락. `uv pip install --python backend/.venv -r backend/requirements.txt` 재실행. |
+| Python 3.14 에서 `NoEventLoopError`  | 이미 패치됨. `anyio.to_thread` / `BackgroundTask` 가 server.py 상단에서 monkey-patch.                |
+| What-If 가 0% 멈춤                   | `ANTHROPIC_API_KEY` 가 backend/.env 에 있는지 확인.                                                  |
+
+---
+
+## 🗄️ 데이터 저장 — PostgreSQL + 파일 폴백
+
+정형 데이터는 **Neon PostgreSQL** 을 우선 조회하고, DB 미설정·연결 실패 시 기존
+`backend/data/*.json` 파일로 **자동 폴백**합니다(무중단). API 응답 구조는 두 경로가 동일합니다.
+
+### DB로 서빙하는 테이블
+
+| 테이블               | 원본 파일                       | 읽기 경로                                              |
+| -------------------- | ------------------------------- | ------------------------------------------------------ |
+| `icebergs`           | `copernicus_icebergs.json`      | `GET /api/icebergs/latest`, `/api/collab/all-icebergs` |
+| `bergs`              | `realBergData_latest.json`      | `GET /api/icebergs/latest`                             |
+| `sentinel1_products` | `sentinel1_catalog_latest.json` | `GET /api/sentinel1/catalog`, `/products`              |
+| `sar_detections`     | `sar_detections_latest.json`    | `GET /api/collab/sar-icebergs`, `/sar-metadata`        |
+| `simulation_results` | `data/simulations/*.json`       | `GET /api/simulations`, `/api/simulations/:scenario`   |
+
+> 대용량 해빙 그리드(`realIceData_*`)와 기상(`weather_latest.json`)은 의도적으로 **파일 유지**(DB 미이관).
+
+### 동작 방식
+
+- **읽기**: Node(`src/services/db.js`, `dataStore.js`, `sarDetectionStore.js`)와 Python report-service(`modules/db.py`, `data_loader.py`, `whatif_tools.py`)가 DB 우선 + 파일 폴백.
+- **쓰기/동기화**: 데이터 수집 fetcher 가 JSON 을 갱신하면, `src/index.js` 가 **fetcher 완료 후 + 서버 시작 시** `scripts/sync_db.js` 를 자동 실행해 DB 를 최신화(멱등 upsert). SAR 온디맨드 탐지 후에도 자동 동기화.
+- **스키마/마이그레이션**: `scripts/schema.sql` + `scripts/sync_db.js` (backend 단독 동작 — `backend/node_modules` 의 `pg`·`dotenv` 사용, 루트 `database/` 폴더 의존 없음).
+
+### 설정 & 수동 동기화
+
+```bash
+# backend/.env 에 DATABASE_URL 설정 (Neon 연결 문자열, sslmode=require 포함)
+#   미설정 시 자동으로 JSON 파일 폴백 모드로 동작
+
+cd backend
+node scripts/sync_db.js        # JSON → DB 수동 동기화 (스키마 적용 + upsert, 재실행 안전)
+```
+
+> Node 는 `pg`, Python report-service 는 `psycopg2-binary` 를 사용하며 둘 다 통합 의존성에 포함되어 있습니다.
 
 ---
 
 ## 📦 배포
 
-### Hugging Face Spaces (백엔드 + AI)
-[`hf-space/DEPLOY.md`](hf-space/DEPLOY.md) 참고. Docker 기반 자동 빌드.
+### AWS EC2 (백엔드 + AI)
+
+백엔드는 **Node API 게이트웨이(8000)가 Python AI 서비스(8001~8005)를 자식 프로세스로 기동**하고
+스케줄러·DB 동기화가 상시 동작하는 멀티프로세스 구조라, 장시간 실행되는 **단일 VM(EC2)** 에
+배포하는 것이 적합합니다. (로컬 셋업과 동일한 흐름을 서버에서 재현)
+
+**1) 인스턴스 준비**
+- Ubuntu 22.04 LTS, 권장 `t3.medium`(2vCPU/4GB + swap 6GB — 추론 데모). 여유는 `t3.large` 8GB, 학습은 `t3.xlarge` 16GB. GPU는 선택.
+- 스토리지 30GB+ (모델 ~600MB + 의존성 + 데이터 캐시).
+- **보안 그룹**: 인바운드 80/443(웹)만 공개. 8000~8005 는 외부에 열지 말고 내부에서만 사용.
+
+**2) 런타임 설치**
+```bash
+# Node.js 20, uv, git-lfs
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs git-lfs
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**3) 코드 + 의존성**
+```bash
+git clone <repo> && cd digital-twin && git lfs pull   # 모델 파일
+uv venv backend/.venv
+uv pip install --python backend/.venv -r backend/requirements.txt
+cd backend && npm install
+```
+
+**4) 환경변수** — `backend/.env` 작성 (로컬과 동일 키 + 운영 DB)
+```bash
+DATABASE_URL=postgresql://...neon.tech/neondb?sslmode=require   # Neon PostgreSQL
+ANTHROPIC_API_KEY=...
+COPERNICUS_MARINE_USER=... / COPERNICUS_MARINE_PASSWORD=...
+CDSE_USER=... / CDSE_PASSWORD=...
+```
+
+**5) 상시 구동 (PM2 또는 systemd)** — Node(8000)가 RL/Report/Fuel(8001~8003)을 자동 기동하므로
+**진입점은 Node 하나만** 관리하면 됩니다. SAR(8005)만 별도 기동.
+```bash
+sudo npm i -g pm2
+pm2 start backend/src/index.js --name arctic-api
+pm2 start "uv run --no-project --active python sar_server.py" --name arctic-sar --cwd backend
+pm2 save && pm2 startup     # 부팅 시 자동 시작
+```
+
+**6) 리버스 프록시 + HTTPS (Nginx + Certbot)** — `:80/:443` → `127.0.0.1:8000` 프록시.
+`/api/rl`·`/api/report`·`/api/fuel` 등은 Node 가 내부에서 8001~8005 로 다시 프록시하므로
+Nginx 는 8000 한 곳만 바라보면 됩니다.
+
+> DB 는 관리형 **Neon PostgreSQL** 을 그대로 사용(별도 RDS 불필요). EC2 부팅·fetcher 실행 시
+> `scripts/sync_db.js` 가 자동으로 JSON→DB 동기화합니다. `DATABASE_URL` 미설정 시 파일 폴백 동작.
+>
+> _(AWS EC2 단일 컨테이너 배포 상세는 [`deploy/DEPLOY.md`](deploy/DEPLOY.md) 참고)_
 
 ### Vercel (프론트엔드)
-1. GitHub 저장소 import
-2. Root Directory: `frontend`
-3. Framework: Vite
-4. 자동 배포
+
+1. GitHub 저장소 import → Root Directory: `frontend`, Framework: Vite
+2. `frontend/vercel.json` 의 `CHANGE-ME-AWS-BACKEND-HOST` 를 **EC2 도메인**으로 치환
+   (`/api/*`·`/health` rewrite 대상). 상세는 `frontend/README.md` 참고.
 
 ---
 
 ## 🎯 프로젝트 하이라이트
 
 ### 1. 듀얼 클라우드 아키텍처
+
 - **프론트엔드**: Vercel (Edge Network)
-- **백엔드 + AI**: Hugging Face Spaces (16GB RAM)
-- **장점**: 각 플랫폼의 강점 활용, 영구 무료 운영
+- **백엔드 + AI**: AWS EC2 (멀티프로세스 상시 구동) + Neon PostgreSQL (관리형 DB)
+- **장점**: 장시간 실행 AI 서비스·스케줄러에 적합, 프론트는 글로벌 엣지 배포
 
 ### 2. 강화학습 모델 다수 학습
+
 - 3 항로 × 7 빙해 등급 × 4 선박 종류 = **84개 빙산 회피 모델**
 - 7 × 4 = **28개 출항 스케줄 모델**
 - Stable Baselines3 SAC 기반 학습
 
 ### 3. Graceful Degradation 패턴
+
 - 외부 LLM API (Claude) 실패 시 풀 시나리오로 자동 대체
 - 운영 안정성 보장
 
 ### 4. Git LFS 관리
+
 - 200MB+ AI 모델 파일 LFS 추적
 - 코드 저장소 가벼움 유지
 
@@ -309,5 +409,5 @@ MIT License
 
 ## 🙋 연락처
 
-- GitHub: [@Hijin554](https://github.com/Hijin554)
-- Live Demo: https://arctic-twin.xyz
+- GitHub: [@youmin0523](https://github.com/youmin0523)
+- Live Demo: 추후 업데이트 예정

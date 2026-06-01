@@ -1,0 +1,36 @@
+# ============================================================
+# Arctic Digital Twin — Backend (AWS EC2 단일 컨테이너 구동)
+#   사용: backend/.env 를 채운 뒤  ->  docker compose up -d --build
+#   확인:  curl http://localhost:8000/api/health
+# ============================================================
+services:
+  backend:
+    build: .
+    image: arctic-twin-backend:latest
+    container_name: arctic-twin-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"            # Vercel rewrite 대상 / nginx·ALB 가 앞단이면 127.0.0.1:8000 으로 좁혀도 됨
+    env_file:
+      - .env                   # ANTHROPIC_API_KEY, COPERNICUS_*, CDSE_*, DATABASE_URL 등
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+    volumes:
+      # fetcher 결과/로그를 컨테이너 재시작 후에도 유지 (DB 가 1차 소스, JSON 은 폴백)
+      - backend-data:/app/data
+      - backend-logs:/app/logs
+    # t3.medium(4GB) 기준: 컨테이너 3.2g 한도 → 호스트 OS/SSH 용 ~0.8GB 확보.
+    # 베이스라인 2~3GB + 부팅 동시 로드/fetcher 스파이크는 호스트 swap(6GB)으로 흡수.
+    # (t3.large 8GB 로 올리면 7g 로 키워도 됨.)
+    mem_limit: 3200m
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 180s
+      retries: 3
+
+volumes:
+  backend-data:
+  backend-logs:

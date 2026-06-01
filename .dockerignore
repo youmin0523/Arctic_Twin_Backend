@@ -1,0 +1,48 @@
+# ============================================================
+# Docker 빌드 컨텍스트 제외 목록
+#   주의: backend/model/ 은 의도적으로 포함한다 (RL/YOLO/fuel 모델 ~591MB).
+# ============================================================
+
+# 의존성/환경 — 컨테이너 안에서 새로 설치한다
+node_modules
+.venv
+venv
+env
+
+# Python 캐시
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+
+# 시크릿 — 절대 이미지에 굽지 않는다 (.env 는 docker compose env_file 로 주입)
+.env
+.env.local
+.env.*.local
+
+# 로그
+logs
+*.log
+
+# 재생성 가능한 대용량 데이터 (런타임에 fetcher 가 다시 받음)
+data/sentinel1_archive
+data/datasets
+data/archive
+data/simulations
+pipeline/cache
+pipeline/fetchers/cache
+
+# 로컬 전용 / 아카이브
+_archive
+docs
+README.md
+
+# Windows 전용 런처/배치 (Linux 컨테이너에서 불필요)
+*.bat
+services-launcher
+
+# Git / IDE
+.git
+.gitignore
+.vscode
+.idea

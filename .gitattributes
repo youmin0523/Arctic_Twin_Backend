@@ -1,0 +1,9 @@
+# Linux 컨테이너/EC2 에서 실행되는 파일은 OS 무관하게 항상 LF 유지.
+# (Windows 에서 커밋해도 CRLF 가 섞여 `bad interpreter` 등으로 깨지지 않도록)
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+
+# Windows 전용 배치는 CRLF 유지
+*.bat       text eol=crlf

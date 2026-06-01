@@ -125,6 +125,62 @@ def _fail_job(job_id: str, error: str):
         jobs[job_id]["error"] = error
 
 
+# ── What-If 실행 통계 누적 ────────────────────────────────────
+# 완료된 What-If 실행을 backend/data/whatif_stats.json 에 적산한다.
+# (backend/data 는 docker named volume 이라 컨테이너 재시작 후에도 유지)
+WHATIF_STATS_PATH = Path(__file__).resolve().parents[2] / "data" / "whatif_stats.json"
+
+
+def _load_whatif_runs() -> list:
+    import json
+    try:
+        if WHATIF_STATS_PATH.exists():
+            return json.loads(WHATIF_STATS_PATH.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        logger.warning("whatif stats 로드 실패: %s", e)
+    return []
+
+
+def _save_whatif_run(record: dict):
+    import json
+    try:
+        runs = _load_whatif_runs()
+        runs.append(record)
+        runs = runs[-500:]  # 최근 500건만 유지 (파일 비대화 방지)
+        WHATIF_STATS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        WHATIF_STATS_PATH.write_text(
+            json.dumps(runs, ensure_ascii=False), encoding="utf-8"
+        )
+    except Exception as e:  # noqa: BLE001
+        logger.warning("whatif stats 저장 실패: %s", e)
+
+
+def _convergence_status(scenarios: list) -> str:
+    """프론트(WhatIfPanel)와 동일 규칙으로 수렴 상태를 분류."""
+    def _is_hyp(s: dict) -> bool:
+        if s.get("is_hypothetical") is True:
+            return True
+        t = (s.get("name") or s.get("label") or "")
+        return "[HYP]" in t or "【가설】" in t
+
+    real = [s for s in scenarios if not _is_hyp(s)]
+    n = len(real)
+    if n == 0:
+        return "stalled"
+    rec = {"추천": 0, "조건부": 0, "비추천": 0}
+    for s in real:
+        r = s.get("recommendation")
+        if r in rec:
+            rec[r] += 1
+    if rec["비추천"] / n >= 0.8:
+        return "collapse"
+    if n < 4:
+        return "stalled"
+    if rec["추천"] > 0 and rec["비추천"] > 0:
+        return "good"
+    return "improving"
+
+
 # ── Request Models ────────────────────────────────────────────
 class ReportRequest(BaseModel):
     route: str = "NSR"
@@ -601,8 +657,10 @@ async def multi_model_stop():
 
 async def _run_whatif(job_id: str, req: WhatIfRequest):
     """비동기 What-If 시나리오 생성 — async 함수로 이벤트 루프에서 직접 실행."""
+    import time
     from dataclasses import asdict
     from modules.whatif_generator_max import parse_result_v3
+    _t0 = time.monotonic()
     try:
         _update_job(job_id, 10)
 
@@ -629,6 +687,17 @@ async def _run_whatif(job_id: str, req: WhatIfRequest):
         }
         jobs[job_id]["result"] = result_dict
         _update_job(job_id, 100, status="completed")
+
+        # 통계 누적 (/api/report/whatif/stats 가 집계)
+        _save_whatif_run({
+            "route": req.route,
+            "ice_class": req.ice_class,
+            "n_scenarios": len(result.scenarios),
+            "iterations": result.tool_calls_count,
+            "latency_ms": int((time.monotonic() - _t0) * 1000),
+            "convergence": _convergence_status(result_dict["scenarios"]),
+            "ts": datetime.now().isoformat(timespec="seconds"),
+        })
         logger.info("What-If 완료: %d 시나리오", len(result.scenarios))
     except Exception as e:
         logger.error("What-If 실패: %s", e, exc_info=True)
@@ -655,6 +724,40 @@ async def whatif_status(job_id: str):
         "progress": job["progress"],
         "error": job.get("error"),
         "result": job.get("result"),
+    }
+
+
+@app.get("/api/report/whatif/stats")
+async def whatif_stats():
+    """누적된 What-If 실행 통계 (WhatIfPanel 의 STATS 패널용)."""
+    runs = _load_whatif_runs()
+    n = len(runs)
+    if n == 0:
+        return {
+            "n_runs": 0, "avg_iterations": 0, "avg_scenarios": 0,
+            "avg_latency_ms": 0, "convergence_dist": {},
+            "by_route": {}, "by_ice_class": {},
+        }
+
+    def _avg(key: str) -> float:
+        return round(sum((r.get(key) or 0) for r in runs) / n, 1)
+
+    conv: dict[str, int] = {}
+    by_route: dict[str, int] = {}
+    by_ice: dict[str, int] = {}
+    for r in runs:
+        conv[r.get("convergence", "n/a")] = conv.get(r.get("convergence", "n/a"), 0) + 1
+        by_route[r.get("route", "?")] = by_route.get(r.get("route", "?"), 0) + 1
+        by_ice[r.get("ice_class", "?")] = by_ice.get(r.get("ice_class", "?"), 0) + 1
+
+    return {
+        "n_runs": n,
+        "avg_iterations": _avg("iterations"),
+        "avg_scenarios": _avg("n_scenarios"),
+        "avg_latency_ms": int(_avg("latency_ms")),
+        "convergence_dist": conv,
+        "by_route": by_route,
+        "by_ice_class": by_ice,
     }
 
 

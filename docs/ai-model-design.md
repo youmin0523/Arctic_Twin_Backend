@@ -68,9 +68,9 @@
                                       │ HTTPS  /api/*
                                       ▼
         ┌─────────────────────────────────────────────────────────┐
-        │        Hugging Face Spaces (Docker, CPU 16GB)            │
+        │       AWS EC2 (Docker, t3.medium · 2vCPU/4GB)           │
         │  ┌───────────────────────────────────────────────────┐  │
-        │  │            FastAPI Proxy  (port 7860)              │  │
+        │  │           Node 게이트웨이  (port 8000)             │  │
         │  └──┬─────────────┬──────────────┬──────────────┬────┘  │
         │     │             │              │              │       │
         │  ┌──▼───────┐ ┌───▼────────┐ ┌───▼───────┐ ┌────▼─────┐ │
@@ -429,8 +429,8 @@
 
 | 항목 | 내용 |
 |---|---|
-| 호스팅 | Hugging Face Spaces (Docker multi-process, CPU 16GB) |
-| 프론트엔드 | Vercel (React + Cesium), `arctic-twin.xyz` |
+| 호스팅 | AWS EC2 (Docker 단일 컨테이너, t3.medium 2vCPU/4GB + swap 6GB) — Node 게이트웨이 8000 단일 진입점 |
+| 프론트엔드 | Vercel (React + Cesium), `arctictwin.com` |
 | 모델 저장 | Git LFS (~200MB) — ONNX/ZIP/PKL |
 | 추론 런타임 | onnxruntime(CPU) — RL 배포 모델 |
 | 동시 기동 | [services-launcher/](../services-launcher) — 5개 서비스 프로세스 분리 실행 |
