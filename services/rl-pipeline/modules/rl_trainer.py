@@ -14,7 +14,7 @@ from typing import Optional
 import numpy as np
 
 try:
-    from stable_baselines3.common.callbacks import BaseCallback as _BaseCallback
+    from stable_baselines3.common.callbacks import BaseCallback as _BaseCallback  # type: ignore[assignment]
 except ImportError:
     class _BaseCallback:
         def __init__(self, verbose=0): pass
@@ -108,6 +108,7 @@ class RLTrainer:
                         self.agent.build_model(difficulty=stage.difficulty,
                                                reward_weights=reward_weights)
                     else:
+                        assert self.agent.env is not None  # _create_env()가 직전에 설정
                         self.agent.model.set_env(self.agent.env)
 
                     start_time = time.time()
@@ -144,6 +145,7 @@ class RLTrainer:
             if self.agent.model is None:
                 self.agent.build_model(difficulty=difficulty, reward_weights=reward_weights)
             else:
+                assert self.agent.env is not None  # _create_env()가 직전에 설정
                 self.agent.model.set_env(self.agent.env)
 
             start_time = time.time()
@@ -218,32 +220,105 @@ class RLTrainer:
         try:
             env.reset()
 
-            obs = self._build_obs_from_real_data(ship_state, icebergs, ice_data, weather)
-            action, value = self.agent.predict(obs, deterministic=True)
+            lat0 = float(ship_state["lat"])
+            lon0 = float(ship_state["lon"])
+            heading0 = float(ship_state.get("heading", 0) or 0)
+            speed0 = float(ship_state.get("speed_knots", 14) or 14)
+            ice_class = ship_state.get("ice_class", "PC5")
 
-            # 미래 경로 예측용 환경 구성
-            env.ship.lon = ship_state["lon"]
-            env.ship.lat = ship_state["lat"]
-            env.ship.heading = ship_state.get("heading", 0)
-            env.ship.speed_knots = ship_state.get("speed_knots", 14)
-            env.ice_concentration = ice_data.get("concentration", 0)
-            env.visibility_km = weather.get("visibility_km", 10)
+            # ── 합성 항로 구성 ────────────────────────────────────────
+            # 현재 위치 → (다음 경유점 방향 또는 현재 헤딩)으로 SEG_KM 연장한 직선.
+            # env.reset()의 랜덤 항로를 그대로 두면 실제 선박이 항로 밖이라
+            # cross-track > MAX_DEVIATION 으로 첫 스텝에 종료되어 경로가 1점만 나옴.
+            nwp = ship_state.get("next_waypoint")
+            if nwp and nwp.get("lat") is not None:
+                ref_bearing = bearing_deg(lat0, lon0, float(nwp["lat"]), float(nwp["lon"]))
+            else:
+                ref_bearing = heading0
+            SEG_KM = 70.0
+            br = math.radians(ref_bearing)
+            tgt_lat = lat0 + math.cos(br) * SEG_KM / KM_PER_DEG_LAT
+            tgt_lon = lon0 + math.sin(br) * SEG_KM / max(km_per_deg_lon(lat0), 1e-6)
+
+            env.route_wps = [(lat0, lon0), (tgt_lat, tgt_lon)]
+            env.segment_start_idx = 0
+            env.segment_end_idx = 1
+            assert env.ship is not None  # env.reset() 직후 항상 생성됨
+            env.ship.lat = lat0
+            env.ship.lon = lon0
+            env.ship.heading = ref_bearing       # 항로에 정렬 → cross-track 0 에서 출발
+            env.ship.speed_knots = speed0
+            env.ship.target_speed = speed0
+            env.ice_concentration = float(ice_data.get("concentration", 0) or 0)
+            env.visibility_km = float(weather.get("visibility_km", 10) or 10)
+            env.wave_height_m = float(weather.get("wave_height_m", 1) or 1)
+            env.ice_class = ice_class
+            env.max_safe_conc = MAX_SAFE_CONCENTRATION.get(ice_class, 0.7)
             env.icebergs = [
                 Iceberg(lat=b["lat"], lon=b["lon"], length_m=b.get("length_m", 5000))
                 for b in icebergs
             ]
+            env.step_count = 0
+            env.prev_progress = 0.0
 
-            sequence = self.agent.predict_sequence(obs, env, n_steps=20)
-            projected_path = [{"lon": s["lon"], "lat": s["lat"]} for s in sequence]
-            confidence = min(1.0, max(0.0, (value + 50) / 100.0))
+            # ── 투영 보폭 확대 ────────────────────────────────────────
+            # DT=2s 면 48스텝이 ~0.7km 라 항로 스케일 회피가 보이지 않는다.
+            # SEG_KM 를 N_PROJ 스텝으로 커버하도록 투영 전용 DT 를 키운다.
+            N_PROJ = 48
+            dist_per_step = SEG_KM / N_PROJ
+            speed_km_per_s = max(speed0 * 1.852 / 3600.0, 1e-4)
+            env.DT = float(min(240.0, max(2.0, dist_per_step / speed_km_per_s)))
+
+            obs = env._get_obs()
+            action, value = self.agent.predict(obs, deterministic=True)
+
+            # ── 롤아웃 ────────────────────────────────────────────────
+            # predict_sequence 를 인라인해 collision/success 를 직접 관찰하고
+            # 그 품질로 confidence 를 산출(임의의 value 스케일 공식 대신).
+            sequence = []
+            collided = False
+            reached = False
+            o = obs
+            for _ in range(N_PROJ):
+                a, _v = self.agent.predict(o, deterministic=True)
+                o, _r, _term, _trunc, info = env.step(a)
+                st = env.get_ship_state()
+                sequence.append({"lon": st["lon"], "lat": st["lat"]})
+                if info.get("collision"):
+                    collided = True
+                    break
+                if info.get("success"):
+                    reached = True
+                    break
+                if _trunc:
+                    break
+
+            # 시작점 포함 + 과도한 포인트는 ~30개로 다운샘플
+            pts = [{"lon": lon0, "lat": lat0}] + sequence
+            if len(pts) > 30:
+                stride = math.ceil(len(pts) / 30)
+                pts = pts[::stride] + [pts[-1]]
+            projected_path = pts
+
+            # confidence: 충돌 없이 항로를 따라가면(=회피 성공) 높게,
+            # 롤아웃이 충돌로 끝나면 낮게 → 프론트가 A* 폴백을 쓰도록.
+            if collided:
+                confidence = 0.2
+            elif len(sequence) >= max(3, N_PROJ // 4):
+                confidence = 0.85
+            else:
+                confidence = 0.4
 
             return {
                 "action": action.tolist(),
                 "heading_delta": float(action[0]),
                 "speed_factor": float(action[1]),
                 "confidence": confidence,
-                "value_estimate": value,
+                "value_estimate": float(value),
                 "projected_path": projected_path,
+                "collided": collided,
+                "reached": reached,
+                "steps": len(sequence),
                 "fallback": confidence < 0.3,
             }
         finally:
