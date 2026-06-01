@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const { execFile, spawn } = require('child_process');
 const schedule = require('node-schedule');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware, fixRequestBody } = require('http-proxy-middleware');
 const { uvEnv, uvCommand, VENV_PYTHON } = require('./services/uvPython');
 
 const iceRouter = require('./routes/ice');
@@ -184,23 +184,15 @@ app.use(createProxyMiddleware('/api/rl', {
   changeOrigin: true,
   timeout: 30000,
   proxyTimeout: 30000,
-  on: {
-    proxyReq: (proxyReq, req) => {
-      // express.json()이 body를 먼저 소비하므로 직접 재작성
-      if (req.body && Object.keys(req.body).length > 0) {
-        const bodyData = JSON.stringify(req.body);
-        proxyReq.setHeader('Content-Type', 'application/json');
-        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-        proxyReq.write(bodyData);
-      }
-    },
-    error: (_err, _req, res) => {
-      res.status(503).json({
-        error: 'RL 서버에 연결할 수 없습니다.',
-        fallback: true,
-        detail: rlProcess ? 'RL 서버 시작 중...' : 'RL 서버가 비활성화되어 있습니다.',
-      });
-    },
+  // http-proxy-middleware v2 문법: onProxyReq/onError (v3 의 on:{} 블록은 v2에서 무시됨).
+  // express.json()이 body를 먼저 소비하므로 fixRequestBody 로 재스트림 (POST 본문 누락 방지).
+  onProxyReq: fixRequestBody,
+  onError: (_err, _req, res) => {
+    res.status(503).json({
+      error: 'RL 서버에 연결할 수 없습니다.',
+      fallback: true,
+      detail: rlProcess ? 'RL 서버 시작 중...' : 'RL 서버가 비활성화되어 있습니다.',
+    });
   },
 }));
 
@@ -225,22 +217,15 @@ app.use(createProxyMiddleware('/api/report', {
   changeOrigin: true,
   timeout: 120000,
   proxyTimeout: 120000,
-  on: {
-    proxyReq: (proxyReq, req) => {
-      if (req.body && Object.keys(req.body).length > 0) {
-        const bodyData = JSON.stringify(req.body);
-        proxyReq.setHeader('Content-Type', 'application/json');
-        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-        proxyReq.write(bodyData);
-      }
-    },
-    error: (_err, _req, res) => {
-      res.status(503).json({
-        error: 'Report 서버에 연결할 수 없습니다.',
-        fallback: true,
-        detail: reportProcess ? 'Report 서버 시작 중...' : 'Report 서버가 비활성화되어 있습니다.',
-      });
-    },
+  // http-proxy-middleware v2 문법: onProxyReq/onError (v3 의 on:{} 블록은 v2에서 무시됨).
+  // express.json()이 body를 먼저 소비하므로 fixRequestBody 로 재스트림 (POST 본문 누락 방지).
+  onProxyReq: fixRequestBody,
+  onError: (_err, _req, res) => {
+    res.status(503).json({
+      error: 'Report 서버에 연결할 수 없습니다.',
+      fallback: true,
+      detail: reportProcess ? 'Report 서버 시작 중...' : 'Report 서버가 비활성화되어 있습니다.',
+    });
   },
 }));
 
@@ -265,22 +250,15 @@ app.use(createProxyMiddleware('/api/fuel', {
   changeOrigin: true,
   timeout: 30000,
   proxyTimeout: 30000,
-  on: {
-    proxyReq: (proxyReq, req) => {
-      if (req.body && Object.keys(req.body).length > 0) {
-        const bodyData = JSON.stringify(req.body);
-        proxyReq.setHeader('Content-Type', 'application/json');
-        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-        proxyReq.write(bodyData);
-      }
-    },
-    error: (_err, _req, res) => {
-      res.status(503).json({
-        error: 'ML 연료 예측 서버에 연결할 수 없습니다.',
-        fallback: true,
-        detail: mlProcess ? 'ML 서버 시작 중...' : 'ML 서버가 비활성화되어 있습니다.',
-      });
-    },
+  // http-proxy-middleware v2 문법: onProxyReq/onError (v3 의 on:{} 블록은 v2에서 무시됨).
+  // express.json()이 body를 먼저 소비하므로 fixRequestBody 로 재스트림 (POST 본문 누락 방지).
+  onProxyReq: fixRequestBody,
+  onError: (_err, _req, res) => {
+    res.status(503).json({
+      error: 'ML 연료 예측 서버에 연결할 수 없습니다.',
+      fallback: true,
+      detail: mlProcess ? 'ML 서버 시작 중...' : 'ML 서버가 비활성화되어 있습니다.',
+    });
   },
 }));
 
