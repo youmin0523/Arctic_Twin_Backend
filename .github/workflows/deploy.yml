@@ -44,19 +44,28 @@ jobs:
             APP_DIR="${APP_DIR:-$HOME/Arctic_Twin_Backend}"
             cd "$APP_DIR"
 
-            echo "==> [1/4] GitHub origin/main 으로 동기화"
+            echo "==> [1/5] GitHub origin/main 으로 동기화"
             git fetch --all --prune
             # 서버 working tree 는 runtime 데이터가 docker 볼륨에 분리돼 있어 clean.
             # CI/CD 는 GitHub 가 단일 진실원본이므로 origin/main 에 정확히 맞춘다.
             git reset --hard origin/main
 
-            echo "==> [2/4] 재빌드 + 무중단에 가깝게 교체"
+            # 40GB 루트 디스크 제약: torch 이미지(~11GB) 재빌드는 옛 이미지와 공존이
+            # 불가하므로, 빌드 전에 컨테이너를 내리고 미사용 이미지/캐시를 비워 공간을
+            # 확보한다. (named volume 의 runtime 데이터는 -af 로 지워지지 않음)
+            echo "==> [2/5] 디스크 확보: 컨테이너 정지 + 미사용 이미지/빌드캐시 정리"
+            sudo docker compose down --remove-orphans || true
+            sudo docker image prune -af || true
+            sudo docker builder prune -af || true
+            df -h / | tail -1
+
+            echo "==> [3/5] 이미지 재빌드 + 기동 (빌드 동안 짧은 다운타임)"
             sudo docker compose up -d --build
 
-            echo "==> [3/4] dangling 이미지 정리(디스크 25GB 보호)"
+            echo "==> [4/5] dangling 이미지 정리"
             sudo docker image prune -f
 
-            echo "==> [4/4] 헬스 체크 (모델 로드까지 대기, 최대 ~3.5분)"
+            echo "==> [5/5] 헬스 체크 (모델 로드까지 대기, 최대 ~3.5분)"
             for i in $(seq 1 21); do
               if curl -fsS http://localhost:8000/api/health >/dev/null 2>&1; then
                 echo "✅ backend healthy"
