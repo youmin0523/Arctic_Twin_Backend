@@ -44,28 +44,43 @@ jobs:
             APP_DIR="${APP_DIR:-$HOME/Arctic_Twin_Backend}"
             cd "$APP_DIR"
 
-            echo "==> [1/5] GitHub origin/main 으로 동기화"
+            echo "==> [1/4] GitHub origin/main 으로 동기화"
+            PREV=$(git rev-parse HEAD)
             git fetch --all --prune
             # 서버 working tree 는 runtime 데이터가 docker 볼륨에 분리돼 있어 clean.
             # CI/CD 는 GitHub 가 단일 진실원본이므로 origin/main 에 정확히 맞춘다.
             git reset --hard origin/main
+            NEW=$(git rev-parse HEAD)
+            CHANGED=$(git diff --name-only "$PREV" "$NEW")
+            echo "변경 파일:"; echo "$CHANGED" | sed 's/^/  /'
 
-            # 40GB 루트 디스크 제약: torch 이미지(~11GB) 재빌드는 옛 이미지와 공존이
-            # 불가하므로, 빌드 전에 컨테이너를 내리고 미사용 이미지/캐시를 비워 공간을
-            # 확보한다. (named volume 의 runtime 데이터는 -af 로 지워지지 않음)
-            echo "==> [2/5] 디스크 확보: 컨테이너 정지 + 미사용 이미지/빌드캐시 정리"
-            sudo docker compose down --remove-orphans || true
-            sudo docker image prune -af || true
-            sudo docker builder prune -af || true
-            df -h / | tail -1
+            # 변경 분류:
+            #  - 의존성/빌드(requirements/package/Dockerfile/compose) 변경 → 이미지 풀 재빌드
+            #    (40GB 디스크 제약상 옛 이미지 비우고 빌드 → 빌드 동안 짧은 다운타임)
+            #  - 코드만 변경 → 재빌드 없이 변경 파일만 컨테이너에 복사 후 restart (무중단)
+            CID=$(sudo docker compose ps -q backend || true)
+            if echo "$CHANGED" | grep -qE '(^|/)(requirements\.txt|package\.json|package-lock\.json|Dockerfile|docker-compose\.yml)$' || [ -z "$CID" ]; then
+              echo "==> [2/4] 의존성/이미지 변경(또는 컨테이너 없음) → 디스크 안전 풀 재빌드"
+              sudo docker compose down --remove-orphans || true
+              sudo docker image prune -af || true
+              sudo docker builder prune -af || true
+              df -h / | tail -1
+              sudo docker compose up -d --build
+            else
+              echo "==> [2/4] 코드만 변경 → 무중단 코드 패치 (재빌드 없음)"
+              for f in $CHANGED; do
+                if [ -f "$f" ]; then
+                  sudo docker cp "$f" "$CID:/app/$f" && echo "  patched: $f" || echo "  skip: $f"
+                fi
+              done
+              # Node 게이트웨이 재시작 → Python 서비스(report/rl/fuel) 새 코드로 재기동
+              sudo docker compose restart
+            fi
 
-            echo "==> [3/5] 이미지 재빌드 + 기동 (빌드 동안 짧은 다운타임)"
-            sudo docker compose up -d --build
-
-            echo "==> [4/5] dangling 이미지 정리"
+            echo "==> [3/4] dangling 이미지 정리"
             sudo docker image prune -f
 
-            echo "==> [5/5] 헬스 체크 (모델 로드까지 대기, 최대 ~3.5분)"
+            echo "==> [4/4] 헬스 체크 (모델 로드까지 대기, 최대 ~3.5분)"
             for i in $(seq 1 21); do
               if curl -fsS http://localhost:8000/api/health >/dev/null 2>&1; then
                 echo "✅ backend healthy"
