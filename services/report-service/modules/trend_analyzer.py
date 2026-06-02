@@ -1,10 +1,16 @@
 """
 trend_analyzer.py
 =================
-Claude API를 사용한 북극 항로 동향 분석 텍스트 생성.
+OpenAI API(gpt-4o-mini)를 사용한 북극 항로 동향 분석 텍스트 생성.
 
 4개 섹션별 독립 호출로 한국어 전문 분석 텍스트를 생성한다.
 API 실패 시 fallback 텍스트를 반환하여 보고서 전체 실패를 방지한다.
+
+배경:
+- 기존에는 Anthropic Claude API(ANTHROPIC_API_KEY)를 사용했으나, 헤드리스 배포
+  환경에서 키 인증 문제로 4개 섹션이 전부 폴백으로 떨어졌다.
+- What-If 생성기(whatif_generator_openai)와 동일하게 OPENAI_API_KEY 기반 OpenAI
+  클라이언트로 전환하여 인증 경로를 일원화한다.
 """
 
 import logging
@@ -42,41 +48,44 @@ FALLBACK_TEXTS = {
 
 
 class TrendAnalyzer:
-    """Claude API 기반 동향 분석기."""
+    """OpenAI API 기반 동향 분석기."""
 
     def __init__(self):
-        self.api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-        self.model = "claude-sonnet-4-6"
+        self.api_key = os.environ.get("OPENAI_API_KEY", "")
+        # What-If 생성기와 동일하게 환경변수로 모델 override 가능 (기본 gpt-4o-mini)
+        self.model = os.environ.get("TREND_OPENAI_MODEL", "gpt-4o-mini")
         self._client = None
 
     @property
     def client(self):
         if self._client is None:
             if not self.api_key:
-                logger.warning("ANTHROPIC_API_KEY가 설정되지 않았습니다.")
+                logger.warning("OPENAI_API_KEY가 설정되지 않았습니다.")
                 return None
             try:
-                import anthropic
-                self._client = anthropic.Anthropic(api_key=self.api_key)
+                from openai import OpenAI
+                self._client = OpenAI(api_key=self.api_key)
             except Exception as e:
-                logger.error("Anthropic 클라이언트 초기화 실패: %s", e)
+                logger.error("OpenAI 클라이언트 초기화 실패: %s", e)
                 return None
         return self._client
 
-    def _call_claude(self, user_prompt: str, max_tokens: int = 1500) -> str | None:
-        """Claude API 호출. 실패 시 None 반환."""
+    def _call_llm(self, user_prompt: str, max_tokens: int = 1500) -> str | None:
+        """OpenAI Chat Completions 호출. 실패 시 None 반환."""
         if not self.client:
             return None
         try:
-            response = self.client.messages.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
                 max_tokens=max_tokens,
-                system=SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": user_prompt}],
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
             )
-            return getattr(response.content[0], "text", "")
+            return response.choices[0].message.content
         except Exception as e:
-            logger.error("Claude API 호출 실패: %s", e)
+            logger.error("OpenAI API 호출 실패: %s", e)
             return None
 
     def analyze_monthly_trends(self, monthly_summary: list[dict]) -> str:
@@ -106,7 +115,7 @@ class TrendAnalyzer:
 3. 북극 항로(NSR, NWP, TSR) 운항에 미치는 영향
 4. 향후 수개월간의 해빙 예측 전망"""
 
-        result = self._call_claude(prompt)
+        result = self._call_llm(prompt)
         return result or FALLBACK_TEXTS["monthly"]
 
     def analyze_current_conditions(
@@ -137,7 +146,7 @@ class TrendAnalyzer:
 2. 빙산 분포 현황과 주의 구간
 3. 기상 조건별 운항 주의사항 (파고, 가시거리, 기온)"""
 
-        result = self._call_claude(prompt)
+        result = self._call_llm(prompt)
         return result or FALLBACK_TEXTS["current"]
 
     def analyze_route_risk(
@@ -174,7 +183,7 @@ class TrendAnalyzer:
 2. 안전 운항 가능 기간과 위험 기간
 3. 해당 항로 운항 시 구체적 주의사항"""
 
-        result = self._call_claude(prompt)
+        result = self._call_llm(prompt)
         return result or FALLBACK_TEXTS["route"]
 
     def write_conclusions(
@@ -209,7 +218,7 @@ class TrendAnalyzer:
 4. 【운항 준비 권고】 — 필요한 장비, 보험, 쇄빙선 에스코트 등
 5. 【종합 판단】 — 최종 운항 가/부 권고"""
 
-        result = self._call_claude(prompt, max_tokens=2000)
+        result = self._call_llm(prompt, max_tokens=2000)
         return result or FALLBACK_TEXTS["conclusions"]
 
 
