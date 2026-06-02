@@ -11,9 +11,12 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, Future
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from .rl_ship_dynamics import ShipParams
+
+if TYPE_CHECKING:
+    from .rl_iterative_trainer import IterativeTrainer
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +68,7 @@ class ModelStatus:
     label: str
     is_running: bool = False
     current_iteration: int = 0
-    latest_metrics: dict = None
+    latest_metrics: Optional[dict] = None
     converged: bool = False
     error: Optional[str] = None
 
@@ -99,7 +102,7 @@ class RLMultiModelTrainer:
         self._lock = threading.Lock()
         self._statuses: dict[str, ModelStatus] = {}
         self._futures: dict[str, Future] = {}
-        self._trainers: dict[str, object] = {}
+        self._trainers: dict[str, "IterativeTrainer"] = {}
         self._executor: Optional[ThreadPoolExecutor] = None
         self.is_running = False
         self.stop_requested = False

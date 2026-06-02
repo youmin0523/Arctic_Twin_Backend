@@ -17,6 +17,7 @@ const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 const { hasDb, query } = require('../services/db');
+const { parseScenarioName } = require('../lib/scenarioMeta');
 
 const SIM_DIR = path.join(__dirname, '..', '..', 'data', 'simulations');
 
@@ -43,14 +44,7 @@ router.get('/', async (req, res) => {
       : [];
     const scenarios = files.map((f) => {
       const stem = f.replace(/\.json$/, '');
-      const m = stem.match(/([a-z]+)_month(\d+)_arc(\d+)/i);
-      return {
-        scenario: stem,
-        route_code: m ? m[1].toUpperCase() : null,
-        month: m ? Number(m[2]) : null,
-        arc_level: m ? Number(m[3]) : null,
-        source_file: f,
-      };
+      return { ...parseScenarioName(stem), source_file: f };
     });
     res.json({ source: 'file', count: scenarios.length, scenarios });
   } catch (err) {

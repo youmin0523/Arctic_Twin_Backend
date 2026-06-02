@@ -5,7 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "test": "node --test",
+    "models:generate": "node scripts/models.js generate",
+    "models:verify": "node scripts/models.js verify",
+    "models:download": "node scripts/models.js download"
   },
   "dependencies": {
     "cors": "^2.8.5",

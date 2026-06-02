@@ -275,6 +275,7 @@ npm run dev
 | `sentinel1_products` | `sentinel1_catalog_latest.json` | `GET /api/sentinel1/catalog`, `/products`              |
 | `sar_detections`     | `sar_detections_latest.json`    | `GET /api/collab/sar-icebergs`, `/sar-metadata`        |
 | `simulation_results` | `data/simulations/*.json`       | `GET /api/simulations`, `/api/simulations/:scenario`   |
+| `edited_routes`      | `edited_routes.json`            | `GET/POST /api/routes/edited` (DB 우선·파일 폴백·미러)  |
 
 > 대용량 해빙 그리드(`realIceData_*`)와 기상(`weather_latest.json`)은 의도적으로 **파일 유지**(DB 미이관).
 
@@ -297,6 +298,29 @@ node scripts/sync_db.js        # JSON → DB 수동 동기화 (스키마 적용 
 > Node 는 `pg`, Python report-service 는 `psycopg2-binary` 를 사용하며 둘 다 통합 의존성에 포함되어 있습니다.
 
 ---
+
+## 🧠 AI 모델 관리 — MANIFEST + 무결성 검증
+
+학습된 모델(YOLOv8 SAR 탐지기, SAC 회피/출항, XGBoost 연료 — 총 ~720MB)은
+**`model/MANIFEST.json`** 을 단일 진실원본으로 버전·무결성 관리합니다. 각 모델의
+경로·크기·**sha256**·역할(role)을 기록해 "어떤 모델이 포함돼야 하는가"를 명시하고,
+클론·배포 시 누락(SAR 미포함 등)·손상을 자동으로 잡아냅니다.
+
+```bash
+cd backend
+npm run models:verify     # 로컬 모델 ↔ MANIFEST 대조 (누락·손상 시 exit 1) — CI/배포 게이트
+npm run models:generate   # 모델 추가/교체 후 MANIFEST 재생성 (커밋 대상)
+npm run models:download    # MODEL_BASE_URL 에서 누락 모델 자동 다운로드
+```
+
+- **재현성**: `MANIFEST.json` 이 sha256 을 고정 → 팀원/서버가 동일 모델을 보장.
+- **SAR 언블록**: YOLOv8 가중치가 누락되면 `verify` 가 즉시 식별, `download` 로 복구.
+- **버전관리**: 모델 교체 시 `generate` → 해시 변경이 diff 로 드러나 추적 가능.
+- **호스팅**: 대용량 바이너리는 git 대신 외부 스토리지(S3/HF 등)에 두고
+  `MODEL_BASE_URL` 로 받는 것을 권장(`<base>/<manifest path>` 규칙). 무결성은 sha256 으로 검증.
+
+> CI(`.github/workflows/ci.yml`)의 `node-tests` 잡이 MANIFEST 스키마·diff 로직을 테스트하고,
+> 배포 전 `npm run models:verify` 로 모델 가용성을 게이트할 수 있습니다.
 
 ## 📦 배포
 

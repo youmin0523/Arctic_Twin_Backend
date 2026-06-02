@@ -544,6 +544,7 @@ def _fill_array(arr: list[float | None]) -> None:
             # 이전 null 구간 보간
             if last_valid_idx is not None and i - last_valid_idx > 1:
                 v0, v1 = arr[last_valid_idx], arr[i]
+                assert v0 is not None and v1 is not None
                 span = i - last_valid_idx
                 for j in range(last_valid_idx + 1, i):
                     t = (j - last_valid_idx) / span

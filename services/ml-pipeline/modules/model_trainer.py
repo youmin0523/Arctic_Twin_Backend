@@ -79,6 +79,7 @@ class FuelModelTrainer:
 
         log 스케일과 원본 스케일 모두에서 성능을 측정한다.
         """
+        assert self.model is not None
         y_pred_log = self.model.predict(self.X_test)
         y_pred = np.exp(y_pred_log)  # 원본 스케일로 역변환
 
@@ -107,6 +108,7 @@ class FuelModelTrainer:
 
     def plot_feature_importance(self, save_path: str | None = None):
         """Feature Importance를 막대 그래프로 시각화하고 저장한다."""
+        assert self.model is not None
         importances = self.model.feature_importances_
         feature_names = cfg.FEATURE_COLUMNS
 

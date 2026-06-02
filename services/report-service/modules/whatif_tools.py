@@ -8,10 +8,11 @@ RouteScorer, DataLoader를 래핑하여 Claude가 프로그래밍적으로
 """
 
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from dataclasses import asdict
 
 from modules import db
+from modules.sar_risk import assess_sar_risk
 
 logger = logging.getLogger("report-service.whatif_tools")
 
@@ -247,6 +248,15 @@ class WhatIfToolExecutor:
         # SAR 탐지 현황 확인 — DB(sar_detections) 최신 배치 우선, 실패 시 파일 폴백
         sar_info = self._get_sar_info()
 
+        # SAR 원시 수치를 정량 위험 신호로 변환해 What-If(LLM·시나리오)에 연동
+        now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        sar_risk = assess_sar_risk(
+            sar_info.get("sar_detected"),
+            products_processed=sar_info.get("sar_products_processed"),
+            detection_time=sar_info.get("sar_detection_time"),
+            now_iso=now_iso,
+        )
+
         return {
             "ice": {
                 "arctic_cells": ice_stats.get("arctic_cells", 0),
@@ -257,6 +267,7 @@ class WhatIfToolExecutor:
                 "total": berg_stats.get("total_count", 0),
                 "arctic": berg_stats.get("arctic_count", 0),
                 **sar_info,
+                "sar_risk": sar_risk,
             },
             "weather": {
                 route: {

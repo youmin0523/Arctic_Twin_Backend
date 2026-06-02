@@ -12,6 +12,7 @@ import logging
 from datetime import date, timedelta
 from pathlib import Path
 from dataclasses import dataclass, field
+from typing import cast
 
 import numpy as np
 
@@ -39,7 +40,7 @@ else:
         f"확인된 후보: {[str(p) for p in _candidates]}"
     )
 
-from arctic_master_router import calculate_rio  # noqa: E402
+from arctic_master_router import calculate_rio, IceCondition  # noqa: E402
 
 logger = logging.getLogger("report-service.route_scorer")
 
@@ -208,7 +209,7 @@ class RouteScorer:
             ice_conditions = concentration_to_ice_conditions(avg_conc)
 
             try:
-                rio = calculate_rio(ice_class, ice_conditions)
+                rio = calculate_rio(ice_class, cast(list[IceCondition], ice_conditions))
             except ValueError as e:
                 logger.error("RIO 계산 실패 (%s): %s", seg["name"], e)
                 rio = -10.0

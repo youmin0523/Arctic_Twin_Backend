@@ -92,9 +92,12 @@ def generate_dataset(save_path: str | None = None) -> pd.DataFrame:
         n = cfg.SAMPLES_PER_VESSEL
 
         # 선박 제원 샘플링 (균일 분포)
-        displacement = rng.uniform(*vessel["displacement_range"], n)
-        draft = rng.uniform(*vessel["draft_range"], n)
-        engine_power = rng.uniform(*vessel["engine_power_range"], n)
+        disp_lo, disp_hi = vessel["displacement_range"]
+        draft_lo, draft_hi = vessel["draft_range"]
+        power_lo, power_hi = vessel["engine_power_range"]
+        displacement = rng.uniform(disp_lo, disp_hi, n)
+        draft = rng.uniform(draft_lo, draft_hi, n)
+        engine_power = rng.uniform(power_lo, power_hi, n)
 
         # 빙하 조건 샘플링
         ice_concentration, ice_thickness = _sample_ice_conditions(rng, n)

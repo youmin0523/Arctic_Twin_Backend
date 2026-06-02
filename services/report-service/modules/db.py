@@ -39,8 +39,9 @@ def fetch_all(sql: str, params: tuple | None = None) -> list[dict]:
 
     conn = None
     try:
-        conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=10)
-        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        # db_available()가 psycopg2 설치 여부를 이미 보장 (pyright는 추적 불가)
+        conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=10)  # type: ignore[union-attr]
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:  # type: ignore[union-attr]
             cur.execute(sql, params)
             return [dict(r) for r in cur.fetchall()]
     finally:

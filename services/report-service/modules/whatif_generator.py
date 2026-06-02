@@ -22,7 +22,7 @@ import random
 from dataclasses import dataclass, field, asdict
 from datetime import date, timedelta
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional, cast
 
 from dotenv import load_dotenv
 
@@ -582,7 +582,7 @@ class WhatIfGenerator:
             forecast_days=forecast_days,
         )
 
-        messages = [{"role": "user", "content": prompt}]
+        messages: list[dict[str, Any]] = [{"role": "user", "content": prompt}]
         tool_calls_count = 0
         # 도구 호출 결과 수집: score_route / score_route_modified_ice / compare_ice_classes 결과만 저장
         collected_route_summaries: list[dict] = []
@@ -594,8 +594,8 @@ class WhatIfGenerator:
                     model="claude-sonnet-4-6",
                     max_tokens=4000,
                     system=WHATIF_SYSTEM_PROMPT,
-                    tools=TOOL_DEFINITIONS,
-                    messages=messages,
+                    tools=cast(Any, TOOL_DEFINITIONS),
+                    messages=cast(Any, messages),
                 )
             except Exception as e:
                 logger.error("Claude API 호출 실패: %s", e)

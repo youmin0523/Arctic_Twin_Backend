@@ -122,6 +122,7 @@ class IcebergModelTrainer:
         else:
             if not self.model:
                 self.setup()
+            assert self.model is not None
             self.results = self.model.train(
                 data=str(self.dataset_yaml),
                 epochs=self.epochs,
@@ -182,6 +183,7 @@ class IcebergModelTrainer:
         if not self.model:
             self.setup()
 
+        assert self.model is not None
         log.info("모델 평가 시작...")
         metrics = self.model.val(
             data=str(self.dataset_yaml),

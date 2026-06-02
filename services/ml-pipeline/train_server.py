@@ -157,7 +157,7 @@ def _fuel_iterative_sync(req: FuelTrainRequest) -> None:
     _save_state()
 
     try:
-        from modules import config as cfg
+        from modules import config as cfg  # type: ignore[attr-defined]
         from copy import deepcopy
 
         # 초기 파라미터 패치

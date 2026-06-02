@@ -34,7 +34,7 @@ Usage
 
 from __future__ import annotations
 import math
-from typing import Callable, Literal, TypedDict
+from typing import Callable, Literal, TypedDict, cast
 
 from pipeline.arctic_master_router import RIV_TABLE
 from pipeline.icebreaker.models import (
@@ -215,9 +215,9 @@ def move_toward(
     remaining = _km_between(from_pos, to_pos)
     step_km = speed_knots * NM_TO_KM * dt_hours
     if step_km <= 0.0 or remaining == 0.0:
-        return dict(from_pos)
+        return cast("Position", dict(from_pos))
     if step_km >= remaining:
-        return dict(to_pos)
+        return cast("Position", dict(to_pos))
     brng = bearing(from_pos, to_pos)
     return offset_position(from_pos, brng, step_km)
 
@@ -476,7 +476,7 @@ def dispatch_tick(
     """
     updated: list[Icebreaker] = [dict(ib) for ib in icebreakers]  # type: ignore[misc]
     for ib in updated:
-        ib["position"] = dict(ib["position"])
+        ib["position"] = cast("Position", dict(ib["position"]))
     events: list[DispatchEvent] = []
 
     # history 복사 (caller mutation 방지)
@@ -943,7 +943,7 @@ def run_tests() -> None:
     synth: Icebreaker = {
         "id": "ib-synth",
         "name_ko": "SYNTH",
-        "position": dict(synth_home),
+        "position": cast("Position", dict(synth_home)),
         "home_port": "TEST",
         "status": "idle",
         "speed_knots": 60.0,   # ~111 km/h
@@ -952,7 +952,7 @@ def run_tests() -> None:
         "escorting_ship_id": None,
     }
     # 테스트용 home_positions 주입 (모듈 _HOME_POSITIONS 에 합성 쇄빙선 등록)
-    _HOME_POSITIONS["ib-synth"] = dict(synth_home)
+    _HOME_POSITIONS["ib-synth"] = cast("Position", dict(synth_home))
 
     ship_pos_t10 = _ship_pos(75.0, 80.0)  # 쇄빙선 기준 동쪽 ~57km
     forward_t10 = [
@@ -1007,12 +1007,12 @@ def run_tests() -> None:
 
     def _synth_ib(id_: str, lat: float, lon: float, speed: float,
                   status: str = "idle") -> Icebreaker:
-        return {  # type: ignore[return-value]
+        return cast("Icebreaker", {
             "id": id_, "name_ko": id_, "position": {"lat": lat, "lon": lon},
             "home_port": "T", "status": status, "speed_knots": speed,
             "ice_class": "Arc9", "breakable_thickness_m": 2.5,
             "escorting_ship_id": None,
-        }
+        })
 
     ship = _ship_pos(75.0, 80.0)
     # 가장 가까운 idle 이 ~100km, 본선 15kn, 쇄빙선 20kn
@@ -1061,29 +1061,30 @@ def run_tests() -> None:
     ib_b_home: Position = {"lat": 75.0, "lon": 84.0}   # ~115km east — 더 가까움
     ib_a: Icebreaker = {
         "id": "ib-a", "name_ko": "A",
-        "position": dict(ib_a_home), "home_port": "AX",
+        "position": cast("Position", dict(ib_a_home)), "home_port": "AX",
         "status": "idle", "speed_knots": 10.0,
         "ice_class": "Arc9", "breakable_thickness_m": 2.0,
         "escorting_ship_id": None,
     }
     ib_b: Icebreaker = {
         "id": "ib-b", "name_ko": "B",
-        "position": dict(ib_b_home), "home_port": "BX",
+        "position": cast("Position", dict(ib_b_home)), "home_port": "BX",
         "status": "idle", "speed_knots": 20.0,
         "ice_class": "Arc9", "breakable_thickness_m": 2.0,
         "escorting_ship_id": None,
     }
-    _HOME_POSITIONS["ib-a"] = dict(ib_a_home)
-    _HOME_POSITIONS["ib-b"] = dict(ib_b_home)
+    _HOME_POSITIONS["ib-a"] = cast("Position", dict(ib_a_home))
+    _HOME_POSITIONS["ib-b"] = cast("Position", dict(ib_b_home))
 
     # 본선 40kn(고속), 동쪽으로 계속 이동하며 RIO=-5(위험) 유지
-    ship_state = {"lat": 75.0, "lon": 80.0}
+    ship_state: Position = {"lat": 75.0, "lon": 80.0}
 
     def rio_always_bad(_p: Position) -> float:
         return -5.0
 
     def forward_east(pos: Position) -> list[Position]:
-        return [dict(pos), {"lat": pos["lat"], "lon": pos["lon"] + 1.0}]
+        return [cast("Position", dict(pos)),
+                {"lat": pos["lat"], "lon": pos["lon"] + 1.0}]
 
     fleet_t12: list[Icebreaker] = [ib_a, ib_b]  # type: ignore[list-item]
     hist_t12: dict[str, list[float]] = {}

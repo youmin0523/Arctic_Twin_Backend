@@ -21,7 +21,7 @@ import copy
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pipeline.arctic_master_router import calculate_rio
 from pipeline.icebreaker.ice_type_mapper import (
@@ -31,6 +31,7 @@ from pipeline.icebreaker.ice_type_mapper import (
 from pipeline.icebreaker.icebreaker_dispatcher import (
     LOOKAHEAD_MAX_KM,
     NM_TO_KM,
+    DispatchEvent,
     _km_between,
     bearing,
     dispatch_tick,
@@ -72,21 +73,21 @@ def _position_at_km(
 ) -> Position:
     """누적 거리 km 에 해당하는 좌표를 great-circle 구간 보간으로 반환."""
     if km_along <= 0.0:
-        return dict(route[0])
+        return cast("Position", dict(route[0]))
     total = cum_km[-1]
     if km_along >= total:
-        return dict(route[-1])
+        return cast("Position", dict(route[-1]))
     # 이진 검색 대신 선형 (경로 점 수 ~50, 충분히 빠름)
     for i in range(len(cum_km) - 1):
         if cum_km[i] <= km_along <= cum_km[i + 1]:
             seg_len = cum_km[i + 1] - cum_km[i]
             if seg_len <= 0:
-                return dict(route[i])
+                return cast("Position", dict(route[i]))
             frac = (km_along - cum_km[i]) / seg_len
             # great-circle 구간 보간
             brng = bearing(route[i], route[i + 1])
             return offset_position(route[i], brng, frac * seg_len)
-    return dict(route[-1])
+    return cast("Position", dict(route[-1]))
 
 
 def _forward_route_from(
@@ -106,7 +107,7 @@ def _forward_route_from(
     for i in range(len(cum_km)):
         if cum_km[i] <= km_along:
             continue
-        pts.append(dict(route[i]))
+        pts.append(cast("Position", dict(route[i])))
         if cum_km[i] >= target_km:
             break
     return pts
@@ -149,7 +150,7 @@ def _print_header(route_name: str, ship_id: str, ice_class: str,
 
 def _print_events(
     t_hours: float,
-    events: list[dict],
+    events: list[DispatchEvent],
     fleet_before: list[Icebreaker],
     fleet_after: list[Icebreaker],
     ship_pos: Position,
@@ -230,7 +231,7 @@ def simulate_voyage(
 
     fleet: list[Icebreaker] = [dict(ib) for ib in INITIAL_ICEBREAKERS]  # type: ignore[misc]
     for ib in fleet:
-        ib["position"] = dict(ib["position"])
+        ib["position"] = cast("Position", dict(ib["position"]))
 
     km_along = 0.0
     ship_pos = _position_at_km(route, cum_km, km_along)

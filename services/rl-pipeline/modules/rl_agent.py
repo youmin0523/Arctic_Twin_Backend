@@ -9,22 +9,29 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
+import gymnasium as gym
 
-try:
+if TYPE_CHECKING:
+    # 타입 체크 시에는 실제 sb3 클래스를 사용 (런타임에는 아래 try/except 사용)
     from stable_baselines3 import SAC
     from stable_baselines3.common.callbacks import BaseCallback
     HAS_SB3 = True
-except ImportError:
-    HAS_SB3 = False
-    SAC = None
+else:
+    try:
+        from stable_baselines3 import SAC
+        from stable_baselines3.common.callbacks import BaseCallback
+        HAS_SB3 = True
+    except ImportError:
+        HAS_SB3 = False
+        SAC = None
 
-    # SB3 미설치 시 더미 BaseCallback (서버 기동용)
-    class BaseCallback:
-        def __init__(self, verbose=0): pass
-        def _on_step(self): return True
+        # SB3 미설치 시 더미 BaseCallback (서버 기동용)
+        class BaseCallback:
+            def __init__(self, verbose=0): pass
+            def _on_step(self): return True
 
 from gymnasium.wrappers import RecordEpisodeStatistics
 from .rl_environment import IcebergAvoidanceEnv
@@ -157,7 +164,7 @@ class IcebergAvoidanceAgent:
         self.model_key = model_key
         self.model_dir = _model_dir_for(model_key)
         self.model: Optional[SAC] = None
-        self.env: Optional[IcebergAvoidanceEnv] = None
+        self.env: Optional[gym.Env] = None
         self.callback = TrainingMetricsCallback()
         self._model_version = self._detect_version()
 
@@ -195,6 +202,7 @@ class IcebergAvoidanceAgent:
             )
         if self.env is None:
             self.create_env(difficulty, reward_weights=reward_weights)
+        assert self.env is not None
 
         self.model = SAC(
             "MlpPolicy",
@@ -231,11 +239,12 @@ class IcebergAvoidanceAgent:
             verbose=0,
         )
 
-        cb_list = [self.callback, checkpoint_cb]
+        cb_list: list[BaseCallback] = [self.callback, checkpoint_cb]
         if extra_callback:
             cb_list.append(extra_callback)
         callbacks = CallbackList(cb_list)
 
+        assert self.model is not None
         try:
             self.model.learn(
                 total_timesteps=total_timesteps,

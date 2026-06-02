@@ -179,10 +179,10 @@ def run_fuel_cycle(state: dict, cycle_num: int) -> dict:
             if "fuel_iterative" in mod_name or "model_trainer" in mod_name:
                 del sys.modules[mod_name]
 
-        import modules.fuel_iterative_trainer as fit_mod
+        import modules.fuel_iterative_trainer as fit_mod  # type: ignore[import]
         fit_mod.TARGET_R2 = target_r2
 
-        from modules.fuel_iterative_trainer import FuelIterativeTrainer
+        from modules.fuel_iterative_trainer import FuelIterativeTrainer  # type: ignore[import]
 
         def cb(stage, progress, **kw):
             log.info("  [FUEL] %s (%d%%)", stage, progress)

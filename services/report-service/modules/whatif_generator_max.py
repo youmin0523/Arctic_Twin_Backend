@@ -260,7 +260,7 @@ class WhatIfGeneratorMax:
             "route": str, "ice_class": str, "departure_date": str,
             "forecast_days": int, "ice_multiplier": float
         })
-        async def score_route_modified_ice(args):
+        async def score_route_modified_ice(args) -> dict:
             gen.tool_calls_count += 1
             r = executor.execute("score_route_modified_ice", args)
             if "avg_rio" in r:

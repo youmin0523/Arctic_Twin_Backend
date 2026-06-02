@@ -18,23 +18,29 @@ const sentinel1Router = require('./routes/sentinel1');
 const reportRouter = require('./routes/report');
 const collabRouter = require('./routes/collab'); // SAR-RL 콜라보 (신규)
 const simulationsRouter = require('./routes/simulations'); // 시뮬레이션 결과 DB 서빙 (신규)
+const editedRoutesRouter = require('./routes/editedRoutes'); // 사용자 편집 항로 영속(공유)
+const avoidanceRouter = require('./routes/avoidance'); // RL 회피 메트릭 영속화(세션 간 추세)
+const aiRouter = require('./routes/ai'); // AI 항해 통합 엔드포인트(회피+출항+연료 집약)
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 // 미들웨어
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '4mb' })); // 편집 항로(다점) 저장 대비 한도 상향
 
 // API 라우트
 app.use('/api/ice', iceRouter);
 app.use('/api/icebergs', icebergRouter);
 app.use('/api/route', routingRouter);
+app.use('/api/routes', editedRoutesRouter); // 사용자 편집 항로(공유 저장)
 app.use('/api/pipeline', pipelineRouter);
 app.use('/api/weather', weatherRouter);
 app.use('/api/sentinel1', sentinel1Router);
 app.use('/api/collab', collabRouter); // SAR-RL 콜라보 (신규)
 app.use('/api/simulations', simulationsRouter); // 시뮬레이션 결과 DB 서빙 (신규)
+app.use('/api/avoidance', avoidanceRouter); // RL 회피 메트릭 영속화 (신규)
+app.use('/api/ai', aiRouter); // AI 항해 통합 엔드포인트 (신규)
 app.use('/proxy', proxyRouter);
 
 // 기존 arctic-hybrid.html 호환 프록시

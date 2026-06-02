@@ -512,7 +512,7 @@ def render():
 if __name__ == "__main__":
     # Windows 터미널 UTF-8 강제 설정
     if sys.platform == "win32":
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
     print("모니터 시작 중...")
     try:
         while True:

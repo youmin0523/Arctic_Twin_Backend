@@ -153,6 +153,7 @@ def trigger_training():
     print("\n학습 트리거 중...")
     for t in TRAIN_TRIGGERS:
         result = post_json(str(t["url"]), dict(t["body"]))  # type: ignore[arg-type]
+        assert result is not None
         msg = result.get("message") or result.get("error") or str(result)
         status = "✓" if "error" not in result else "✗"
         print(f"  [{status}] {t['name']}: {msg}")

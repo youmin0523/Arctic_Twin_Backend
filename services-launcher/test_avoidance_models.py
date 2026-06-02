@@ -10,7 +10,7 @@ from pathlib import Path
 RL_DIR = Path(__file__).resolve().parent.parent / "backend" / "services" / "rl-pipeline"
 sys.path.insert(0, str(RL_DIR))
 
-from modules.rl_agent import IcebergAvoidanceAgent  # noqa: E402
+from modules.rl_agent import IcebergAvoidanceAgent  # noqa: E402  # type: ignore[import]
 
 ROUTES = ["NSR", "NWP", "TSR"]
 DIFFS = ["easy", "normal", "hard"]
