@@ -108,3 +108,11 @@ CREATE TABLE IF NOT EXISTS simulation_results (
 CREATE INDEX IF NOT EXISTS idx_sim_route ON simulation_results (route_code, month, arc_level);
 -- JSONB 내부 키 조회가 잦으면:
 -- CREATE INDEX IF NOT EXISTS idx_sim_payload_gin ON simulation_results USING GIN (payload);
+
+-- 7) edited_routes : 사용자가 편집한 항로 웨이포인트(전 사용자 공유, 다중사용자·감사 대비)
+--    기존 data/edited_routes.json 을 DB 로 영속화. 파일 폴백 유지(무중단).
+CREATE TABLE IF NOT EXISTS edited_routes (
+    route_key   TEXT PRIMARY KEY,             -- "NSR" / "NWP" / "TSR" ...
+    waypoints   JSONB NOT NULL,               -- [{lon,lat,label?}, ...]
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
