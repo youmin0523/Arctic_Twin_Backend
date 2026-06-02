@@ -61,10 +61,12 @@ MAX_BACKOFF = 300.0  # 5분 캡
 RETRYABLE_CODES = {429, 500, 502, 503, 529}
 
 # 디스크 관리
-# 주의: 이 값은 루트 디스크 용량보다 충분히 작아야 한다. 과거 50GB(>실디스크 40GB)로
+# 주의: 이 값은 루트 디스크(40GB) 용량보다 충분히 작아야 한다. 과거 50GB(>실디스크 40GB)로
 # 설정돼 정리가 영영 트리거되지 않아 archive 가 디스크를 100% 채운 사고가 있었다.
-# 이미지(~13GB)+OS(~6GB)+기타 볼륨을 빼면 SAR 원본에 8GB 정도만 할당한다.
-DEFAULT_MAX_DISK_GB = 8
+# 도커 이미지 재빌드(~13GB transient) + OS(~6GB) + swap(6GB) + 레포 를 빼면
+# SAR raw 에 안전하게 줄 수 있는 건 ~6GB. raw zip 은 탐지(iceberg_detector)용 중간 입력일
+# 뿐이라 최근 몇 패스만 있으면 충분하고, 동향용 산출물(작은 JSON)은 별도로 무한 보관된다.
+DEFAULT_MAX_DISK_GB = 6
 
 # Arctic 빙하 AOI (관심 지역)
 ARCTIC_AOIS = {
@@ -479,10 +481,15 @@ def save_catalog(catalog):
 
 # ─── 디스크 관리 ─────────────────────────────────────────────────────
 def get_archive_size_gb():
-    """sentinel1_archive 디렉토리 총 크기 (GB)."""
+    """sentinel1_archive 디렉토리 총 크기 (GB) — 완성 .zip + 끊긴 .zip.tmp 등 모든 파일 합산.
+
+    과거엔 *.zip 만 셌는데, 끊긴 부분 다운로드(.zip.tmp, 개당 최대 ~2GB)가 합산에서
+    빠져 캡(DEFAULT_MAX_DISK_GB)을 우회 → 14개 누적으로 디스크 100% / 빌드 실패 사고 발생.
+    이제 모든 파일을 합산해 캡이 실제 디스크 사용량을 정확히 강제한다.
+    """
     if not ARCHIVE_DIR.exists():
         return 0.0
-    total = sum(f.stat().st_size for f in ARCHIVE_DIR.rglob("*.zip"))
+    total = sum(f.stat().st_size for f in ARCHIVE_DIR.rglob("*") if f.is_file())
     return total / (1024 ** 3)
 
 
