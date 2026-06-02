@@ -35,6 +35,23 @@ _CANDIDATES = [
 DATA_DIR = next((p for p in _CANDIDATES if p.exists()), _CANDIDATES[0])
 
 
+def _safe_json_load(path: Path) -> dict | None:
+    """JSON 파일을 안전하게 로드. 파일이 없거나 손상(디스크 풀로 잘림 등) 시 None 반환.
+
+    fetcher가 디스크 풀 상태에서 *_latest.json 을 중간까지만 써서 JSONDecodeError 가
+    나도, 손상 파일 한 개가 보고서 생성 전체(데이터 로딩 5%)를 중단시키지 않도록 한다.
+    """
+    if not path.exists():
+        logger.warning("데이터 파일 없음: %s", path.name)
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        logger.error("데이터 파일 손상/읽기 실패 → 건너뜀: %s (%s)", path.name, e)
+        return None
+
+
 class DataLoader:
     """JSON 데이터 로드 및 통계 계산."""
 
@@ -79,12 +96,10 @@ class DataLoader:
     def load_latest_ice(self) -> dict:
         """최신 해빙 데이터 로드 (위도 65도 이상만)."""
         fpath = self.data_dir / "realIceData_latest.json"
-        if not fpath.exists():
-            logger.warning("최신 해빙 파일 없음: %s", fpath)
+        data = _safe_json_load(fpath)
+        if data is None:
+            # 파일 없음/손상 → 빈 통계로 우아하게 폴백 (보고서 전체 중단 방지)
             return {"cells": [], "stats": {}}
-
-        with open(fpath, encoding="utf-8") as f:
-            data = json.load(f)
 
         cells = data.get("cells", [])
         arctic_cells = [c for c in cells if c.get("lat", 0) > 65]
@@ -109,11 +124,9 @@ class DataLoader:
         data = self._load_icebergs_from_db()
         if data is None:
             fpath = self.data_dir / "realBergData_latest.json"
-            if not fpath.exists():
-                logger.warning("빙산 파일 없음: %s", fpath)
+            data = _safe_json_load(fpath)
+            if data is None:
                 return {"bergs": [], "stats": {}}
-            with open(fpath, encoding="utf-8") as f:
-                data = json.load(f)
 
         bergs = data.get("bergs", [])
         # 북극권 빙산만 필터 (위도 > 60)
@@ -181,9 +194,8 @@ class DataLoader:
 
         # 메인: weather_latest.json (Open-Meteo, 5개 항로)
         main_path = self.data_dir / "weather_latest.json"
-        if main_path.exists():
-            with open(main_path, encoding="utf-8") as f:
-                main_data = json.load(f)
+        main_data = _safe_json_load(main_path)
+        if main_data is not None:
             result["fetched_at"] = main_data.get("fetched_at")
             result["source"] = main_data.get("source")
             routes = main_data.get("routes", {})
@@ -207,9 +219,8 @@ class DataLoader:
 
         # 보조: arctic_weather_latest.json (MET Norway, NSR)
         arctic_path = self.data_dir / "arctic_weather_latest.json"
-        if arctic_path.exists():
-            with open(arctic_path, encoding="utf-8") as f:
-                arctic_data = json.load(f)
+        arctic_data = _safe_json_load(arctic_path)
+        if arctic_data is not None:
             result["arctic"] = {
                 "source": arctic_data.get("source"),
                 "waypoints": arctic_data.get("waypoints", []),
