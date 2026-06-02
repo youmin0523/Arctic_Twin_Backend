@@ -61,6 +61,22 @@ jobs:
             CID=$(sudo docker compose ps -q backend || true)
             if echo "$CHANGED" | grep -qE '(^|/)(requirements\.txt|package\.json|package-lock\.json|Dockerfile|docker-compose\.yml)$' || [ -z "$CID" ]; then
               echo "==> [2/4] 의존성/이미지 변경(또는 컨테이너 없음) → 디스크 안전 풀 재빌드"
+              # 빌드 공간 보장: SAR raw 아카이브가 디스크를 잠식해 이미지 빌드를 실패시키지 않도록
+              # (1) 끊긴 부분 다운로드(.zip.tmp) 제거 (2) raw zip 을 하드캡(5GB)으로 오래된 것부터 FIFO 정리.
+              # ⚠ 동향용 처리 산출물(*_latest.json, archive/, monthly/ — 작은 JSON)은 절대 건드리지 않는다.
+              SAR_DIR="$(sudo docker volume inspect arctic_twin_backend_backend-data --format '{{.Mountpoint}}' 2>/dev/null || true)/sentinel1_archive"
+              if [ -d "$SAR_DIR" ]; then
+                echo "  SAR 아카이브 정리 전: $(sudo du -sh "$SAR_DIR" | cut -f1)"
+                sudo find "$SAR_DIR" -type f -name '*.zip.tmp' -delete || true
+                CAP_KB=$((5 * 1024 * 1024))   # 5GB
+                while [ "$(sudo du -sk "$SAR_DIR" 2>/dev/null | cut -f1)" -gt "$CAP_KB" ]; do
+                  OLD=$(sudo find "$SAR_DIR" -type f -name '*.zip' -printf '%T@ %p\n' 2>/dev/null | sort -n | head -1 | cut -d' ' -f2-)
+                  [ -z "$OLD" ] && break
+                  sudo rm -f "$OLD"
+                done
+                sudo find "$SAR_DIR" -mindepth 1 -type d -empty -delete 2>/dev/null || true
+                echo "  SAR 아카이브 정리 후: $(sudo du -sh "$SAR_DIR" | cut -f1)"
+              fi
               sudo docker compose down --remove-orphans || true
               sudo docker image prune -af || true
               sudo docker builder prune -af || true
