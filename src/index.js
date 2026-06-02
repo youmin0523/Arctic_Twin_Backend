@@ -5,6 +5,8 @@ const path = require('path');
 const { execFile, spawn } = require('child_process');
 const schedule = require('node-schedule');
 const { createProxyMiddleware, fixRequestBody } = require('http-proxy-middleware');
+const swaggerUi = require('swagger-ui-express');
+const openapiSpec = require('./docs/openapi');
 const { uvEnv, uvCommand, VENV_PYTHON } = require('./services/uvPython');
 
 const iceRouter = require('./routes/ice');
@@ -28,6 +30,15 @@ const PORT = process.env.PORT || 8000;
 // 미들웨어
 app.use(cors());
 app.use(express.json({ limit: '4mb' })); // 편집 항로(다점) 저장 대비 한도 상향
+
+// API 문서 (Swagger UI) — /api-docs 에서 인터랙티브 명세 제공.
+// servers 드롭다운에서 로컬(http://localhost:8000) / 운영(https://arctictwin.com) 전환 가능.
+// 원본 OpenAPI JSON 은 /api-docs.json 으로 노출(외부 도구/클라이언트 생성용).
+app.get('/api-docs.json', (req, res) => res.json(openapiSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, {
+  explorer: true,
+  customSiteTitle: 'Arctic Digital Twin — API Docs',
+}));
 
 // API 라우트
 app.use('/api/ice', iceRouter);
