@@ -20,7 +20,7 @@ import os
 import re
 import shutil
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 FILENAME = "realBergData_latest.json"
@@ -131,15 +131,37 @@ def fetch_github():
 # ── NSIDC IIP 시즌 CSV (3순위) ──────────────────────────────────────
 NSIDC_BASE = "https://noaadata.apps.nsidc.org/NOAA/G00807/"
 
-def fetch_nsidc_iip(year=2021):
-    """NSIDC IIP 시즌 CSV → 빙산 리스트 (마지막 100개 관측)."""
+def fetch_nsidc_iip(year=None):
+    """NSIDC IIP 시즌 CSV → 빙산 리스트 (마지막 100개 관측).
+
+    //! [Original Code] year=2021 하드코딩 → NSIDC 가 신규 시즌을 올려도 영원히
+    //   2021 데이터만 가져왔다.
+    //* [Modified Code] 연도 미지정 시 올해부터 과거로 내려가며 최초로 존재하는
+    //   시즌 CSV 를 사용 (현재 NSIDC 는 2021 까지 게시 → 2022+ 게시되면 자동 반영).
+    """
     import requests
-    url = f"{NSIDC_BASE}IIP_{year}IcebergSeason.csv"
-    print(f"[NSIDC-IIP] fetching: {url}")
-    resp = requests.get(url, timeout=60)
-    if resp.status_code != 200:
-        print(f"  HTTP {resp.status_code}")
+    from datetime import datetime as _dt
+
+    years = [year] if year else list(range(_dt.now().year, 2020, -1))
+    resp = None
+    used_year = None
+    for yr in years:
+        url = f"{NSIDC_BASE}IIP_{yr}IcebergSeason.csv"
+        print(f"[NSIDC-IIP] trying: {url}")
+        try:
+            r = requests.get(url, timeout=60)
+        except Exception as e:  # noqa: BLE001
+            print(f"  error: {type(e).__name__}: {str(e)[:60]}")
+            continue
+        if r.status_code == 200 and len(r.content) > 1000:
+            resp = r
+            used_year = yr
+            break
+        print(f"  HTTP {r.status_code} ({len(r.content)} bytes) - 다음 연도 시도")
+    if resp is None:
+        print("[NSIDC-IIP] 사용 가능한 시즌 CSV 없음")
         return None
+    print(f"[NSIDC-IIP] using season {used_year}")
 
     reader = csv.DictReader(io.StringIO(resp.text))
     all_rows = list(reader)
@@ -217,13 +239,25 @@ def fetch_all():
         print("[ERROR] No iceberg data from any source")
         return None
 
+    # //* [Modified Code] 북극 디지털 트윈이므로 북반구(lat>0) 빙산만 보존.
+    #   NIC/GitHub 소스는 대부분 남극(A-series) 대형 빙산이라 그대로 두면
+    #   북극 지도와 무관한 데이터가 섞인다 → 소스 단계에서 제외.
+    before = len(all_bergs)
+    all_bergs = [b for b in all_bergs if b.get("lat", 0) > 0]
+    dropped = before - len(all_bergs)
+    if dropped:
+        print(f"[FILTER] 남반구 빙산 {dropped}개 제외 (북극 전용)")
+    if not all_bergs:
+        print("[ERROR] 북반구 빙산이 없음 (모든 소스가 남극 데이터)")
+        return None
+
     result = {
         "source": " / ".join(sources),
-        "date": datetime.utcnow().strftime("%Y-%m-%d"),
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "berg_count": len(all_bergs),
         "bergs": all_bergs,
     }
-    print(f"\n[TOTAL] {len(all_bergs)} icebergs from: {', '.join(sources)}")
+    print(f"\n[TOTAL] {len(all_bergs)} 북반구 icebergs from: {', '.join(sources)}")
     return result
 
 
@@ -255,7 +289,7 @@ def main():
         print("[DRY-RUN] Sources:")
         print(f"  NIC:    {NIC_URL}")
         print(f"  GitHub: {GITHUB_URL}")
-        print(f"  NSIDC:  {NSIDC_BASE}IIP_2021IcebergSeason.csv")
+        print(f"  NSIDC:  {NSIDC_BASE}IIP_<올해→과거>IcebergSeason.csv (최초 존재 시즌)")
         return
 
     data = fetch_all()
