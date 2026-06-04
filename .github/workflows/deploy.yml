@@ -59,7 +59,28 @@ jobs:
             #    (40GB 디스크 제약상 옛 이미지 비우고 빌드 → 빌드 동안 짧은 다운타임)
             #  - 코드만 변경 → 재빌드 없이 변경 파일만 컨테이너에 복사 후 restart (무중단)
             CID=$(sudo docker compose ps -q backend || true)
-            if echo "$CHANGED" | grep -qE '(^|/)(requirements\.txt|package\.json|package-lock\.json|Dockerfile|docker-compose\.yml)$' || [ -z "$CID" ]; then
+            # 재빌드 필요 판정:
+            #  - requirements/package/Dockerfile 변경 → 무조건 재빌드
+            #  - docker-compose.yml 은 "주석(#)·공백 제외 실질 변경"이 있을 때만 재빌드
+            #    (예: 인스턴스 타입 주석 정정 같은 변경은 무중단 restart 로 처리 — 다운타임 방지)
+            #  - 컨테이너 없으면 무조건 재빌드
+            NEED_REBUILD=0
+            if echo "$CHANGED" | grep -qE '(^|/)(requirements\.txt|package\.json|package-lock\.json|Dockerfile)$'; then
+              NEED_REBUILD=1
+            fi
+            if echo "$CHANGED" | grep -qE '(^|/)docker-compose\.yml$'; then
+              COMPOSE_FUNC=$(git diff "$PREV" "$NEW" -- '*docker-compose.yml' \
+                | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \
+                | grep -vE '^[+-][[:space:]]*#' | grep -vE '^[+-][[:space:]]*$' || true)
+              if [ -n "$COMPOSE_FUNC" ]; then
+                echo "  docker-compose.yml 실질 변경 감지 → 재빌드"
+                NEED_REBUILD=1
+              else
+                echo "  docker-compose.yml 주석/공백만 변경 → 재빌드 생략(무중단)"
+              fi
+            fi
+            if [ -z "$CID" ]; then NEED_REBUILD=1; fi
+            if [ "$NEED_REBUILD" = "1" ]; then
               echo "==> [2/4] 의존성/이미지 변경(또는 컨테이너 없음) → 디스크 안전 풀 재빌드"
               # 빌드 공간 보장: SAR raw 아카이브가 디스크를 잠식해 이미지 빌드를 실패시키지 않도록
               # (1) 끊긴 부분 다운로드(.zip.tmp) 제거 (2) raw zip 을 하드캡(5GB)으로 오래된 것부터 FIFO 정리.
