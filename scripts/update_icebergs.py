@@ -159,25 +159,36 @@ def main():
     sources_used = []
     tmpdir = tempfile.mkdtemp(prefix="cop_icebergs_")
 
+    # //* [Modified Code] 3개 데이터셋(총 ~3.49GB)을 순차 다운로드하면 wall-clock 이
+    #   길어진다. 네트워크 I/O 바운드이므로 ThreadPoolExecutor 로 동시 다운로드하고,
+    #   완료되는 데이터셋부터 즉시 추출·변환(geopandas)해 다운로드와 변환을 오버랩한다.
+    #   (변환은 GDAL 스레드안전성을 고려해 메인 스레드에서 순차 수행)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def _download_one(ds):
+        ds_dir = os.path.join(tmpdir, ds["id_prefix"])
+        os.makedirs(ds_dir, exist_ok=True)
+        log.info(f"[parallel] 다운로드 시작: {ds['id']}")
+        result = download_dataset(ds["id"], ds_dir)
+        return ds, ds_dir, result
+
     try:
-        for ds in DATASETS:
-            ds_dir = os.path.join(tmpdir, ds["id_prefix"])
-            os.makedirs(ds_dir, exist_ok=True)
-
-            result = download_dataset(ds["id"], ds_dir)
-            if result is None:
-                continue
-
-            extract_zips(ds_dir)
-            shp_files = find_shapefiles(ds_dir)
-            if not shp_files:
-                log.warning(f"  No .shp files found for {ds['id']}")
-                continue
-
-            for shp in shp_files:
-                bergs = shapefile_to_icebergs(shp, ds["source_label"], ds["id_prefix"])
-                all_icebergs.extend(bergs)
-                sources_used.append(ds["source_label"])
+        with ThreadPoolExecutor(max_workers=len(DATASETS)) as ex:
+            futures = [ex.submit(_download_one, ds) for ds in DATASETS]
+            for fut in as_completed(futures):
+                ds, ds_dir, result = fut.result()
+                if result is None:
+                    continue
+                # 다운로드 완료된 데이터셋 → 즉시 추출·변환 (다른 데이터셋은 계속 다운로드 중)
+                extract_zips(ds_dir)
+                shp_files = find_shapefiles(ds_dir)
+                if not shp_files:
+                    log.warning(f"  No .shp files found for {ds['id']}")
+                    continue
+                for shp in shp_files:
+                    bergs = shapefile_to_icebergs(shp, ds["source_label"], ds["id_prefix"])
+                    all_icebergs.extend(bergs)
+                    sources_used.append(ds["source_label"])
 
     except Exception as e:
         log.error(f"Pipeline error: {e}")
