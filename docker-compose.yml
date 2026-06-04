@@ -20,7 +20,7 @@ services:
       # fetcher 결과/로그를 컨테이너 재시작 후에도 유지 (DB 가 1차 소스, JSON 은 폴백)
       - backend-data:/app/data
       - backend-logs:/app/logs
-    # t3.medium(4GB) 기준: 컨테이너 3.2g 한도 → 호스트 OS/SSH 용 ~0.8GB 확보.
+    # t2.medium(4GB) 기준: 컨테이너 3.2g 한도 → 호스트 OS/SSH 용 ~0.8GB 확보.
     # 베이스라인 2~3GB + 부팅 동시 로드/fetcher 스파이크는 호스트 swap(6GB)으로 흡수.
     # (t3.large 8GB 로 올리면 7g 로 키워도 됨.)
     mem_limit: 3200m

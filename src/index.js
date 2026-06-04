@@ -434,7 +434,7 @@ app.listen(PORT, () => {
   console.log(`[Server] Arctic Digital Twin API running on http://localhost:${PORT}`);
   console.log(`[Scheduler] Sentinel-1: 01:00 UTC | Ice: 02:00 UTC | SAR: 03:00 UTC | Berg: 04:00 UTC | Weather: every 6h`);
   // AI 서버 3종(RL/Report/ML)을 순차(stagger) 기동해 부팅 시 torch/모델 동시 로드 피크를 분산.
-  // t3.medium(4GB) 같은 작은 인스턴스에서 동시 로드가 RAM 을 순간 초과해 swap 으로 빠지는 것을 막는다.
+  // t2.medium(4GB) 같은 작은 인스턴스에서 동시 로드가 RAM 을 순간 초과해 swap 으로 빠지는 것을 막는다.
   // 큰 인스턴스에선 영향 미미(단지 ~50s 늦게 모두 기동). AI_STARTUP_STAGGER_MS=0 으로 동시 기동 복원 가능.
   const STAGGER_MS = Number(process.env.AI_STARTUP_STAGGER_MS ?? 25000);
   startRLServer();                            // t+0
