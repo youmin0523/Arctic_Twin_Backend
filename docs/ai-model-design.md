@@ -68,7 +68,7 @@
                                       │ HTTPS  /api/*
                                       ▼
         ┌─────────────────────────────────────────────────────────┐
-        │       AWS EC2 (Docker, t3.medium · 2vCPU/4GB)           │
+        │       AWS EC2 (Docker, t2.medium · 2vCPU/4GB)           │
         │  ┌───────────────────────────────────────────────────┐  │
         │  │           Node 게이트웨이  (port 8000)             │  │
         │  └──┬─────────────┬──────────────┬──────────────┬────┘  │
@@ -429,7 +429,7 @@
 
 | 항목 | 내용 |
 |---|---|
-| 호스팅 | AWS EC2 (Docker 단일 컨테이너, t3.medium 2vCPU/4GB + swap 6GB) — Node 게이트웨이 8000 단일 진입점 |
+| 호스팅 | AWS EC2 (Docker 단일 컨테이너, t2.medium 2vCPU/4GB + swap 6GB) — Node 게이트웨이 8000 단일 진입점 |
 | 프론트엔드 | Vercel (React + Cesium), `arctictwin.com` |
 | 모델 저장 | Git LFS (~200MB) — ONNX/ZIP/PKL |
 | 추론 런타임 | onnxruntime(CPU) — RL 배포 모델 |

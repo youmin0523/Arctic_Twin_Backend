@@ -7,7 +7,7 @@
 #   또는 인스턴스에 복사 후:
 #     bash ec2-setup.sh
 # ------------------------------------------------------------
-#   권장 인스턴스: t3.medium (2vCPU / 4GB). 추론 전용(학습 안 함) 데모 기준.
+#   권장 인스턴스: t2.medium (2vCPU / 4GB). 추론 전용(학습 안 함) 데모 기준.
 #   PyTorch/YOLO/xgboost AI 서버 3종 + 모델 ~591MB 가 상주 (베이스라인 ~2~3GB).
 #   4GB 는 빠듯하므로 swap 6G 로 부팅 동시 로드·fetcher 스파이크를 흡수한다.
 #   (여유 원하면 t3.large 8GB, 학습까지 돌리면 t3.xlarge 16GB.)
@@ -20,7 +20,7 @@ set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/youmin0523/Arctic_Twin_Backend.git}"
 APP_DIR="${APP_DIR:-$HOME/Arctic_Twin_Backend}"
-SWAP_SIZE="${SWAP_SIZE:-6G}"   # t3.medium(4GB) 보강: RAM 부족분을 swap 으로 흡수
+SWAP_SIZE="${SWAP_SIZE:-6G}"   # t2.medium(4GB) 보강: RAM 부족분을 swap 으로 흡수
 
 echo "==> [1/5] 시스템 패키지 + Docker 설치"
 sudo apt-get update -y
@@ -31,7 +31,7 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 sudo usermod -aG docker "$USER" || true   # 로그아웃/재접속 후 sudo 없이 docker 사용
 
-echo "==> [2/5] swap ${SWAP_SIZE} 설정 (t3.medium 4GB 보강 — 부팅 동시 로드/fetcher 스파이크 흡수)"
+echo "==> [2/5] swap ${SWAP_SIZE} 설정 (t2.medium 4GB 보강 — 부팅 동시 로드/fetcher 스파이크 흡수)"
 if ! sudo swapon --show | grep -q '/swapfile'; then
   sudo fallocate -l "$SWAP_SIZE" /swapfile 2>/dev/null \
     || sudo dd if=/dev/zero of=/swapfile bs=1M count=6144
