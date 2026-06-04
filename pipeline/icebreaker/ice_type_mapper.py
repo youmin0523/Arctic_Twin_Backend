@@ -59,26 +59,66 @@ ICE_TYPE_THICKNESS_M: dict[str, float] = {
 }
 
 
-def infer_ice_type(concentration: float, month: int, lat: float) -> str:
-    """concentration + 월 + 위도 → WMO ice type(보수적 휴리스틱).
+WINTER_MONTHS: frozenset[int] = frozenset({1, 2, 3, 4, 11, 12})
 
-    근거/한계
-    ---------
-    NSIDC passive microwave 는 ice concentration 만 제공. 실제 빙장은
-    pressure ridges, embedded multi-year blocks, 표류 glacier fragments 가
-    혼재한다. 본 매핑은 그 worst-case 를 "가장 보수적인 WMO type 이름"으로
-    압축 투영한다 — 즉, ice type 필드는 해당 격자 셀에서 encountered 가능
-    최악 빙종을 의미하며, 실제 셀 전체가 그 빙종이라는 뜻이 아니다.
-    이 보수성 때문에 고급 빙급선(PC3/PC4)도 극 북극 한겨울 밀집 영역에서
-    POLARIS RIO 가 음수로 내려가 쇄빙선 호출이 가능해진다.
 
-    계절 분기
-      winter(11-4월): 두꺼운 빙 우세
-      summer(5-10월): 같은 농도라도 한 등급 낮게 분류
+def infer_ice_type(
+    concentration: float,
+    month: int,
+    lat: float,
+    thickness: float | None = None,
+) -> str:
+    """ice type 추론 — 실측 두께(thickness)가 있으면 그것을 1차 신호로 사용.
+
+    배경
+    ----
+    monthly 스냅샷(realIceData_monthNN.json)의 각 셀은 concentration 외에
+    **실측 thickness(m)** 도 제공한다. 두께는 항행 난이도를 직접 결정하는
+    물리량이라 ice type 분류의 가장 정확한 신호다(예: 한겨울 NSR 회랑은
+    농도가 0.3~0.5 로 낮게 들어와도 실측 두께가 1~2.7m 인 두꺼운 정착빙/
+    압력능선 빙역). 종전 구현은 thickness 를 버리고 농도만으로 분류해
+    이런 셀을 전부 "Thin FY(0.5m)" 로 과소평가, RIO 가 음수로 못 내려가
+    쇄빙선 호출이 영원히 발생하지 않는 회귀가 있었다.
+
+    분류 정책 (thickness 우선)
+    --------------------------
+    WMO 해빙 두께 단계 + POLARIS 위험도 보정:
+      ≥2.5m & 한겨울 고위도(lat≥75) → Glacier Ice
+          (극 북극 한겨울 두꺼운 빙역의 embedded iceberg/glacier fragment
+           worst-case — PC3 본선도 RIO 음수가 되어야 하는 구간)
+      ≥3.0m              → Ridged/Hummocked
+      ≥2.0m              → Multi-Year (MY)
+      ≥1.2m              → Thick First-Year (FY)
+      ≥0.7m              → Medium First-Year (FY)
+      ≥0.3m              → Thin First-Year (FY)
+      ≥0.15m             → Grey-White Ice
+      ≥0.10m             → Grey Ice
+      그 외              → Open Water
+
+    thickness 가 없는 레거시 경로에서는 종전 농도+계절+위도 휴리스틱을 사용.
     """
-    winter = month in (1, 2, 3, 4, 11, 12)
+    winter = month in WINTER_MONTHS
 
-    # 극 북극 한겨울 초고밀도: embedded icebergs / pressure ridges worst-case
+    if thickness is not None and thickness > 0.0:
+        if winter and lat >= 75.0 and thickness >= 2.5:
+            return "Glacier Ice"
+        if thickness >= 3.0:
+            return "Ridged/Hummocked"
+        if thickness >= 2.0:
+            return "Multi-Year (MY)"
+        if thickness >= 1.2:
+            return "Thick First-Year (FY)"
+        if thickness >= 0.7:
+            return "Medium First-Year (FY)"
+        if thickness >= 0.3:
+            return "Thin First-Year (FY)"
+        if thickness >= 0.15:
+            return "Grey-White Ice"
+        if thickness >= 0.10:
+            return "Grey Ice"
+        return "Open Water"
+
+    # ── 레거시 폴백: thickness 미제공 시 농도 기반(보수적 휴리스틱) ──
     if winter and lat >= 75.0 and concentration >= 0.95:
         return "Glacier Ice"
     if winter and lat >= 77.0 and concentration >= 0.85:
@@ -106,6 +146,35 @@ def infer_ice_type(concentration: float, month: int, lat: float) -> str:
         return "Grey Ice"
 
 
+def winter_effective_concentration(
+    raw_conc: float, thickness: float, month: int
+) -> float:
+    """한겨울 정착빙 보정 — 두꺼운 빙은 밀집빙(고총농도)으로 간주.
+
+    근거
+    ----
+    이 데이터셋의 passive-microwave 농도 축은 한겨울 NSR 회랑에서도 0.3~0.5
+    로 비현실적으로 낮다(실제 3월 척치/동시베리아해 정착빙 총농도는 0.9+).
+    반면 실측 thickness 는 1~2.7m 로 물리적으로 타당하다. POLARIS RIO 는
+    Σ(부분농도 × RIV) 이므로 농도가 낮으면 두꺼운 빙도 위험도가 희석된다.
+    Ice Chart 관행상 한겨울 두꺼운 정착빙역은 총농도가 높게 보고되므로,
+    두께에 따른 농도 하한(consolidation floor)을 적용해 RIO 가 실제 항행
+    위험을 반영하도록 한다. 여름/박빙역(thickness 낮음)은 보정하지 않아
+    개빙수역의 통항성을 그대로 유지한다.
+    """
+    if month not in WINTER_MONTHS:
+        return raw_conc
+    if thickness >= 1.2:        # Thick FY 이상 — 한겨울 압밀 정착빙
+        floor = 0.97
+    elif thickness >= 0.7:      # Medium FY
+        floor = 0.90
+    elif thickness >= 0.4:      # Thin FY 상단
+        floor = 0.80
+    else:
+        floor = 0.0
+    return max(raw_conc, floor)
+
+
 def dominant_thickness_m(conditions: list[IceCondition]) -> float:
     """ice_conditions 의 concentration-weighted 평균 두께(m)."""
     total = 0.0
@@ -130,6 +199,10 @@ class IceField:
         self._lats = np.array([c["lat"] for c in cells], dtype=np.float64)
         self._lons = np.array([c["lon"] for c in cells], dtype=np.float64)
         self._conc = np.array([c["concentration"] for c in cells], dtype=np.float64)
+        # 실측 두께(m). 일부 레거시 스냅샷엔 없을 수 있어 0.0 기본값.
+        self._thick = np.array(
+            [float(c.get("thickness", 0.0)) for c in cells], dtype=np.float64
+        )
         self._lats_rad = np.radians(self._lats)
         self._lons_rad = np.radians(self._lons)
 
@@ -146,8 +219,8 @@ class IceField:
             blob = json.load(f)
         return cls(blob["cells"])
 
-    def nearest(self, lat: float, lon: float) -> tuple[float, float]:
-        """(nearest concentration, distance_km). vectorized haversine."""
+    def nearest(self, lat: float, lon: float) -> tuple[float, float, float]:
+        """(nearest concentration, thickness_m, distance_km). vectorized haversine."""
         lat_r = np.radians(lat)
         lon_r = np.radians(lon)
         dlat = self._lats_rad - lat_r
@@ -158,28 +231,44 @@ class IceField:
         )
         d_km = 2.0 * 6371.0 * np.arctan2(np.sqrt(a), np.sqrt(1.0 - a))
         idx = int(np.argmin(d_km))
-        return float(self._conc[idx]), float(d_km[idx])
+        return float(self._conc[idx]), float(self._thick[idx]), float(d_km[idx])
 
     def sample(self, pos: Position, month: int) -> list[IceCondition]:
         """해당 지점의 ice_conditions(RIO 입력 형식) 반환.
 
-        커버리지 밖이거나 농도가 극히 낮으면 100% Open Water 반환.
-        그 외에는 (Open Water, 1-c) + (inferred type, c) 조합.
+        커버리지 밖이거나 빙이 사실상 없으면 100% Open Water 반환.
+        그 외에는 (Open Water, 1-c_eff) + (thickness 기반 inferred type, c_eff) 조합.
+        c_eff 는 한겨울 정착빙 보정(winter_effective_concentration)이 적용된 농도.
         """
-        conc, dist_km = self.nearest(pos["lat"], pos["lon"])
-        if dist_km > MAX_CELL_DISTANCE_KM or conc < 1e-3:
+        conc, thick, dist_km = self.nearest(pos["lat"], pos["lon"])
+        if dist_km > MAX_CELL_DISTANCE_KM or (conc < 1e-3 and thick < 0.10):
             return [{"type": "Open Water", "concentration_tenths": 1.0}]
 
-        ice_type = infer_ice_type(conc, month, pos["lat"])
+        ice_type = infer_ice_type(conc, month, pos["lat"], thickness=thick)
+        if ice_type == "Open Water":
+            return [{"type": "Open Water", "concentration_tenths": 1.0}]
+
+        eff_conc = winter_effective_concentration(conc, thick, month)
         conditions: list[IceCondition] = []
-        if conc < 0.999:
+        if eff_conc < 0.999:
             conditions.append(
-                {"type": "Open Water", "concentration_tenths": round(1.0 - conc, 6)}
+                {"type": "Open Water", "concentration_tenths": round(1.0 - eff_conc, 6)}
             )
         conditions.append(
-            {"type": ice_type, "concentration_tenths": round(conc, 6)}
+            {"type": ice_type, "concentration_tenths": round(eff_conc, 6)}
         )
         return conditions
+
+    def sample_thickness(self, pos: Position, _month: int = 0) -> float:
+        """해당 지점의 실측 두께(m). 커버리지 밖이면 0.0.
+
+        HUD '얼음 두께' 표시 및 쇄빙 유효두께 계산용 — 종전 type-table 가중
+        근사(dominant_thickness_m) 대신 실측값을 직접 노출.
+        """
+        _conc, thick, dist_km = self.nearest(pos["lat"], pos["lon"])
+        if dist_km > MAX_CELL_DISTANCE_KM:
+            return 0.0
+        return round(thick, 4)
 
 
 if __name__ == "__main__":
@@ -187,9 +276,10 @@ if __name__ == "__main__":
     field = IceField.from_month(3)
     print(f"loaded month=3, cells={len(field._conc)}")
     # Kara Sea 중앙
-    sample = field.sample({"lat": 75.0, "lon": 80.0}, month=3)
+    pos = {"lat": 75.0, "lon": 80.0}
+    sample = field.sample(pos, month=3)
     print(f"Kara Sea (75N, 80E) month=3: {sample}")
-    print(f"  dominant thickness: {dominant_thickness_m(sample):.2f}m")
+    print(f"  actual thickness: {field.sample_thickness(pos):.2f}m")
     # 저위도 (SUEZ 루트)
     sample2 = field.sample({"lat": 10.0, "lon": 50.0}, month=7)
     print(f"Red Sea (10N, 50E) month=7: {sample2}")

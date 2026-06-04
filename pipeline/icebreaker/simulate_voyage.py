@@ -24,10 +24,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from pipeline.arctic_master_router import calculate_rio
-from pipeline.icebreaker.ice_type_mapper import (
-    IceField,
-    dominant_thickness_m,
-)
+from pipeline.icebreaker.ice_type_mapper import IceField
 from pipeline.icebreaker.icebreaker_dispatcher import (
     LOOKAHEAD_MAX_KM,
     NM_TO_KM,
@@ -199,6 +196,33 @@ def _print_events(
 # ─── 메인 시뮬 ────────────────────────────────────────────────────────────
 
 
+def _apply_land_avoidance(
+    route: list[Position], verbose: bool
+) -> list[Position]:
+    """정적 경로를 전역 육지 마스크로 정합(섬·반도 관통 제거).
+
+    마스크 자산이 없으면(CI/배포 환경) 경고 후 원본 경로 사용 — 회피는
+    선택적 개선이며 시뮬 자체는 원본으로도 동작.
+    """
+    try:
+        from pipeline.icebreaker.land_mask import LandMask, refine_route
+    except Exception as e:  # noqa: BLE001
+        if verbose:
+            print(f"[LAND]    육지 마스크 모듈 로드 불가 — 원본 경로 사용 ({e})")
+        return route
+    try:
+        mask = LandMask.load()
+    except Exception as e:  # noqa: BLE001 — 마스크 파일 없음 등
+        if verbose:
+            print(f"[LAND]    육지 마스크 자산 없음 — 원본 경로 사용 ({e})")
+        return route
+    refined = refine_route(route, mask)
+    if verbose:
+        print(f"[LAND]    경로 정합: {len(route)} -> {len(refined)} waypoints "
+              f"(육지 회피)")
+    return refined
+
+
 def simulate_voyage(
     route_name: str,
     ship_id: str,
@@ -209,15 +233,19 @@ def simulate_voyage(
     output_path: str | Path | None = None,
     verbose: bool = True,
     max_ticks: int = 5000,
+    avoid_land: bool = True,
 ) -> dict[str, Any]:
     """주어진 경로/월/본선 속성으로 항해 시뮬레이션 실행.
 
+    avoid_land=True 면 전역 육지 마스크로 경로를 정합해 섬·반도 관통을 제거.
     Returns the trace dict. Writes JSON if output_path given.
     """
     routes = load_routes()
     if route_name not in routes:
         raise ValueError(f"Unknown route: {route_name}")
     route = routes[route_name]
+    if avoid_land:
+        route = _apply_land_avoidance(route, verbose)
 
     field = IceField.from_month(month)
     pc_class = arc_to_pc(ship_ice_class)
@@ -254,7 +282,9 @@ def simulate_voyage(
         ship_pos = _position_at_km(route, cum_km, km_along)
         conditions = field.sample(ship_pos, month)
         rio_now = calculate_rio(pc_class, conditions)
-        actual_thick = dominant_thickness_m(conditions)
+        # 실측 두께(m) 직접 사용 — 종전 type-table 가중 근사는 농도가 낮으면
+        # 두꺼운 빙역도 0.0x m 로 과소표시되는 문제가 있었다.
+        actual_thick = field.sample_thickness(ship_pos)
 
         escort_before = _find_active_escort(fleet, ship_id)
         eff_thick = effective_ice_thickness(actual_thick, escort_before)

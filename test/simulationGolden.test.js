@@ -88,11 +88,23 @@ test('RIO 값이 유한 + POLARIS 합리적 범위(-50~10)', () => {
   }
 });
 
-test('summary 카운터가 음수 아님', () => {
+test('summary 카운터(개수/거리)가 음수 아님', () => {
   for (const { file, data } of ALL) {
-    for (const key of ['icebreaker_calls', 'intercept_failed', 'total_escort_distance_km', 'max_rio_violation']) {
+    for (const key of ['icebreaker_calls', 'intercept_failed', 'total_escort_distance_km']) {
       const v = data.summary[key];
       if (v != null) assert.ok(v >= 0, `${file}: summary.${key} 음수(${v})`);
+    }
+  }
+});
+
+test('max_rio_violation 은 0 이하(가장 위험했던 RIO)', () => {
+  // max_rio_violation 은 항해 중 마주친 가장 낮은(가장 위험한) RIO 다.
+  // 위반이 없으면 0, 쇄빙 호출이 필요한 빙역을 지나면 음수가 정상.
+  for (const { file, data } of ALL) {
+    const v = data.summary.max_rio_violation;
+    if (v != null) {
+      assert.ok(v <= 0, `${file}: max_rio_violation 양수(${v})`);
+      assert.ok(v >= -50, `${file}: max_rio_violation 비현실적(${v})`);
     }
   }
 });
