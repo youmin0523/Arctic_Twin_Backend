@@ -59,6 +59,27 @@ jobs:
             #    (40GB 디스크 제약상 옛 이미지 비우고 빌드 → 빌드 동안 짧은 다운타임)
             #  - 코드만 변경 → 재빌드 없이 변경 파일만 컨테이너에 복사 후 restart (무중단)
             CID=$(sudo docker compose ps -q backend || true)
+
+            # ── 디스크 가드 (무조건 선실행) ──────────────────────────────
+            # full disk 면 코드 패치/restart 도 'no space left on device' 로 실패한다
+            # (정리가 재빌드 경로에만 있어 발생). 어떤 경로든 먼저 빌드캐시·댕글링
+            # 이미지·SAR raw 아카이브(데이터 볼륨)를 정리해 공간을 확보한다.
+            echo "==> [1.5/4] 디스크 정리 (무조건)"
+            df -h / | tail -1
+            sudo docker builder prune -af || true
+            sudo docker image prune -f || true
+            SAR_DIR_GUARD="$(sudo docker volume inspect arctic_twin_backend_backend-data --format '{{.Mountpoint}}' 2>/dev/null || true)/sentinel1_archive"
+            if [ -d "$SAR_DIR_GUARD" ]; then
+              sudo find "$SAR_DIR_GUARD" -type f -name '*.zip.tmp' -delete || true
+              CAP_KB_GUARD=$((5 * 1024 * 1024))   # 5GB 하드캡
+              while [ "$(sudo du -sk "$SAR_DIR_GUARD" 2>/dev/null | cut -f1)" -gt "$CAP_KB_GUARD" ]; do
+                OLD_G=$(sudo find "$SAR_DIR_GUARD" -type f -name '*.zip' -printf '%T@ %p\n' 2>/dev/null | sort -n | head -1 | cut -d' ' -f2-)
+                [ -z "$OLD_G" ] && break
+                sudo rm -f "$OLD_G"
+              done
+            fi
+            df -h / | tail -1
+
             # 재빌드 필요 판정:
             #  - requirements/package/Dockerfile 변경 → 무조건 재빌드
             #  - docker-compose.yml 은 "주석(#)·공백 제외 실질 변경"이 있을 때만 재빌드
