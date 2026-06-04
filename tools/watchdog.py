@@ -54,13 +54,13 @@ SERVERS = [
     },
     {
         "name": "sar-server",
-        "port": 8003,
+        "port": 8005,  # sar_server.py 가 8005 에 바인딩 (8003 은 ml-fuel 서버)
         "cwd":  BASE,
         "cmd":  UVRUN + ["python", str(BASE / "sar_server.py")],
-        "health": "http://127.0.0.1:8003/",
-        "train_url": "http://127.0.0.1:8003/api/sar/train",
+        "health": "http://127.0.0.1:8005/",
+        "train_url": "http://127.0.0.1:8005/api/sar/train",
         "train_body": b'{"max_iterations":3,"epochs":30,"device":"cpu"}',
-        "status_url": "http://127.0.0.1:8003/api/sar/status",
+        "status_url": "http://127.0.0.1:8005/api/sar/status",
         "running_key": "is_training",
     },
     {

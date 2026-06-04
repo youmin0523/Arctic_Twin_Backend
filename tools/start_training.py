@@ -4,7 +4,7 @@ start_training.py — 전체 학습 서버 통합 시작 스크립트
 실행: python start_training.py
   - rl-pipeline         (포트 8001) : 빙산회피 SAC 84 노선
   - report-service      (포트 8002) : 출항 스케줄링 SAC 28 조합
-  - sar_server          (포트 8003) : YOLOv8 SAR 딥러닝
+  - sar_server          (포트 8005) : YOLOv8 SAR 딥러닝
   - ml-training-service (포트 8004) : Fuel XGBoost + What-if Analysis
 
 각 서버를 독립 프로세스로 기동 후 학습 자동 트리거.
@@ -38,10 +38,10 @@ SERVERS = [
     },
     {
         "name": "sar-server",
-        "port": 8003,
+        "port": 8005,  # sar_server.py 가 8005 에 바인딩 (8003 은 ml-fuel 서버)
         "cwd":  BASE,
         "cmd":  UVRUN + ["python", "sar_server.py"],
-        "health": "http://127.0.0.1:8003/",
+        "health": "http://127.0.0.1:8005/",
     },
     {
         "name": "ml-training-service",
@@ -68,7 +68,7 @@ TRAIN_TRIGGERS: list[dict[str, object]] = [
     },
     {
         "name": "SAR YOLOv8 딥러닝 (30 epoch)",
-        "url":  "http://127.0.0.1:8003/api/sar/train",
+        "url":  "http://127.0.0.1:8005/api/sar/train",
         "body": {"epochs": 30, "batch_size": 4, "synthetic_count": 200, "device": "cpu"},
     },
     {

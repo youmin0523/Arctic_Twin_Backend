@@ -17,7 +17,7 @@ const { legacyNsidcProxy, legacyCopProxy, legacySentinelProxy } = require('./rou
 const pipelineRouter = require('./routes/pipeline');
 const weatherRouter = require('./routes/weather');
 const sentinel1Router = require('./routes/sentinel1');
-const reportRouter = require('./routes/report');
+// (report 라우터는 /api/report 프록시가 전담하므로 마운트하지 않음 — routes/report.js 는 미사용)
 const collabRouter = require('./routes/collab'); // SAR-RL 콜라보 (신규)
 const simulationsRouter = require('./routes/simulations'); // 시뮬레이션 결과 DB 서빙 (신규)
 const editedRoutesRouter = require('./routes/editedRoutes'); // 사용자 편집 항로 영속(공유)
@@ -140,8 +140,8 @@ function makePythonServer({ tag, port, pyArgs, cwd, healthPath = '/' }) {
       setTimeout(start, restartDelay);
     });
 
-    // 서버 준비 후 헬스 체크 루프 시작
-    setTimeout(scheduleHealthCheck, 30000);
+    // 서버 준비 후 헬스 체크 루프 시작 (kill() 에서 취소 가능하도록 타이머 보관)
+    healthCheckTimer = setTimeout(scheduleHealthCheck, 30000);
   }
 
   async function scheduleHealthCheck() {
@@ -364,9 +364,15 @@ const WEATHER_SCRIPT_PATH = path.join(
 
 function runWeatherPipeline() {
   console.log('[Scheduler] Running weather pipeline (Open-Meteo, all routes)...');
+  // 북극 파고/SST Copernicus 폴백이 헤드리스 서버에서 인증할 수 있도록 자격증명 주입
+  // (없으면 copernicus_wave/sst_fallback 의 _copernicus_available() 가 false → 폴백 조용히 스킵)
+  const env = uvEnv({
+    COPERNICUSMARINE_SERVICE_USERNAME: process.env.COPERNICUS_MARINE_USER,
+    COPERNICUSMARINE_SERVICE_PASSWORD: process.env.COPERNICUS_MARINE_PASSWORD,
+  });
   const { cmd, args } = uvCommand([WEATHER_SCRIPT_PATH]);
   // timeout 30분: Open-Meteo + Copernicus(북극 파고/SST) 폴백이 항로별로 돌아 실측 ~22분 소요
-  execFile(cmd, args, { env: uvEnv(), timeout: 1800000 }, (err, stdout, stderr) => {
+  execFile(cmd, args, { env, timeout: 1800000 }, (err, stdout, stderr) => {
     if (err) console.error('[Scheduler] Weather pipeline error:', err.message);
     if (stdout) console.log('[Weather]', stdout.trim().slice(-500));
     if (stderr) console.error('[Weather] stderr:', stderr.trim().slice(-200));

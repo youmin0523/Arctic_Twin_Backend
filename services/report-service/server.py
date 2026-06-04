@@ -768,16 +768,17 @@ async def whatif_stats():
 
 
 # ══════════════════════════════════════════════════════════════
-# SAR 빙산 탐지 모델 학습 API — 8003 전용 서버로 프록시
+# SAR 빙산 탐지 모델 학습 API — 8005 전용 서버로 프록시
 # ══════════════════════════════════════════════════════════════
-# SAR 학습은 sar_server.py (포트 8003) 에서 독립 프로세스로 실행됩니다.
+# SAR 학습은 sar_server.py (포트 8005) 에서 독립 프로세스로 실행됩니다.
+# (8003 은 ml-pipeline 연료 서버라 /api/sar/* 가 없음 — 8005 가 정답)
 # 이 서버(8002)는 RL 학습 전용으로 유지되어 이벤트루프 블로킹이 발생하지 않습니다.
 
-SAR_SERVER_URL = "http://127.0.0.1:8003"
+SAR_SERVER_URL = "http://127.0.0.1:8005"
 
 
 async def _sar_proxy(method: str, path: str, body: bytes | None = None) -> dict:
-    """8003 SAR 서버로 요청을 프록시."""
+    """8005 SAR 서버로 요청을 프록시."""
     import httpx
     async with httpx.AsyncClient(timeout=10.0) as client:
         if method == "GET":
@@ -790,31 +791,31 @@ async def _sar_proxy(method: str, path: str, body: bytes | None = None) -> dict:
 
 @app.post("/api/report/sar/train")
 async def start_sar_training(req: SarTrainRequest):
-    """SAR 학습 시작 — sar_server(8003)로 위임."""
+    """SAR 학습 시작 — sar_server(8005)로 위임."""
     try:
         import json as _json
-        result = await _sar_proxy("POST", "/api/sar/train", _json.dumps(req.dict()).encode())
+        result = await _sar_proxy("POST", "/api/sar/train", _json.dumps(req.model_dump()).encode())
         return result
     except Exception:
         return JSONResponse(
             status_code=503,
-            content={"error": "SAR 서버(8003)에 연결할 수 없습니다. 'python sar_server.py' 를 먼저 실행하세요."},
+            content={"error": "SAR 서버(8005)에 연결할 수 없습니다. 'python sar_server.py' 를 먼저 실행하세요."},
         )
 
 
 @app.get("/api/report/sar/train-status")
 async def sar_train_status():
-    """SAR 학습 상태 — sar_server(8003)에서 조회."""
+    """SAR 학습 상태 — sar_server(8005)에서 조회."""
     try:
         return await _sar_proxy("GET", "/api/sar/status")
     except Exception:
-        return {"error": "SAR 서버(8003) 응답 없음", "is_training": False}
+        return {"error": "SAR 서버(8005) 응답 없음", "is_training": False}
 
 
 @app.get("/api/report/sar/model-info")
 async def sar_model_info():
-    """SAR 모델 메타데이터 — sar_server(8003)에서 조회."""
+    """SAR 모델 메타데이터 — sar_server(8005)에서 조회."""
     try:
         return await _sar_proxy("GET", "/api/sar/model-info")
     except Exception:
-        return {"error": "SAR 서버(8003) 응답 없음"}
+        return {"error": "SAR 서버(8005) 응답 없음"}

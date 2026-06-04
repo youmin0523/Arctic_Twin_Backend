@@ -124,6 +124,8 @@ async function loadSentinel1(c) {
   console.log(`✓ sentinel1_products: ${n}건`);
 }
 
+// 일일 API 호출 예산 모니터링용 sink (직접 SQL/대시보드 조회). HTTP reader 없음 — 의도된 설계.
+// 실제 기상 페이로드(weather_latest.json)는 대용량이라 DB 미동기화 — dataStore.getWeatherData 가 파일 서빙.
 async function loadWeather(c) {
   const f = path.join(DATA, 'weather_api_usage.json');
   if (!exists(f)) return console.warn('· skip weather_api_usage (파일 없음)');

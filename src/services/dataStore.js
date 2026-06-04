@@ -31,6 +31,9 @@ async function readJsonFile(filePath) {
 }
 
 // 해빙 농도 데이터
+// [의도] 해빙 농도(realIceData_*.json)는 대용량 지오공간 blob 이라 DB 미동기화 — 파일 서빙 전용.
+// (DB-first 는 구조화/쿼리 가능한 데이터셋(icebergs/bergs/sentinel1/sar/simulations)에만 적용.
+//  단일 EC2 운영이므로 fetcher 쓰기 ↔ reader 읽기가 같은 디스크 → 파일 서빙으로 충분)
 async function getIceData(type, month) {
   const cacheKey = `ice_${type}_${month}`;
   const cached = getCached(cacheKey);
@@ -218,6 +221,8 @@ async function getSentinel1Catalog() {
 }
 
 // 기상 데이터 (Open-Meteo — weather_fetcher.py 수집, 5개 항로)
+// [의도] weather_latest.json 은 대용량 페이로드라 DB 미동기화 — 파일 서빙 전용(getIceData 동일 사유).
+//   weather_api_usage 테이블은 일일 호출 예산 모니터링용 sink(직접 SQL 조회), HTTP reader 없음(정상).
 // 6시간마다 갱신되므로 캐시 TTL을 30분으로 설정
 const WEATHER_CACHE_TTL = 30 * 60 * 1000;
 

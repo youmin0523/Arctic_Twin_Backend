@@ -65,7 +65,9 @@ ultralytics>=8.0.0
 
 # ── 보고서 / What-If AI (report-service) ─────────────────
 # What-If 시나리오: OpenAI gpt-4o-mini function calling (헤드리스 배포 호환)
-openai>=1.40.0
+# >=1.99: whatif_generator_openai.py 가 openai.types.chat.ChatCompletionMessageFunctionToolCall
+#         심볼을 import 하는데 1.99+ 에서만 존재 (그 이하로 resolve 시 서비스 기동 크래시)
+openai>=1.99.0
 # (레거시) Claude Agent SDK + Max OAuth 기반 생성기 — 로컬 전용, 배포 미사용
 anthropic==0.92.0
 claude-agent-sdk==0.1.71

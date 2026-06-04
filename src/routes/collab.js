@@ -106,12 +106,11 @@ router.get('/all-icebergs', async (req, res) => {
 // body: { confidence?: number, max_products?: number }
 router.post('/sar-detect-trigger', (req, res) => {
   const { confidence, max_products: maxProducts } = req.body || {};
+  // src/routes → ../.. = backend 루트. (루트 폴더명에 의존하지 않도록 'backend' 하드코딩 제거)
   const script = path.resolve(
     __dirname,
     '..',
     '..',
-    '..',
-    'backend',
     'pipeline',
     'processors',
     'iceberg_detector.py'

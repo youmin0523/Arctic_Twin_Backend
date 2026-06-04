@@ -15,6 +15,7 @@ Dataset (Global) : cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m
 Variable         : thetao (Sea water potential temperature, °C)
 """
 
+import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -26,7 +27,15 @@ SST_VARIABLE = "thetao"
 
 
 def _copernicus_available() -> bool:
-    """Copernicus Marine 인증 상태 확인."""
+    """Copernicus Marine 인증 상태 확인.
+
+    헤드리스 서버(AWS)는 자격증명 파일 없이 환경변수로만 인증하므로
+    env var(COPERNICUSMARINE_SERVICE_USERNAME/PASSWORD)도 함께 확인한다.
+    (copernicus_fetcher.py 와 동일한 기준 — 파일만 확인하면 운영에서 폴백이 조용히 스킵됨)
+    """
+    if os.environ.get("COPERNICUSMARINE_SERVICE_USERNAME") and \
+       os.environ.get("COPERNICUSMARINE_SERVICE_PASSWORD"):
+        return True
     cred_paths = [
         Path.home() / ".copernicusmarine" / ".copernicusmarine-credentials",
         Path.home() / ".copernicusmarine" / "credentials",
