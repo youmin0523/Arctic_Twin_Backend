@@ -36,10 +36,11 @@ from pipeline.icebreaker.icebreaker_dispatcher import (
     offset_position,
 )
 from pipeline.icebreaker.models import (
-    INITIAL_ICEBREAKERS,
+    FLEET_BY_ROUTE,
     Icebreaker,
     Position,
     arc_to_pc,
+    fleet_for_route,
 )
 from pipeline.icebreaker.routes_loader import load_routes
 
@@ -120,9 +121,10 @@ def _find_active_escort(
 
 
 def _pick_home_port(ib_id: str) -> str:
-    for ib in INITIAL_ICEBREAKERS:
-        if ib["id"] == ib_id:
-            return ib["home_port"]
+    for flt in FLEET_BY_ROUTE.values():
+        for ib in flt:
+            if ib["id"] == ib_id:
+                return ib["home_port"]
     return "?"
 
 
@@ -265,7 +267,7 @@ def simulate_voyage(
     cum_km = _cumulative_km(segments)
     route_total_km = cum_km[-1]
 
-    fleet: list[Icebreaker] = [dict(ib) for ib in INITIAL_ICEBREAKERS]  # type: ignore[misc]
+    fleet: list[Icebreaker] = [dict(ib) for ib in fleet_for_route(route_name)]  # type: ignore[misc]
     for ib in fleet:
         ib["position"] = cast("Position", dict(ib["position"]))
 
