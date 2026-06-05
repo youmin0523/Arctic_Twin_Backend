@@ -20,18 +20,16 @@ router.get('/concentration', async (req, res) => {
 });
 
 // GET /api/ice/thickness?month=2023-03
-router.get('/thickness', async (req, res) => {
-  try {
-    const month = req.query.month || 'latest';
-    const data = await getIceData('thickness', month);
-    if (!data) {
-      return res.status(404).json({ error: `Thickness data not found for month: ${month}` });
-    }
-    res.json(data);
-  } catch (err) {
-    console.error('[Ice] thickness error:', err.message);
-    res.status(500).json({ error: err.message });
-  }
+// 주의: 현재 데이터 소스(realIceData_*.json)는 해빙 "농도"만 포함하고
+// 두께(thickness) 그리드는 제공하지 않는다. 과거엔 이 엔드포인트가 농도
+// 데이터를 그대로 두께인 것처럼 반환했으나(오배치), 실측 두께가 없으므로
+// 명시적으로 미제공(501) 응답을 돌려준다. (프론트엔드는 이 엔드포인트를 사용하지 않음)
+router.get('/thickness', (req, res) => {
+  res.status(501).json({
+    error: 'sea-ice thickness grid not available',
+    detail: '현재 수집 데이터는 해빙 농도(concentration)만 포함합니다.',
+    hint: 'use /api/ice/concentration',
+  });
 });
 
 // GET /api/ice/archives - 사용 가능한 아카이브 목록 (월별 + 날짜별)

@@ -15,9 +15,29 @@ import argparse
 import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
+
+
+def _atomic_write_json(path, data, **dump_kwargs) -> None:
+    """임시파일로 쓴 뒤 os.replace로 원자적 교체 (디스크풀 시 기존 파일 보존)."""
+    d = os.path.dirname(os.path.abspath(path))
+    os.makedirs(d, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=d, prefix=os.path.basename(path) + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, **dump_kwargs)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 # ─── NSIDC Polar Stereographic 파라미터 (공식) ─────────────────────
 TRUE_LAT = 70.0          # true scale latitude (degrees)
@@ -229,8 +249,7 @@ def save_json(data, month, output_dir="output"):
     os.makedirs(monthly_dir, exist_ok=True)
     fname = f"realIceData_month{month:02d}.json"
     out_path = os.path.join(monthly_dir, fname)
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False)
+    _atomic_write_json(out_path, data, ensure_ascii=False)
     size_mb = os.path.getsize(out_path) / (1024 * 1024)
     print(f"[저장] {out_path} ({size_mb:.1f} MB, {data['cell_count']} cells)")
     return out_path

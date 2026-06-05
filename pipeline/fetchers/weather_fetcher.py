@@ -20,13 +20,34 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import ssl
 import sys
+import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen, Request
+
+
+def _atomic_write_json(path, data, **dump_kwargs) -> None:
+    """임시파일로 쓴 뒤 os.replace로 원자적 교체 (디스크풀 시 기존 파일 보존)."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, **dump_kwargs)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 try:
     from copernicus_wave_fallback import fill_wave_heights as _cop_fill_waves
@@ -303,8 +324,7 @@ def _load_usage() -> dict:
 def _save_usage(usage: dict) -> None:
     """일일 API 호출 횟수 파일 저장."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    with open(USAGE_FILE, "w", encoding="utf-8") as f:
-        json.dump(usage, f)
+    _atomic_write_json(USAGE_FILE, usage)
 
 
 def _check_budget(needed: int) -> bool:
@@ -393,27 +413,42 @@ def fetch_marine_batch(waypoints: list[dict]) -> list[dict]:
     return results
 
 
-def fetch_forecast_batch(waypoints: list[dict]) -> list[tuple[float | None, float | None]]:
-    """Open-Meteo Forecast API에서 기온(°C)과 가시거리(km)를 배치 조회."""
+def fetch_forecast_batch(waypoints: list[dict]) -> list[dict]:
+    """Open-Meteo Forecast API에서 기온(°C)·가시거리(km)·바람(10m)을 배치 조회.
+
+    바람 파라미터는 같은 요청에 포함되므로 추가 API 호출/비용이 없다.
+    반환 각 원소: {temp_c, vis_km, wind_speed_ms, wind_dir_deg, wind_gust_ms}
+    """
     lats = ",".join(str(wp["lat"]) for wp in waypoints)
     lons = ",".join(str(wp["lon"]) for wp in waypoints)
-    url = f"{FORECAST_API}?latitude={lats}&longitude={lons}&current=temperature_2m,visibility&cell_selection=nearest"
+    url = (
+        f"{FORECAST_API}?latitude={lats}&longitude={lons}"
+        f"&current=temperature_2m,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
+        f"&wind_speed_unit=ms&cell_selection=nearest"
+    )
 
     data = _http_get(url)
     if isinstance(data, dict):
         data = [data]
 
-    results: list[tuple[float | None, float | None]] = []
+    results: list[dict] = []
     for entry in data:
         current = entry.get("current", {})
         temp_raw = current.get("temperature_2m")
         vis_raw = current.get("visibility")
+        ws_raw = current.get("wind_speed_10m")
+        wd_raw = current.get("wind_direction_10m")
+        wg_raw = current.get("wind_gusts_10m")
 
-        temp_c = round(float(temp_raw), 1) if temp_raw is not None else None
-        # Open-Meteo visibility: meters -> km
-        vis_km = round(float(vis_raw) / 1000.0, 2) if vis_raw is not None else None
-
-        results.append((temp_c, vis_km))
+        results.append({
+            "temp_c": round(float(temp_raw), 1) if temp_raw is not None else None,
+            # Open-Meteo visibility: meters -> km
+            "vis_km": round(float(vis_raw) / 1000.0, 2) if vis_raw is not None else None,
+            # wind_speed_unit=ms 로 요청 → 이미 m/s
+            "wind_speed_ms": round(float(ws_raw), 1) if ws_raw is not None else None,
+            "wind_dir_deg": round(float(wd_raw)) if wd_raw is not None else None,
+            "wind_gust_ms": round(float(wg_raw), 1) if wg_raw is not None else None,
+        })
 
     return results
 
@@ -428,7 +463,8 @@ def fetch_route_weather(route_key: str, waypoints: list[dict], dry_run: bool = F
         wp_results = [
             {"name": wp["name"], "lat": wp["lat"], "lon": wp["lon"],
              "wave_height_m": None, "wave_direction_deg": None, "wave_period_s": None,
-             "temperature_c": None, "visibility_km": None}
+             "temperature_c": None, "visibility_km": None,
+             "wind_speed_ms": None, "wind_direction_deg": None, "wind_gust_ms": None}
             for wp in waypoints
         ]
         return {"waypoints": wp_results, "route_summary": compute_route_summary(wp_results)}
@@ -442,21 +478,25 @@ def fetch_route_weather(route_key: str, waypoints: list[dict], dry_run: bool = F
             print(f"    [WARN] Marine API: {e}")
             wave_data.extend([{"height": None, "direction": None, "period": None}] * len(chunk))
 
-    # 배치 forecast API (청킹)
-    forecast_data: list[tuple[float | None, float | None]] = []
+    # 배치 forecast API (청킹) — 각 원소: dict(temp_c,vis_km,wind_speed_ms,wind_dir_deg,wind_gust_ms)
+    def _null_forecast() -> dict:
+        return {"temp_c": None, "vis_km": None,
+                "wind_speed_ms": None, "wind_dir_deg": None, "wind_gust_ms": None}
+
+    forecast_data: list[dict] = []
     for chunk in _chunked(waypoints, CHUNK_SIZE):
         try:
             forecast_data.extend(fetch_forecast_batch(chunk))
         except RuntimeError as e:
             print(f"    [WARN] Forecast API: {e}")
-            forecast_data.extend([(None, None)] * len(chunk))
+            forecast_data.extend([_null_forecast() for _ in chunk])
 
     # //! [Original Code] 배치 결과만으로 웨이포인트 결합 (null 다수 발생)
     # //* [Modified Code] null인 좌표를 개별 재시도 + 인접 보간으로 보완
     # ── Stage 1: null인 좌표만 개별 재시도 (Open-Meteo는 개별 호출 시 더 잘 응답) ──
     null_indices = [
-        i for i, (temp, vis) in enumerate(forecast_data)
-        if temp is None or vis is None
+        i for i, fc in enumerate(forecast_data)
+        if fc["temp_c"] is None or fc["vis_km"] is None
     ]
     if null_indices:
         print(f"    [RETRY] Forecast null at {len(null_indices)}/{len(forecast_data)} points, retrying individually...")
@@ -464,13 +504,14 @@ def fetch_route_weather(route_key: str, waypoints: list[dict], dry_run: bool = F
             wp = waypoints[idx]
             try:
                 retry_result = fetch_forecast_batch([wp])
-                if retry_result and retry_result[0] != (None, None):
-                    old_temp, old_vis = forecast_data[idx]
-                    new_temp, new_vis = retry_result[0]
-                    forecast_data[idx] = (
-                        new_temp if new_temp is not None else old_temp,
-                        new_vis if new_vis is not None else old_vis,
-                    )
+                if retry_result:
+                    # 새 값이 있으면 채우고, 없으면 기존 값 유지 (필드별 병합)
+                    new = retry_result[0]
+                    old = forecast_data[idx]
+                    forecast_data[idx] = {
+                        k: (new.get(k) if new.get(k) is not None else old.get(k))
+                        for k in old
+                    }
             except RuntimeError:
                 pass  # 개별 재시도 실패 → 보간으로 처리
             time.sleep(0.05)  # rate limit 방지
@@ -482,7 +523,7 @@ def fetch_route_weather(route_key: str, waypoints: list[dict], dry_run: bool = F
     wp_results = []
     for i, wp in enumerate(waypoints):
         wave = wave_data[i] if i < len(wave_data) else {"height": None, "direction": None, "period": None}
-        temp, vis = forecast_data[i] if i < len(forecast_data) else (None, None)
+        fc = forecast_data[i] if i < len(forecast_data) else {}
         wp_results.append({
             "name": wp["name"],
             "lat": wp["lat"],
@@ -490,8 +531,11 @@ def fetch_route_weather(route_key: str, waypoints: list[dict], dry_run: bool = F
             "wave_height_m": wave.get("height"),
             "wave_direction_deg": wave.get("direction"),
             "wave_period_s": wave.get("period"),
-            "temperature_c": temp,
-            "visibility_km": vis,
+            "temperature_c": fc.get("temp_c"),
+            "visibility_km": fc.get("vis_km"),
+            "wind_speed_ms": fc.get("wind_speed_ms"),
+            "wind_direction_deg": fc.get("wind_dir_deg"),
+            "wind_gust_ms": fc.get("wind_gust_ms"),
         })
 
     # Open-Meteo 소스 태깅 + Copernicus Arctic wave fallback
@@ -514,24 +558,21 @@ def fetch_route_weather(route_key: str, waypoints: list[dict], dry_run: bool = F
     return {"waypoints": wp_results, "route_summary": summary}
 
 
-def _interpolate_nulls(data: list[tuple[float | None, float | None]]) -> None:
+def _interpolate_nulls(data: list[dict]) -> None:
     """
-    forecast_data 리스트 내 null 값을 인접 유효값으로 선형 보간 (in-place).
-    양쪽 끝 null은 가장 가까운 유효값으로 채움.
+    forecast_data(dict 리스트) 내 null 값을 인접 유효값으로 선형 보간 (in-place).
+    양쪽 끝 null은 가장 가까운 유효값으로 채움. wind_dir_deg는 각도라 보간 시
+    경계(0/360) 왜곡이 생길 수 있어 풍속/풍향은 보간하지 않고 원값을 유지한다.
     """
     n = len(data)
     if n == 0:
         return
 
-    # 기온(temp) 보간
-    temps = [t for t, _ in data]
-    _fill_array(temps)
-    # 가시거리(vis) 보간
-    vises = [v for _, v in data]
-    _fill_array(vises)
-
-    for i in range(n):
-        data[i] = (temps[i], vises[i])
+    for key in ("temp_c", "vis_km"):
+        arr = [d.get(key) for d in data]
+        _fill_array(arr)
+        for i in range(n):
+            data[i][key] = arr[i]
 
 
 def _fill_array(arr: list[float | None]) -> None:
@@ -569,12 +610,16 @@ def compute_route_summary(waypoints: list[dict]) -> dict:
     temps = [w["temperature_c"] for w in waypoints if w["temperature_c"] is not None]
     visib = [w["visibility_km"] for w in waypoints if w["visibility_km"] is not None]
     ssts = [w["sst_c"] for w in waypoints if w.get("sst_c") is not None]
+    winds = [w["wind_speed_ms"] for w in waypoints if w.get("wind_speed_ms") is not None]
+    gusts = [w["wind_gust_ms"] for w in waypoints if w.get("wind_gust_ms") is not None]
 
     max_wave = round(max(waves), 2) if waves else None
     min_temp = round(min(temps), 1) if temps else None
     min_vis = round(min(visib), 2) if visib else None
     min_sst = round(min(ssts), 1) if ssts else None
     max_sst = round(max(ssts), 1) if ssts else None
+    max_wind = round(max(winds), 1) if winds else None
+    max_gust = round(max(gusts), 1) if gusts else None
 
     return {
         "max_wave_height_m": max_wave,
@@ -582,6 +627,8 @@ def compute_route_summary(waypoints: list[dict]) -> dict:
         "min_visibility_km": min_vis,
         "min_sst_c": min_sst,
         "max_sst_c": max_sst,
+        "max_wind_speed_ms": max_wind,
+        "max_wind_gust_ms": max_gust,
         "is_temp_below_minus_10": (min_temp < -10.0) if min_temp is not None else False,
     }
 
@@ -591,6 +638,8 @@ def compute_global_summary(routes: dict) -> dict:
     all_waves = []
     all_temps = []
     all_visib = []
+    all_winds = []
+    all_gusts = []
     for route_data in routes.values():
         s = route_data.get("route_summary", {})
         if s.get("max_wave_height_m") is not None:
@@ -599,15 +648,23 @@ def compute_global_summary(routes: dict) -> dict:
             all_temps.append(s["min_temperature_c"])
         if s.get("min_visibility_km") is not None:
             all_visib.append(s["min_visibility_km"])
+        if s.get("max_wind_speed_ms") is not None:
+            all_winds.append(s["max_wind_speed_ms"])
+        if s.get("max_wind_gust_ms") is not None:
+            all_gusts.append(s["max_wind_gust_ms"])
 
     max_wave = round(max(all_waves), 2) if all_waves else None
     min_temp = round(min(all_temps), 1) if all_temps else None
     min_vis = round(min(all_visib), 2) if all_visib else None
+    max_wind = round(max(all_winds), 1) if all_winds else None
+    max_gust = round(max(all_gusts), 1) if all_gusts else None
 
     return {
         "max_wave_height_m": max_wave,
         "min_temperature_c": min_temp,
         "min_visibility_km": min_vis,
+        "max_wind_speed_ms": max_wind,
+        "max_wind_gust_ms": max_gust,
         "is_temp_below_minus_10": (min_temp < -10.0) if min_temp is not None else False,
     }
 
@@ -669,8 +726,7 @@ def run(dry_run: bool = False) -> int:
 
     print(f"\n[3/3] Saving: {out_file}")
     if not dry_run:
-        with open(out_file, "w", encoding="utf-8") as f:
-            json.dump(output, f, ensure_ascii=False, indent=2)
+        _atomic_write_json(out_file, output, ensure_ascii=False, indent=2)
         print("  [OK] weather_latest.json saved")
     else:
         print("  (dry-run: file write skipped)")

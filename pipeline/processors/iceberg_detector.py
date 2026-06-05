@@ -21,12 +21,37 @@ realBergData_latest.json을 업데이트합니다.
 import argparse
 import json
 import logging
-from datetime import datetime
+import os
+import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 
 log = logging.getLogger("iceberg_detector")
+
+
+def _atomic_write_json(path: Path, data) -> None:
+    """같은 디렉터리에 임시파일로 쓴 뒤 os.replace로 원자적 교체.
+
+    쓰기 도중 중단/디스크풀이 발생해도 기존 파일은 잘리지 않는다.
+    (디스크풀 → *_latest.json truncation → JSONDecodeError 재발 방지)
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 PIPELINE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = PIPELINE_DIR.parent / "data"
@@ -400,21 +425,27 @@ def run_detection_pipeline(
     # 기존 데이터와 병합
     merged = postprocessor.merge_with_existing(all_new_bergs)
 
-    # 저장
-    with open(BERG_FILE, "w", encoding="utf-8") as f:
-        json.dump(merged, f, indent=2, ensure_ascii=False)
+    # 저장 — iceberg_fetcher.save_json과 동일한 envelope 포맷으로 감싼다.
+    # (bare 리스트로 쓰면 sync_db.loadBergs의 `d.bergs`가 undefined가 되어
+    #  berg DB 동기화가 조용히 0건이 됨)
+    berg_payload = {
+        "source": "sentinel1_sar + merged",
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "berg_count": len(merged),
+        "bergs": merged,
+    }
+    _atomic_write_json(BERG_FILE, berg_payload)
     log.info("realBergData_latest.json 업데이트: %d 빙산", len(merged))
 
     # SAR 전용 탐지 결과도 별도 저장
     sar_result = {
-        "detection_time": datetime.now().isoformat(),
+        "detection_time": datetime.now(timezone.utc).isoformat(),
         "products_processed": len(to_process),
         "total_detected": len(all_new_bergs),
         "confidence_threshold": confidence,
         "detections": all_new_bergs,
     }
-    with open(SAR_DETECTION_FILE, "w", encoding="utf-8") as f:
-        json.dump(sar_result, f, indent=2, ensure_ascii=False)
+    _atomic_write_json(SAR_DETECTION_FILE, sar_result)
     log.info("SAR 탐지 결과 저장: %s", SAR_DETECTION_FILE)
 
 

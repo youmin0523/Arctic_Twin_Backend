@@ -20,7 +20,27 @@ import os
 import re
 import shutil
 import sys
+import tempfile
 from datetime import datetime, timezone
+
+
+def _atomic_write_json(path, data, **dump_kwargs) -> None:
+    """임시파일로 쓴 뒤 os.replace로 원자적 교체 (디스크풀 시 기존 파일 보존)."""
+    d = os.path.dirname(os.path.abspath(path))
+    os.makedirs(d, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=d, prefix=os.path.basename(path) + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, **dump_kwargs)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 FILENAME = "realBergData_latest.json"
@@ -265,8 +285,7 @@ def save_json(data):
     """JSON 저장."""
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     out_path = os.path.join(OUTPUT_DIR, FILENAME)
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    _atomic_write_json(out_path, data, ensure_ascii=False, indent=2)
     size_kb = os.path.getsize(out_path) / 1024
     print(f"[saved] {out_path} ({size_kb:.0f} KB)")
 

@@ -29,9 +29,29 @@ import os
 import random
 import shutil
 import sys
+import tempfile
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
+
+
+def _atomic_write_json(path, data, **dump_kwargs) -> None:
+    """임시파일로 쓴 뒤 os.replace로 원자적 교체 (디스크풀 시 기존 파일 보존)."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, **dump_kwargs)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 # ─── 로깅 설정 ────────────────────────────────────────────────────
 LOG_DIR = Path(__file__).resolve().parent.parent.parent / "logs"
@@ -469,8 +489,7 @@ def save_catalog(catalog):
     catalog["updated_at"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     catalog["product_count"] = len(catalog["products"])
 
-    with open(CATALOG_FILE, "w", encoding="utf-8") as f:
-        json.dump(catalog, f, ensure_ascii=False, indent=2)
+    _atomic_write_json(CATALOG_FILE, catalog, ensure_ascii=False, indent=2)
 
     size_kb = CATALOG_FILE.stat().st_size / 1024
     log.info(

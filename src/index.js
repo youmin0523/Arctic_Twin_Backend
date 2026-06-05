@@ -28,7 +28,20 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 // 미들웨어
-app.use(cors());
+// CORS: 기본은 모두 허용(개발/현재 배포 호환). 운영에서 CORS_ALLOWED_ORIGINS
+// (콤마 구분, 예: "https://arctictwin.com,https://www.arctictwin.com")를 설정하면
+// 해당 오리진만 허용 — 와일드카드 CORS + 프록시 결합 위험을 운영에서 좁힌다.
+const corsAllowed = (process.env.CORS_ALLOWED_ORIGINS || '')
+  .split(',').map((s) => s.trim()).filter(Boolean);
+app.use(cors(corsAllowed.length ? {
+  origin(origin, cb) {
+    // Origin 없음(서버-서버/curl/동일출처)·허용목록 매칭 시 통과, 그 외엔 헤더 미부여(브라우저 차단)
+    cb(null, !origin || corsAllowed.includes(origin));
+  },
+} : undefined));
+if (corsAllowed.length) {
+  console.log('[Server] CORS 제한 활성:', corsAllowed.join(', '));
+}
 app.use(express.json({ limit: '4mb' })); // 편집 항로(다점) 저장 대비 한도 상향
 
 // API 문서 (Swagger UI) — /api-docs 에서 인터랙티브 명세 제공.
@@ -436,6 +449,16 @@ setTimeout(runSentinel1Fetcher, 150000);
 // 서버 시작 10초 후 기존 backend/data/*.json 으로 DB 1회 동기화 (부팅 직후 최신화)
 setTimeout(() => runMigrate('startup'), 10000);
 
+// 전역 에러 핸들러 — 모든 라우트/미들웨어 뒤에 등록. async 핸들러가 던진
+// 에러나 next(err) 를 여기서 받아 500 JSON 으로 통일 응답(스택 노출 없음).
+// 없으면 Express 기본 처리로 HTML 스택이 노출되거나 소켓이 매달릴 수 있음.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error('[Express] 처리되지 않은 라우트 에러:', err && err.stack ? err.stack : err);
+  if (res.headersSent) return next(err);
+  res.status(err.status || 500).json({ error: 'internal server error' });
+});
+
 app.listen(PORT, () => {
   console.log(`[Server] Arctic Digital Twin API running on http://localhost:${PORT}`);
   console.log(`[Scheduler] Sentinel-1: 01:00 UTC | Ice: 02:00 UTC | SAR: 03:00 UTC | Berg: 04:00 UTC | Weather: every 6h`);
@@ -459,3 +482,12 @@ function cleanupProcesses() {
 process.on('exit', cleanupProcesses);
 process.on('SIGINT', () => { cleanupProcesses(); process.exit(); });
 process.on('SIGTERM', () => { cleanupProcesses(); process.exit(); });
+
+// 처리되지 않은 비동기 에러로 프로세스가 조용히 죽는 것을 방지.
+// 로깅만 하고 살려둔다(자동 갱신 스케줄러·AI 자식 프로세스 유지가 가용성에 중요).
+process.on('unhandledRejection', (reason) => {
+  console.error('[Process] unhandledRejection:', reason && reason.stack ? reason.stack : reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[Process] uncaughtException:', err && err.stack ? err.stack : err);
+});

@@ -160,26 +160,58 @@ async function loadSimulations(c) {
   console.log(`✓ simulation_results: ${n}건`);
 }
 
+// 로더 1개를 독립 트랜잭션으로 실행. 한 파일이 손상(JSONDecode)되거나
+// 한 테이블 적재가 실패해도 해당 테이블만 롤백하고 나머지는 계속 진행한다.
+// (예전엔 전체가 단일 트랜잭션이라 파일 1개 truncation으로 모든 테이블이 롤백됐음)
+async function runLoader(c, name, fn) {
+  try {
+    await c.query('BEGIN');
+    await fn(c);
+    await c.query('COMMIT');
+    return true;
+  } catch (e) {
+    try { await c.query('ROLLBACK'); } catch (_) { /* 이미 abort된 트랜잭션 */ }
+    console.error(`❌ ${name} 동기화 실패 (이 테이블만 건너뜀):`, e.message);
+    return false;
+  }
+}
+
 // ---------- run ----------
 (async () => {
   const c = await pool.connect();
+  let failures = 0;
   try {
+    // 스키마는 필수 — 실패하면 이후 적재가 무의미하므로 전체 중단.
     await c.query('BEGIN');
     await runSchema(c);
-    await loadIcebergs(c);
-    await loadBergs(c);
-    await loadSar(c);
-    await loadSentinel1(c);
-    await loadWeather(c);
-    await loadSimulations(c);
     await c.query('COMMIT');
-    console.log('\n✅ DB 동기화 완료');
   } catch (e) {
-    await c.query('ROLLBACK');
-    console.error('\n❌ 실패 — 전체 롤백:', e.message);
-    process.exitCode = 1;
-  } finally {
+    try { await c.query('ROLLBACK'); } catch (_) { /* noop */ }
+    console.error('\n❌ 스키마 적용 실패 — 동기화 중단:', e.message);
     c.release();
     await pool.end();
+    process.exitCode = 1;
+    return;
+  }
+
+  for (const [name, fn] of [
+    ['icebergs', loadIcebergs],
+    ['bergs', loadBergs],
+    ['sar_detections', loadSar],
+    ['sentinel1_products', loadSentinel1],
+    ['weather', loadWeather],
+    ['simulation_results', loadSimulations],
+  ]) {
+    const ok = await runLoader(c, name, fn);
+    if (!ok) failures++;
+  }
+
+  c.release();
+  await pool.end();
+  if (failures > 0) {
+    console.error(`\n⚠️  DB 동기화 완료 (실패 ${failures}개 테이블 건너뜀)`);
+    process.exitCode = 1;
+  } else {
+    console.log('\n✅ DB 동기화 완료');
   }
 })();

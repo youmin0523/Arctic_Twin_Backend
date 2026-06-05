@@ -1,12 +1,42 @@
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
+const { URL } = require('url');
 const TRANSPARENT_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   'base64'
 );
 
+// SSRF 방지: 외부 타일 호스트 allowlist. caller 제공 url 은 이 도메인(서브도메인 포함)
+// + https/http 프로토콜일 때만 fetch 한다. 내부망(127.0.0.1, 169.254.x, 메타데이터 등)
+// 으로의 요청을 원천 차단. 프론트는 서버측에서 URL을 만드는 legacy 경로만 쓰므로 영향 없음.
+const ALLOWED_HOSTS = [
+  'gibs.earthdata.nasa.gov',
+  'nsidc.org',
+  'marine.copernicus.eu',
+  'dataspace.copernicus.eu',
+  'earthdata.nasa.gov',
+];
+
+function isAllowedTarget(targetUrl) {
+  try {
+    const u = new URL(targetUrl);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return false;
+    const host = u.hostname.toLowerCase();
+    return ALLOWED_HOSTS.some((d) => host === d || host.endsWith('.' + d));
+  } catch {
+    return false; // 파싱 불가 = 차단
+  }
+}
+
 async function proxyTile(targetUrl, res) {
+  if (!isAllowedTarget(targetUrl)) {
+    console.warn('[Proxy] 차단된 대상 URL:', String(targetUrl).slice(0, 120));
+    res.set('Content-Type', 'image/png');
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Cache-Control', 'no-cache, no-store');
+    return res.status(403).send(TRANSPARENT_PNG);
+  }
   try {
     const response = await fetch(targetUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0 DigitalTwin/1.0' },

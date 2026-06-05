@@ -22,8 +22,28 @@ import json
 import logging
 import os
 import sys
+import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
+
+
+def _atomic_write_json(path, data, **dump_kwargs) -> None:
+    """임시파일로 쓴 뒤 os.replace로 원자적 교체 (디스크풀 시 기존 파일 보존)."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, **dump_kwargs)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 # ─── 로깅 설정 ────────────────────────────────────────────────────
 LOG_DIR = Path(__file__).resolve().parent.parent.parent / "logs"
@@ -226,16 +246,14 @@ def save_json(data, output_dir=OUTPUT_DIR, archive_dir=ARCHIVE_DIR):
 
     # latest (항상 덮어씀)
     latest_path = os.path.join(output_dir, "realIceData_latest.json")
-    with open(latest_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False)
+    _atomic_write_json(latest_path, data, ensure_ascii=False)
     size_kb = os.path.getsize(latest_path) / 1024
     log.info(f"Saved: {latest_path} ({size_kb:.0f} KB, {data['cell_count']} cells)")
 
     # 날짜별 아카이브 (기존 파일 보존)
     archive_path = os.path.join(archive_dir, f"realIceData_{date_str}.json")
     if not os.path.exists(archive_path):
-        with open(archive_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False)
+        _atomic_write_json(archive_path, data, ensure_ascii=False)
         log.info(f"Archived: {archive_path}")
     else:
         log.info(f"Archive already exists, skipping: {archive_path}")

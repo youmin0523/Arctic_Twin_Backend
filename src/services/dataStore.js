@@ -89,22 +89,29 @@ async function getIcebergData() {
           WHERE lat >= 0
           ORDER BY id`
       );
-      // 원본 파일 구조 복원: { source, date, berg_count, bergs:[{id,lat,lon,length_m,width_m,type,last_update}] }
-      const bergs = rows.map((r) => ({
-        id: r.id,
-        lat: r.lat,
-        lon: r.lon,
-        length_m: r.length_m,
-        width_m: r.width_m,
-        type: r.type,
-        last_update: r.last_update,
-      }));
-      data = {
-        source: rows[0]?.data_source ?? null,
-        date: rows[0]?.data_date ?? null,
-        berg_count: bergs.length,
-        bergs,
-      };
+      // DB 테이블이 비어 있으면(migrate 미완/실패 직후) JSON 파일로 폴백한다.
+      // 빈 결과를 그대로 캐시하면 아직 유효한 파일 데이터 대신 빈 목록이 노출됨.
+      if (rows.length === 0) {
+        console.warn('[DataStore] bergs DB 비어 있음 → 파일 폴백');
+        data = null;
+      } else {
+        // 원본 파일 구조 복원: { source, date, berg_count, bergs:[{id,lat,lon,length_m,width_m,type,last_update}] }
+        const bergs = rows.map((r) => ({
+          id: r.id,
+          lat: r.lat,
+          lon: r.lon,
+          length_m: r.length_m,
+          width_m: r.width_m,
+          type: r.type,
+          last_update: r.last_update,
+        }));
+        data = {
+          source: rows[0]?.data_source ?? null,
+          date: rows[0]?.data_date ?? null,
+          berg_count: bergs.length,
+          bergs,
+        };
+      }
     } catch (err) {
       console.warn('[DataStore] bergs DB 조회 실패 → 파일 폴백:', err.message);
       data = null;
@@ -141,14 +148,19 @@ async function getCopernicusIcebergData() {
       const { rows: meta } = await query(
         `SELECT count(*)::int AS count, max(imported_at) AS updated_at FROM icebergs`
       );
-      // 원본 파일 구조 복원: { count, updated_at, icebergs:[{id,lat,lon,source,period}] }
-      const data = {
-        count: meta[0]?.count ?? rows.length,
-        updated_at: meta[0]?.updated_at ? new Date(meta[0].updated_at).toISOString() : null,
-        icebergs: rows,
-      };
-      setCache('copernicus_icebergs_db', data);
-      return data;
+      // DB가 비어 있으면 파일 폴백으로 떨어뜨린다 (빈 목록 캐시 방지).
+      if (rows.length === 0) {
+        console.warn('[DataStore] icebergs DB 비어 있음 → 파일 폴백');
+      } else {
+        // 원본 파일 구조 복원: { count, updated_at, icebergs:[{id,lat,lon,source,period}] }
+        const data = {
+          count: meta[0]?.count ?? rows.length,
+          updated_at: meta[0]?.updated_at ? new Date(meta[0].updated_at).toISOString() : null,
+          icebergs: rows,
+        };
+        setCache('copernicus_icebergs_db', data);
+        return data;
+      }
     } catch (err) {
       console.warn('[DataStore] icebergs DB 조회 실패 → 파일 폴백:', err.message);
     }

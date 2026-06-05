@@ -18,14 +18,17 @@ router.get('/latest', async (req, res) => {
     }));
 
     // Copernicus SAR 빙산
+    // 주의: Copernicus 소스는 빙산 치수를 제공하지 않는다. length/width 는
+    // 렌더링용 대표값(추정)이며 실측이 아니다 → size_estimated 플래그로 명시.
     const copBergs = (copData?.icebergs || []).map(b => ({
       id: b.id,
       lat: b.lat,
       lon: b.lon,
       source: b.source || 'Copernicus SAR',
       period: b.period || '',
-      length_m: 3000,
-      width_m: 1500,
+      length_m: b.length_m ?? 3000,
+      width_m: b.width_m ?? 1500,
+      size_estimated: b.length_m == null,
     }));
 
     const allBergs = [...nicBergs, ...copBergs];
