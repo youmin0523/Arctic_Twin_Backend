@@ -1,7 +1,13 @@
-"""36개 voyage trace(NSR × 12개월 × Arc4/Arc7/Arc9) 재생성.
+"""voyage trace 재생성 — 북극 3개 항로 × 12개월 × Arc4/Arc7/Arc9 = 108개.
 
 backend/data/simulations 와 frontend/public/simulations 양쪽에 동일 출력.
-naming: nsr_month{mm}_{cls}.json, ship_id=ship-nsr-{Cls}-m{mm}
+naming: {route}_month{mm}_{cls}.json, ship_id=ship-{route}-{Cls}-m{mm}
+  NSR → 아라온(ib-araon)      @ Wrangel 연안
+  NWP → CCGS(ib-ccgs)        @ Resolute Passage
+  TSR → 원자력(ib-rosatom)    @ Longyearbyen
+각 항로의 함대/모항은 models.py FLEET_BY_ROUTE 가 route_name 으로 자동 선택.
+
+특정 항로만 재생성하려면 인자 전달: python regenerate_voyage_traces.py NWP TSR
 """
 import shutil
 import sys
@@ -16,38 +22,47 @@ from pipeline.icebreaker.simulate_voyage import simulate_voyage  # noqa: E402
 BACKEND_OUT = _REPO / "backend" / "data" / "simulations"
 FRONTEND_OUT = _REPO / "frontend" / "public" / "simulations"
 CLASSES = ["Arc4", "Arc7", "Arc9"]
+ALL_ROUTES = ["NSR", "NWP", "TSR"]
+
+# CLI 인자로 항로 부분 재생성 가능 (예: ... NWP TSR). 미지정 시 전체.
+_args = [a.upper() for a in sys.argv[1:]]
+ROUTES = [r for r in ALL_ROUTES if r in _args] or ALL_ROUTES
 
 BACKEND_OUT.mkdir(parents=True, exist_ok=True)
 FRONTEND_OUT.mkdir(parents=True, exist_ok=True)
 
 summary_rows = []
-for month in range(1, 13):
-    for cls in CLASSES:
-        mm = f"{month:02d}"
-        fname = f"nsr_month{mm}_{cls.lower()}.json"
-        out = BACKEND_OUT / fname
-        trace = simulate_voyage(
-            route_name="NSR",
-            ship_id=f"ship-nsr-{cls}-m{mm}",
-            ship_ice_class=cls,
-            ship_speed_knots=15.0,
-            month=month,
-            dt_hours=1.0,
-            output_path=out,
-            verbose=False,
-        )
-        shutil.copyfile(out, FRONTEND_OUT / fname)
-        s = trace["summary"]
-        summary_rows.append(
-            (fname, s["icebreaker_calls"], s["intercept_failed"],
-             round(s["total_escort_distance_km"], 0), s["max_rio_violation"])
-        )
+for route in ROUTES:
+    rlow = route.lower()
+    for month in range(1, 13):
+        for cls in CLASSES:
+            mm = f"{month:02d}"
+            fname = f"{rlow}_month{mm}_{cls.lower()}.json"
+            out = BACKEND_OUT / fname
+            trace = simulate_voyage(
+                route_name=route,
+                ship_id=f"ship-{rlow}-{cls}-m{mm}",
+                ship_ice_class=cls,
+                ship_speed_knots=15.0,
+                month=month,
+                dt_hours=1.0,
+                output_path=out,
+                verbose=False,
+            )
+            shutil.copyfile(out, FRONTEND_OUT / fname)
+            s = trace["summary"]
+            summary_rows.append(
+                (fname, s["icebreaker_calls"], s["intercept_failed"],
+                 round(s["total_escort_distance_km"], 0), s["max_rio_violation"])
+            )
 
 print(f"{'file':28s} {'calls':>5s} {'fail':>4s} {'esc_km':>8s} {'max_rio':>8s}")
 for r in summary_rows:
     print(f"{r[0]:28s} {r[1]:5d} {r[2]:4d} {r[3]:8.0f} {r[4]:8.2f}")
 
+n = len(summary_rows)
 total_with_calls = sum(1 for r in summary_rows if r[1] > 0)
 total_with_escort = sum(1 for r in summary_rows if r[3] > 0)
-print(f"\nfiles with calls>0: {total_with_calls}/36, "
-      f"files with successful escort_km>0: {total_with_escort}/36")
+print(f"\nroutes={ROUTES} files={n}")
+print(f"files with calls>0: {total_with_calls}/{n}, "
+      f"files with successful escort_km>0: {total_with_escort}/{n}")

@@ -66,6 +66,32 @@ class RLInferRequest(BaseModel):
     icebergs: List[dict]    # [{lat, lon, length_m}, ...]
     ice_data: dict          # {concentration: float}
     weather: dict           # {visibility_km, wave_height_m}
+    route: str = "NSR"      # 활성 항로(NSR/NWP/TSR) — 항로별 학습 모델 선택용
+
+
+# ── 항로별 추론 트레이너 캐시 ──────────────────────────────
+# 추론은 항로별 전용 학습 모델({route}_normal)을 사용한다. 기본 rl_trainer 는
+# NSR_normal 이므로 NSR 은 그대로 재사용하고, NWP/TSR 는 지연 로드 후 캐시한다.
+# 모델 로드 실패 시 NSR 기본 트레이너로 폴백(추론 중단 방지).
+_VOYAGE_ROUTES = ("NSR", "NWP", "TSR")
+_route_trainers: dict[str, RLTrainer] = {}
+
+
+def _trainer_for_route(route: str) -> RLTrainer:
+    rk = route if route in _VOYAGE_ROUTES else "NSR"
+    if rk == "NSR":
+        return rl_trainer
+    cached = _route_trainers.get(rk)
+    if cached is not None:
+        return cached
+    t = RLTrainer(model_key=f"{rk}_normal", fixed_route=rk)
+    if not t.agent.load():
+        logger.warning(f"[RL] {rk}_normal 모델 로드 실패 — NSR 기본 모델로 폴백")
+        _route_trainers[rk] = rl_trainer
+    else:
+        logger.info(f"[RL] 항로별 추론 모델 로드: {rk}_normal")
+        _route_trainers[rk] = t
+    return _route_trainers[rk]
 
 
 class RLTrainRequest(BaseModel):
@@ -105,9 +131,11 @@ async def health():
 
 @app.post("/api/rl/infer")
 async def rl_infer(req: RLInferRequest):
-    """RL 실시간 추론 — 선박 상태와 빙산 정보를 받아 회피 행동 반환"""
+    """RL 실시간 추론 — 선박 상태와 빙산 정보를 받아 회피 행동 반환.
+    req.route 로 항로별 학습 모델(NSR/NWP/TSR_normal)을 선택한다."""
     try:
-        result = rl_trainer.infer(
+        trainer = _trainer_for_route(req.route)
+        result = trainer.infer(
             ship_state=req.ship_state,
             icebergs=req.icebergs,
             ice_data=req.ice_data,

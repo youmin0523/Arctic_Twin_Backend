@@ -94,7 +94,10 @@ INITIAL_ICEBREAKERS: list[Icebreaker] = [
     {
         "id": "ib-araon",
         "name_ko": "아라온",
-        "position": {"lat": 71.0, "lon": 179.5},  # Wrangel Island 북안
+        # //* [Modified] Wrangel 북방 '연안' 거점으로 재배치 (71.0 → 71.7).
+        #   프론트 ESCORT_ASSETS.NSR.home 과 일치시켜 trace/Live 아라온이
+        #   서로 다른 좌표(71.0 vs 71.7)에 2척으로 보이던 중복 제거.
+        "position": {"lat": 71.7, "lon": 179.5},  # Wrangel 북방 연안
         "home_port": "Wrangel Is. (사전배치)",
         "status": "idle",
         "speed_knots": 16.0,
@@ -103,3 +106,52 @@ INITIAL_ICEBREAKERS: list[Icebreaker] = [
         "escorting_ship_id": None,
     },
 ]
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 항로별 호위 함대 (Route-aware fleet)
+#
+# 각 북극항로는 관할·지리가 달라 호위 자산과 사전배치 모항이 다르다. 프론트엔드
+# useAraonControl.js 의 ESCORT_ASSETS 와 좌표·자산을 일치시킨다(단일 진실원).
+#   NSR → 아라온(KOPRI)        @ Wrangel 북방 연안 (71.7N, 179.5E)
+#   NWP → CCGS 쇄빙선(캐 해경)  @ Resolute Passage (74.55N, -94.9W)
+#   TSR → 원자력 쇄빙선(Rosatom) @ Isfjorden/Longyearbyen (78.28N, 15.2E)
+#
+# 모항은 각 항로가 실제로 ~400km 내로 근접 통과하는 실재 위치여야 호위가 발동된다
+# (dispatcher 의 사전배치 거점 근접 판정). 재생성 후 summary 의 calls>0 로 확인.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FLEET_BY_ROUTE: dict[str, list[Icebreaker]] = {
+    "NSR": INITIAL_ICEBREAKERS,
+    "NWP": [
+        {
+            "id": "ib-ccgs",
+            "name_ko": "CCGS 쇄빙선",
+            "position": {"lat": 74.55, "lon": -94.9},  # Resolute Passage
+            "home_port": "Resolute Passage (사전배치)",
+            "status": "idle",
+            "speed_knots": 15.0,
+            "ice_class": "Arc7",   # CCGS Louis S. St-Laurent 급 ≈ Arc7
+            "breakable_thickness_m": 1.2,
+            "escorting_ship_id": None,
+        },
+    ],
+    "TSR": [
+        {
+            "id": "ib-rosatom",
+            "name_ko": "원자력 쇄빙선",
+            "position": {"lat": 78.28, "lon": 15.2},  # Isfjorden(Longyearbyen)
+            "home_port": "Isfjorden/Longyearbyen (사전배치)",
+            "status": "idle",
+            "speed_knots": 18.0,
+            "ice_class": "Arc9",   # Rosatomflot Arktika 급 원자력 ≈ Arc9
+            "breakable_thickness_m": 2.5,
+            "escorting_ship_id": None,
+        },
+    ],
+}
+
+
+def fleet_for_route(route_name: str) -> list[Icebreaker]:
+    """항로 키에 대응하는 초기 함대 반환. 미등록 항로는 NSR(아라온) 폴백."""
+    return FLEET_BY_ROUTE.get(route_name, INITIAL_ICEBREAKERS)
