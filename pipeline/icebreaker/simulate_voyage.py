@@ -198,29 +198,36 @@ def _print_events(
 
 def _apply_land_avoidance(
     route: list[Position], verbose: bool
-) -> list[Position]:
+) -> tuple[list[Position], list[Position]]:
     """정적 경로를 전역 육지 마스크로 정합(섬·반도 관통 제거).
 
-    마스크 자산이 없으면(CI/배포 환경) 경고 후 원본 경로 사용 — 회피는
-    선택적 개선이며 시뮬 자체는 원본으로도 동작.
+    Returns (refined, display):
+      - refined : 본선 진행용 고밀도 정합 경로(육지 비교차)
+      - display : 육지 안전성을 유지한 채 정점을 최소화한 표시용 경로
+    마스크 자산이 없으면(CI/배포 환경) 경고 후 원본 경로를 그대로 사용.
     """
     try:
-        from pipeline.icebreaker.land_mask import LandMask, refine_route
+        from pipeline.icebreaker.land_mask import (
+            LandMask,
+            refine_route,
+            simplify_route,
+        )
     except Exception as e:  # noqa: BLE001
         if verbose:
             print(f"[LAND]    육지 마스크 모듈 로드 불가 — 원본 경로 사용 ({e})")
-        return route
+        return route, route
     try:
         mask = LandMask.load()
     except Exception as e:  # noqa: BLE001 — 마스크 파일 없음 등
         if verbose:
             print(f"[LAND]    육지 마스크 자산 없음 — 원본 경로 사용 ({e})")
-        return route
+        return route, route
     refined = refine_route(route, mask)
+    display = simplify_route(refined, mask)
     if verbose:
         print(f"[LAND]    경로 정합: {len(route)} -> {len(refined)} waypoints "
-              f"(육지 회피)")
-    return refined
+              f"(육지 회피), 표시용 {len(display)} waypoints")
+    return refined, display
 
 
 def simulate_voyage(
@@ -244,8 +251,9 @@ def simulate_voyage(
     if route_name not in routes:
         raise ValueError(f"Unknown route: {route_name}")
     route = routes[route_name]
+    display_route = route  # 표시용(육지 안전 단순화) — 기본은 원본
     if avoid_land:
-        route = _apply_land_avoidance(route, verbose)
+        route, display_route = _apply_land_avoidance(route, verbose)
 
     field = IceField.from_month(month)
     pc_class = arc_to_pc(ship_ice_class)
@@ -397,6 +405,13 @@ def simulate_voyage(
         },
         "ticks": ticks_out,
         "summary": summary,
+        # 육지 회피로 정합된 본선 항로 웨이포인트(표시용 단순화본). 프론트 Voyage
+        # 모드가 이 경로를 표시선으로 그려, 화면의 항로선과 재생되는 본선 경로를
+        # 일치시킨다. 본선 진행은 고밀도 refined route를 따르고, 단순화본은 같은
+        # 경로 위 정점만 남긴 것이라 시각적으로 동일하다.
+        "route_waypoints": [
+            {"lat": p["lat"], "lon": p["lon"]} for p in display_route
+        ],
     }
 
     if output_path is not None:

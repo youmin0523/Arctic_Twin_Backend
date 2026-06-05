@@ -274,6 +274,27 @@ class LandMask:
         ]
 
 
+def simplify_route(
+    route: list[Position], mask: LandMask, margin: int = 1
+) -> list[Position]:
+    """육지 안전성을 유지하며 경로 정점을 최소화(표시·저장용).
+
+    line-of-sight 병합: 앵커→i 직선이 육지에 margin 셀 이내로 접근하지 않는 한
+    중간 점을 생략한다. 직선 개빙수역 구간은 양끝으로 병합되고, 섬·반도·해협
+    우회에 필요한 정점만 남아 화면 항로선이 본선 경로와 일치하면서도 가볍다.
+    """
+    if len(route) <= 2:
+        return list(route)
+    out: list[Position] = [route[0]]
+    anchor = 0
+    for i in range(2, len(route)):
+        if mask.segment_crosses_land(route[anchor], route[i], margin=margin):
+            out.append(route[i - 1])
+            anchor = i - 1
+    out.append(route[-1])
+    return out
+
+
 def refine_route(route: list[Position], mask: LandMask) -> list[Position]:
     """경로의 각 인접 구간이 육지를 가로지르면 해상 우회 경유점을 삽입.
 
