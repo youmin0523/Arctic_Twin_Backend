@@ -71,21 +71,34 @@ curl http://localhost:8000/api/health/services # rl/report/ml 준비 상태
 - Vercel rewrite 대상: `http://<EC2-퍼블릭-IP>:8000`
 - 단점: 평문 HTTP, IP 고정 위해 **Elastic IP** 할당 권장.
 
-### (B) 권장 — 도메인 + HTTPS (nginx 또는 Caddy)
-1. Elastic IP 할당 → 도메인 A 레코드 연결 (예: `api.arctictwin.com`).
-2. 보안그룹 `80`, `443` 허용 (8000 은 닫고 localhost 만).
-3. compose 의 포트를 `"127.0.0.1:8000:8000"` 으로 좁힌 뒤 리버스 프록시:
+### (B) 권장 — 도메인 + HTTPS (Caddy 자동 인증서) ★현재 기본값
 
+> `arctictwin.com`(apex)은 **프론트엔드(Vercel)** 가 자동 HTTPS 로 서빙한다.
+> 백엔드는 **별도 서브도메인 `api.arctictwin.com`** 이며, 이쪽 HTTPS 를 Caddy 가 담당한다.
+> (헷갈림 주의: `https://arctictwin.com` 접속됨 = 프론트 HTTPS. 백엔드는 `api.` 서브도메인이 따로 필요)
+
+**1. DNS** — `api.arctictwin.com` **A 레코드 → EC2 Elastic IP** 연결 (도메인 관리처에서).
+   Elastic IP 를 먼저 할당해 인스턴스에 붙여 IP 를 고정한다.
+
+**2. 보안그룹** — `80/tcp`, `443/tcp` 인바운드 허용 (80 은 ACME 챌린지+리다이렉트용). `8000` 은 닫는다.
+   `docker-compose.yml` 포트는 이미 `"127.0.0.1:8000:8000"`(loopback) 으로 좁혀져 있어 8000 은 외부 비노출.
+
+**3. Caddy 설치** — 부트스트랩(`ec2-setup.sh`)이 자동 실행한다. 기존 인스턴스엔 1회 수동:
 ```bash
-# Caddy 예시 (자동 HTTPS) — /etc/caddy/Caddyfile
-api.arctictwin.com {
-    reverse_proxy 127.0.0.1:8000
-}
+cd ~/Arctic_Twin_Backend && sudo bash deploy/setup-caddy.sh
+# 설정은 deploy/Caddyfile (api.arctictwin.com → 127.0.0.1:8000, 자동 HTTPS)
+# 다른 도메인이면:  sudo DOMAIN=api.example.com bash deploy/setup-caddy.sh
 ```
-- Vercel rewrite 대상: `https://api.arctictwin.com`
+
+**4. 확인**
+```bash
+curl -fsS https://api.arctictwin.com/api/health     # 200 이면 HTTPS OK
+sudo journalctl -u caddy -n 50 --no-pager           # 인증서 발급 로그
+```
+- Vercel rewrite 대상: `https://api.arctictwin.com` (frontend/vercel.json — 이미 설정됨, 수정 불필요)
 
 > 프론트(Vercel)는 브라우저→Vercel 구간이 HTTPS 이고 Vercel→백엔드는 서버사이드
-> 프록시라 (A)의 평문 HTTP 도 mixed-content 없이 동작한다. 다만 운영은 (B) 권장.
+> 프록시라 (A)의 평문 HTTP 도 mixed-content 없이 동작한다. 다만 운영은 (B) 권장(현재 기본).
 
 ---
 
@@ -109,9 +122,10 @@ sudo docker compose down              # 정지
 
 ## 5. 프론트엔드 연결
 
-백엔드 주소가 정해지면 **frontend 레포의 `vercel.json`** 에서 호스트 토큰
-`https://CHANGE-ME-AWS-BACKEND-HOST` 를 위 (A)/(B) 주소로 찾아바꾸기 하면 끝.
-(프론트는 모든 호출을 상대경로로 하고 Vercel rewrite 가 이 백엔드로 넘긴다.)
+**frontend 레포의 `vercel.json`** 은 이미 `https://api.arctictwin.com` 으로 설정돼 있다((B) 기준).
+프론트는 모든 호출을 상대경로로 하고 Vercel rewrite 가 이 백엔드로 넘긴다.
+- (B) 도메인+HTTPS 사용 시: **수정 불필요**.
+- (A) 빠른 테스트(평문 IP)면: `https://api.arctictwin.com` → `http://<EC2-퍼블릭-IP>:8000` 으로 11곳 찾아바꾸기.
 
 ---
 

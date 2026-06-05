@@ -10,7 +10,9 @@ services:
     container_name: arctic-twin-backend
     restart: unless-stopped
     ports:
-      - "8000:8000"            # Vercel rewrite 대상 / nginx·ALB 가 앞단이면 127.0.0.1:8000 으로 좁혀도 됨
+      # Caddy(호스트, :443)가 앞단에서 HTTPS 종단 후 이 포트로 프록시하므로 loopback 으로 제한.
+      # (8000 을 외부에 직접 노출하려면 "8000:8000" 으로 되돌리고 보안그룹 8000 허용 — deploy/DEPLOY.md (A))
+      - "127.0.0.1:8000:8000"  # Caddy reverse_proxy 대상 (deploy/Caddyfile)
     env_file:
       - .env                   # OPENAI_API_KEY(What-If), COPERNICUS_*, CDSE_*, DATABASE_URL 등
     environment:

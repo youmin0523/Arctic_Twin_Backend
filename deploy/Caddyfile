@@ -1,0 +1,34 @@
+# ============================================================
+# Arctic Digital Twin — 백엔드 리버스 프록시 (자동 HTTPS)
+# ------------------------------------------------------------
+# Caddy 가 api.arctictwin.com 의 TLS 인증서를 Let's Encrypt 로
+# 자동 발급·갱신하고, 평문 백엔드 컨테이너(127.0.0.1:8000)로 프록시한다.
+#
+#   브라우저 ──HTTPS──> Vercel ──HTTPS──> Caddy(:443) ──HTTP──> backend(:8000)
+#
+# 배포: deploy/setup-caddy.sh 가 이 파일을 /etc/caddy/Caddyfile 로 복사 후 reload.
+# 전제: DNS A 레코드  api.arctictwin.com → EC2 Elastic IP,
+#       보안그룹 80/443 인바운드 허용(80 은 ACME 챌린지+리다이렉트용).
+# ============================================================
+
+api.arctictwin.com {
+	# 평문 백엔드(Node 게이트웨이)로 프록시.
+	# report 생성 등 장시간 응답(최대 ~120s)을 끊지 않도록 응답 타임아웃을 넉넉히.
+	reverse_proxy 127.0.0.1:8000 {
+		transport http {
+			read_timeout 180s
+			write_timeout 180s
+		}
+	}
+
+	# 편집 항로(다점) 저장 등 대용량 본문 대비 (Node 는 4mb 한도)
+	request_body {
+		max_size 8MB
+	}
+
+	# 액세스 로그 (운영 디버깅용)
+	log {
+		output file /var/log/caddy/api.arctictwin.com.log
+		format console
+	}
+}

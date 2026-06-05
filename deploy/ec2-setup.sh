@@ -13,7 +13,9 @@
 #   (여유 원하면 t3.large 8GB, 학습까지 돌리면 t3.xlarge 16GB.)
 #   디스크: gp3 40GB 권장 (torch 이미지 압축해제 + 모델 591MB + swap 6GB + 빌드 캐시).
 #          25GB 는 빌드 중 'no space left on device' 로 실패함.
-#   보안그룹: 8000/tcp 인바운드 허용 (또는 80/443 → nginx 프록시).
+#   보안그룹: 80/443 인바운드 허용 (Caddy 자동 HTTPS). 빠른 테스트만 할 거면 8000/tcp.
+#   HTTPS: SETUP_CADDY=1(기본) 이면 deploy/setup-caddy.sh 로 Caddy 설치+인증서 자동 발급.
+#          전제 — DNS A 레코드 api.arctictwin.com → 이 인스턴스 Elastic IP (미리 연결).
 #   비용팁: 데모용이면 안 쓸 때 인스턴스 stop → EC2 요금 0 (EBS만 과금).
 # ============================================================
 set -euo pipefail
@@ -60,11 +62,22 @@ if [ ! -f .env ]; then
   exit 0
 fi
 
-echo "==> [5/5] 빌드 + 기동"
+echo "==> [5/6] 빌드 + 기동"
 sudo docker compose up -d --build
+
+echo "==> [6/6] Caddy 자동 HTTPS (SETUP_CADDY=${SETUP_CADDY:-1})"
+# DNS(api.arctictwin.com → 이 IP)가 아직 안 붙었어도 Caddy 는 백그라운드로 ACME 를
+# 계속 재시도하므로 설치만 해두면 된다. 인증서 실패가 부트스트랩을 막지 않도록 || true.
+if [ "${SETUP_CADDY:-1}" = "1" ]; then
+  sudo DOMAIN="${CADDY_DOMAIN:-api.arctictwin.com}" bash deploy/setup-caddy.sh || \
+    echo "    ⚠ Caddy 설치/인증서 미완 — DNS·보안그룹(80/443) 확인 후: sudo bash deploy/setup-caddy.sh"
+else
+  echo "    건너뜀 (SETUP_CADDY=0). 평문 8000 노출이면 docker-compose 포트를 '8000:8000' 으로 되돌리세요."
+fi
 
 echo ""
 echo "==> 완료. 상태 확인:"
 echo "    sudo docker compose ps"
 echo "    sudo docker compose logs -f backend"
-echo "    curl http://localhost:8000/api/health"
+echo "    curl http://localhost:8000/api/health           # 로컬 평문"
+echo "    curl https://api.arctictwin.com/api/health       # HTTPS (Caddy)"
