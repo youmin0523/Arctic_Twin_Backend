@@ -25,6 +25,7 @@ PDF 8개 섹션:
 
 import io
 import logging
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -76,10 +77,21 @@ FONT_SEARCH_PATHS = [
 ]
 
 _KO_FONT_NAME = "NanumGothic"
+_KO_FONT_BOLD = "NanumGothic-Bold"
+# 실제 bold 폰트(있으면) — <b> 태그가 시각적으로 굵게 렌더링되도록 등록한다.
+# 없으면 regular 로 폴백(색상 강조로 보완).
+BOLD_FONT_SEARCH_PATHS = [
+    Path(__file__).resolve().parents[1] / "assets" / "fonts" / "NanumGothicBold.ttf",
+    Path("C:/Windows/Fonts/malgunbd.ttf"),
+    Path("C:/Windows/Fonts/NanumGothicBold.ttf"),
+    Path("/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf"),
+    Path("/usr/share/fonts/nanum/NanumGothicBold.ttf"),
+]
 # 실제로 사용 가능(등록 완료)한 폰트 이름. 한글 폰트를 못 찾으면 Helvetica로 폴백된다.
 # Helvetica는 ReportLab 내장 폰트라 bold/italic 패밀리 매핑이 기본 제공되므로
 # <para>/<b>/<i> 태그에서도 "Can't determine family" 에러가 나지 않는다.
 KOREAN_FONT = "Helvetica"
+KOREAN_FONT_BOLD = "Helvetica-Bold"
 _ko_font_registered = False
 
 
@@ -115,7 +127,7 @@ def _apply_mpl_theme():
 
 def _register_korean_font():
     """한글 폰트를 등록하고 실제 사용 가능한 폰트 이름을 반환한다."""
-    global _ko_font_registered, KOREAN_FONT
+    global _ko_font_registered, KOREAN_FONT, KOREAN_FONT_BOLD
     if _ko_font_registered:
         return KOREAN_FONT
     _ko_font_registered = True  # 성공/실패와 무관하게 한 번만 시도
@@ -124,15 +136,27 @@ def _register_korean_font():
         if fpath.exists():
             try:
                 pdfmetrics.registerFont(TTFont(_KO_FONT_NAME, str(fpath)))
-                # bold/italic 변형 매핑 (단일 TTF 라 같은 폰트로 폴백)
+                # 실제 bold 폰트가 있으면 등록 → <b> 태그가 시각적으로 굵어진다.
+                bold_name = _KO_FONT_NAME
+                for bpath in BOLD_FONT_SEARCH_PATHS:
+                    if bpath.exists():
+                        try:
+                            pdfmetrics.registerFont(TTFont(_KO_FONT_BOLD, str(bpath)))
+                            bold_name = _KO_FONT_BOLD
+                            logger.info("한국어 bold 폰트 등록: %s", bpath)
+                            break
+                        except Exception as be:
+                            logger.warning("bold 폰트 등록 실패 (%s): %s", bpath, be)
+                KOREAN_FONT_BOLD = bold_name
+                # bold/italic 변형 매핑. bold 는 실제 bold 폰트(없으면 regular 폴백).
                 # 이게 없으면 <para>·<b>·<i> 태그 사용 시
                 #   "Can't determine family/bold/italic for nanumgothic" 에러 발생.
                 pdfmetrics.registerFontFamily(
                     _KO_FONT_NAME,
                     normal=_KO_FONT_NAME,
-                    bold=_KO_FONT_NAME,
+                    bold=bold_name,
                     italic=_KO_FONT_NAME,
-                    boldItalic=_KO_FONT_NAME,
+                    boldItalic=bold_name,
                 )
                 # Matplotlib에도 등록
                 fm.fontManager.addfont(str(fpath))
@@ -173,6 +197,11 @@ def _get_styles():
     styles.add(ParagraphStyle(
         "KoBody", fontName=font, fontSize=10, leading=15,
         spaceAfter=6, textColor=colors.HexColor(TEXT)
+    ))
+    # AI 텍스트 내부 markdown(### ) 소제목용
+    styles.add(ParagraphStyle(
+        "KoAiHeading", fontName=font, fontSize=11.5, leading=16,
+        spaceBefore=8, spaceAfter=4, textColor=colors.HexColor(ACCENT),
     ))
     styles.add(ParagraphStyle(
         "KoSmall", fontName=font, fontSize=8, leading=11,
@@ -553,6 +582,72 @@ def _table_style(font):
     return TableStyle(style)
 
 
+def _inline_md(text):
+    """인라인 markdown → ReportLab 미니 HTML.
+    XML 특수문자를 먼저 이스케이프한 뒤 **굵게** 를 강조 태그로 변환한다.
+    bold 폰트가 없을 수도 있으므로 색상까지 입혀 항상 눈에 띄게 한다."""
+    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    # **굵게** / __굵게__ → 색상 강조 + bold
+    text = re.sub(
+        r"(?:\*\*|__)(.+?)(?:\*\*|__)",
+        r'<b><font color="%s">\1</font></b>' % ACCENT,
+        text,
+    )
+    # 잔여 단독 *, _ 강조 표식 제거(불릿 오인 방지 위해 굵게 처리 뒤에 수행)
+    return text
+
+
+def _md_to_flowables(text, styles, body_style):
+    """AI 가 생성한 markdown 텍스트를 읽기 좋은 ReportLab 플로어블 리스트로 변환.
+    - ### / ## / # → 소제목(KoAiHeading)
+    - 빈 줄 → 단락 분리, 단일 줄바꿈 → <br/>
+    - - / * / 1. → 불릿/번호 목록 (각자 줄바꿈)
+    - **굵게** → 색상 강조
+    문장 중간에 붙어온 '### ...' 헤더도 줄바꿈을 넣어 분리한다."""
+    flow = []
+    if not text or not text.strip():
+        return flow
+
+    # 헤더 마커가 줄 시작이 아니라 문장 중간에 붙어온 경우 줄바꿈으로 분리
+    norm = re.sub(r"\s*(#{1,6})\s+", r"\n\1 ", text.replace("\r\n", "\n"))
+
+    buf = []  # 연속 본문 줄 모으기
+
+    def flush():
+        if buf:
+            html = "<br/>".join(_inline_md(b) for b in buf)
+            if html.strip():
+                flow.append(Paragraph(html, body_style))
+            buf.clear()
+
+    for raw in norm.split("\n"):
+        line = raw.strip()
+        if not line:
+            flush()
+            continue
+        m = re.match(r"^(#{1,6})\s+(.*)$", line)
+        if m:                                   # 소제목
+            heading = m.group(2).strip().rstrip("#").strip()
+            # 헤더 치고 지나치게 길면 개행이 유실된 본문일 가능성 →
+            # 잘못된 거대 제목 대신 본문으로 처리(### 마커만 제거).
+            if len(heading) > 28:
+                buf.append(heading)
+            elif heading:
+                flush()
+                flow.append(Paragraph(_inline_md(heading), styles["KoAiHeading"]))
+        elif re.match(r"^[-*]\s+", line):       # 불릿
+            flush()
+            item = re.sub(r"^[-*]\s+", "", line)
+            flow.append(Paragraph("• " + _inline_md(item), body_style))
+        elif re.match(r"^\d+\.\s+", line):      # 번호 목록
+            flush()
+            flow.append(Paragraph(_inline_md(line), body_style))
+        else:
+            buf.append(line)
+    flush()
+    return flow
+
+
 class PdfGenerator:
     """PDF 보고서 생성기."""
 
@@ -727,7 +822,7 @@ class PdfGenerator:
         table.setStyle(_table_style(self.font))
         story.append(table)
         story.append(Spacer(1, 5*mm))
-        story.append(Paragraph(ai_current, s["KoBody"]))
+        story.extend(_md_to_flowables(ai_current, s, s["KoBody"]))
         story.append(PageBreak())
 
         # ── 섹션 3: 월별 해빙 동향 ───────────────────────
@@ -757,7 +852,7 @@ class PdfGenerator:
         table2.setStyle(_table_style(self.font))
         story.append(table2)
         story.append(Spacer(1, 5*mm))
-        story.append(Paragraph(ai_monthly, s["KoBody"]))
+        story.extend(_md_to_flowables(ai_monthly, s, s["KoBody"]))
         story.append(PageBreak())
 
         # ── 섹션 4: 항로별 위험도 비교 ───────────────────
@@ -793,7 +888,7 @@ class PdfGenerator:
             story.append(Paragraph(cal_text, s["KoSmall"]))
 
         story.append(Spacer(1, 3*mm))
-        story.append(Paragraph(ai_route, s["KoBody"]))
+        story.extend(_md_to_flowables(ai_route, s, s["KoBody"]))
         story.append(PageBreak())
 
         # ── 섹션 6: 구간별 위험 분석 ─────────────────────
@@ -844,19 +939,15 @@ class PdfGenerator:
             rec = whatif_result.get("ai_recommendation", "")
             if rec:
                 story.append(Paragraph("AI 시나리오 종합 추천", s["KoSubtitle"]))
-                for para in rec.split("\n\n"):
-                    if para.strip():
-                        story.append(Paragraph(para.strip(), s["KoBox"]))
+                story.extend(_md_to_flowables(rec, s, s["KoBox"]))
 
             story.append(PageBreak())
 
         # ── 섹션 8: AI 종합 결론 ─────────────────────────
         story.append(self._section_header("7. AI 종합 결론 및 권고사항"))
         story.append(Spacer(1, 5*mm))
-        # 결론을 박스로 표시
-        for para in ai_conclusions.split("\n\n"):
-            if para.strip():
-                story.append(Paragraph(para.strip(), s["KoBox"]))
+        # 결론을 박스로 표시 (markdown 파싱: ### 소제목 / **강조** / 줄바꿈)
+        story.extend(_md_to_flowables(ai_conclusions, s, s["KoBox"]))
         story.append(PageBreak())
 
         # ── 섹션 9: RL 모델 성능 ─────────────────────────
