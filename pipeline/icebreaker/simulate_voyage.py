@@ -42,6 +42,7 @@ from pipeline.icebreaker.models import (
     arc_to_pc,
     fleet_for_route,
 )
+from pipeline.icebreaker.rl_iceberg_bake import apply_rl_iceberg_avoidance
 from pipeline.icebreaker.routes_loader import load_routes
 
 
@@ -243,10 +244,14 @@ def simulate_voyage(
     verbose: bool = True,
     max_ticks: int = 5000,
     avoid_land: bool = True,
+    rl_avoid: bool = False,
 ) -> dict[str, Any]:
     """주어진 경로/월/본선 속성으로 항해 시뮬레이션 실행.
 
     avoid_land=True 면 전역 육지 마스크로 경로를 정합해 섬·반도 관통을 제거.
+    rl_avoid=True 면 학습된 RL 모델로 빙산 회피 디투어를 route 에 사전 베이크해,
+      Voyage 재생(선미추적) 화면에서 본선이 빙산을 휘어 피하는 모습이 재현된다.
+      (RL 의존성/모델 미존재 시 자동으로 회피 없이 진행 — CI 안전.)
     Returns the trace dict. Writes JSON if output_path given.
     """
     routes = load_routes()
@@ -259,6 +264,23 @@ def simulate_voyage(
 
     field = IceField.from_month(month)
     pc_class = arc_to_pc(ship_ice_class)
+
+    # RL 빙산 회피 사전 베이크 — 반드시 육지 정합 이후(detour 가 육지 정합 좌표계
+    # 위에서 만들어지도록). 본선 진행은 route + km_along 스칼라에만 의존하므로
+    # route 를 detour 로 교체하면 이후 tick·dispatch·escort 가 새 경로 위에서 자동 동작.
+    rl_meta: dict[str, Any] = {"applied": False, "method": None, "segments": []}
+    if rl_avoid:
+        route, display_route, rl_meta = apply_rl_iceberg_avoidance(
+            route, display_route, field, route_name,
+            ice_class_pc=pc_class, ship_speed_knots=ship_speed_knots,
+            verbose=verbose,
+        )
+
+    # RL 회피 윈도우(최종 route km 좌표) — tick 루프에서 진입/이탈 시 이벤트 발화.
+    rl_windows = [
+        {**seg, "_started": False, "_ended": False}
+        for seg in rl_meta.get("segments", [])
+    ]
 
     def rio_at_point(pos: Position) -> float:
         return calculate_rio(pc_class, field.sample(pos, month))
@@ -337,6 +359,29 @@ def simulate_voyage(
                       f"{route_total_km:.0f}")
                 last_hour_printed = t_hours
 
+        # RL 회피 윈도우 진입/이탈 이벤트 — km_along 이 세그먼트 경계를 넘을 때 1회.
+        # (프론트는 metadata.rl_avoidance.segments 로 배지를 구동하므로 이벤트는
+        #  토스트/로그용. icebreaker_id 는 토스트 fmtEvent 호환 위해 None 명시.)
+        tick_events: list[dict[str, Any]] = [dict(ev) for ev in events]
+        for win in rl_windows:
+            if not win["_started"] and km_along >= win["start_km"]:
+                win["_started"] = True
+                tick_events.append({
+                    "type": "rl_avoid_start",
+                    "avoidance_type": "iceberg",
+                    "method": rl_meta.get("method") or "RL",
+                    "confidence": win["confidence"],
+                    "berg_count": win["berg_count"],
+                    "icebreaker_id": None,
+                })
+            if win["_started"] and not win["_ended"] and km_along >= win["end_km"]:
+                win["_ended"] = True
+                tick_events.append({
+                    "type": "rl_avoid_end",
+                    "avoidance_type": "iceberg",
+                    "icebreaker_id": None,
+                })
+
         ticks_out.append({
             "t": t_hours,
             "ship": {
@@ -356,7 +401,7 @@ def simulate_voyage(
                 }
                 for ib in fleet
             ],
-            "events": list(events),
+            "events": tick_events,
         })
 
         # 본선 이동 (escort 중이면 쇄빙선 속도 제한)
@@ -404,6 +449,9 @@ def simulate_voyage(
             "dt_hours": dt_hours,
             "total_ticks": total_ticks,
             "duration_hours": round(total_ticks * dt_hours, 2),
+            # RL 빙산 회피 베이크 결과(없으면 applied=False). 프론트 Voyage 모드가
+            # segments 로 회피 배지·청록 항로선을 구동(seek 견고).
+            "rl_avoidance": rl_meta,
         },
         "ticks": ticks_out,
         "summary": summary,

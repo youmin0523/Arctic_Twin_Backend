@@ -21,13 +21,13 @@ def _load_sim():
         pytest.skip(f"simulate_voyage import 불가: {e}")
 
 
-def _run(month=1, ice_class="Arc4", route="NSR", speed=15.0):
+def _run(month=1, ice_class="Arc4", route="NSR", speed=15.0, rl_avoid=False):
     sim = _load_sim()
     try:
         return sim(
             route_name=route, ship_id=f"test-{route}-{ice_class}-m{month}",
             ship_ice_class=ice_class, ship_speed_knots=speed, month=month,
-            dt_hours=1.0, output_path=None, verbose=False,
+            dt_hours=1.0, output_path=None, verbose=False, rl_avoid=rl_avoid,
         )
     except FileNotFoundError as e:
         pytest.skip(f"시뮬레이션 입력 데이터 없음: {e}")
@@ -60,7 +60,12 @@ def test_close_to_baseline_within_tolerance():
     if not baseline_file.exists():
         pytest.skip("baseline 파일 없음")
     base = json.loads(baseline_file.read_text(encoding="utf-8"))
-    t = _run(month=1, ice_class="Arc4", route="NSR")
+    # baseline 이 RL 회피 베이크본이면 동일 설정으로 재실행해 비교한다.
+    # RL 의존성(torch/sb3·가중치)이 없어 재현 불가하면 비교를 skip(CI 안전).
+    base_rl = bool(base.get("metadata", {}).get("rl_avoidance", {}).get("applied"))
+    t = _run(month=1, ice_class="Arc4", route="NSR", rl_avoid=base_rl)
+    if base_rl and not t.get("metadata", {}).get("rl_avoidance", {}).get("applied"):
+        pytest.skip("RL 의존성 없음 — RL 베이크 baseline 재현 불가")
 
     # 총거리 1% 이내
     assert t["summary"]["total_route_km"] == pytest.approx(

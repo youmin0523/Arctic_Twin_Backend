@@ -270,6 +270,39 @@ class IceField:
             return 0.0
         return round(thick, 4)
 
+    def high_threat_cells(
+        self,
+        min_thick: float = 1.2,
+        min_conc: float = 0.0,
+        min_lat: float = 60.0,
+    ) -> list[dict]:
+        """항행 위협이 되는 고두께/고농도 셀 좌표 목록 반환.
+
+        RL 빙산 회피 오프라인 베이크(rl_iceberg_bake)에서 "장애물(대리 빙산)"
+        소스로 사용. 실측 빙산(realBergData)은 북극에 거의 없으므로 두꺼운
+        해빙 셀을 대리 빙산으로 취급한다(프론트 ThreeOverlay 의 surrogateIce 와
+        동일 개념). 프라이빗 배열을 직접 읽지 않도록 public 헬퍼로 노출한다.
+
+        Returns: [{"lat", "lon", "thickness", "concentration"}], 두께 내림차순.
+        """
+        mask = (
+            (self._thick >= min_thick)
+            & (self._conc >= min_conc)
+            & (self._lats >= min_lat)
+        )
+        idx = np.nonzero(mask)[0]
+        cells = [
+            {
+                "lat": float(self._lats[i]),
+                "lon": float(self._lons[i]),
+                "thickness": float(self._thick[i]),
+                "concentration": float(self._conc[i]),
+            }
+            for i in idx
+        ]
+        cells.sort(key=lambda c: c["thickness"], reverse=True)
+        return cells
+
 
 if __name__ == "__main__":
     # 간단 스모크 테스트

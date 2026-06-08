@@ -15,6 +15,12 @@ ReportLab + Matplotlib 기반 한국어 PDF 보고서 생성.
 PDF 8개 섹션:
   1. 표지  2. 현황 요약  3. 월별 해빙 동향  4. 항로별 위험도 비교
   5. RL 출항 최적화  6. 구간별 위험 분석  7. AI 결론/권고  8. RL 모델 성능
+
+디자인 시스템:
+  - 표지/머리글/바닥글은 canvas 콜백(onFirstPage/onLaterPages)으로 직접 그린다.
+  - 섹션 제목은 좌측 액센트 바 + 하단 구분선.
+  - 현황 요약에는 KPI 카드 행.
+  - 모든 차트는 통일된 matplotlib 테마(THEME)를 따른다.
 """
 
 import io
@@ -45,6 +51,21 @@ PAGE_WIDTH, PAGE_HEIGHT = A4
 CHART_WIDTH = 170 * mm
 CHART_HEIGHT = 100 * mm
 
+# ── 디자인 팔레트 ─────────────────────────────────────────────
+NAVY      = "#0E2742"   # 표지 배경 / 헤더
+NAVY_2    = "#16345C"   # 표지 상단 밴드
+INK       = "#0F2A4A"   # 제목 텍스트
+ACCENT    = "#2563EB"   # 포인트(블루)
+SKY       = "#3B82F6"
+PANEL     = "#F4F7FB"   # 카드/박스 배경
+BORDER    = "#D7E0EA"   # 옅은 경계선
+TEXT      = "#1F2A37"   # 본문
+MUTED     = "#64748B"   # 보조 텍스트
+GREEN     = "#16A34A"
+AMBER     = "#F59E0B"
+RED       = "#DC2626"
+PURPLE    = "#7C3AED"
+
 # ── 한국어 폰트 설정 ──────────────────────────────────────────
 FONT_SEARCH_PATHS = [
     Path(__file__).resolve().parents[1] / "assets" / "fonts" / "NanumGothic.ttf",
@@ -60,6 +81,36 @@ _KO_FONT_NAME = "NanumGothic"
 # <para>/<b>/<i> 태그에서도 "Can't determine family" 에러가 나지 않는다.
 KOREAN_FONT = "Helvetica"
 _ko_font_registered = False
+
+
+def _apply_mpl_theme():
+    """모든 차트에 공통 적용되는 matplotlib 스타일. font.family는 건드리지 않는다."""
+    plt.rcParams.update({
+        "figure.facecolor": "white",
+        "savefig.facecolor": "white",
+        "axes.facecolor": "white",
+        "axes.edgecolor": "#CBD5E1",
+        "axes.linewidth": 0.9,
+        "axes.grid": False,
+        "axes.titlesize": 13,
+        "axes.titleweight": "bold",
+        "axes.titlecolor": INK,
+        "axes.titlepad": 14,
+        "axes.labelsize": 10,
+        "axes.labelcolor": "#334155",
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "xtick.color": "#475569",
+        "ytick.color": "#475569",
+        "xtick.labelsize": 9,
+        "ytick.labelsize": 9,
+        "grid.color": "#E2E8F0",
+        "grid.linewidth": 0.8,
+        "legend.fontsize": 9,
+        "legend.frameon": False,
+        "font.size": 10,
+        "axes.unicode_minus": False,
+    })
 
 
 def _register_korean_font():
@@ -86,7 +137,7 @@ def _register_korean_font():
                 # Matplotlib에도 등록
                 fm.fontManager.addfont(str(fpath))
                 plt.rcParams["font.family"] = fm.FontProperties(fname=str(fpath)).get_name()
-                plt.rcParams["axes.unicode_minus"] = False
+                _apply_mpl_theme()
                 KOREAN_FONT = _KO_FONT_NAME
                 logger.info("한국어 폰트 등록: %s", fpath)
                 return KOREAN_FONT
@@ -96,6 +147,7 @@ def _register_korean_font():
     # 한글 폰트를 끝내 못 찾음 → Helvetica 폴백.
     # (한글은 깨질 수 있으나 PDF 생성 자체는 크래시하지 않는다.)
     KOREAN_FONT = "Helvetica"
+    _apply_mpl_theme()
     logger.warning("한국어 폰트를 찾지 못함 — Helvetica로 폴백합니다. PDF에서 한글이 깨질 수 있습니다.")
     return KOREAN_FONT
 
@@ -107,31 +159,142 @@ def _get_styles():
 
     styles.add(ParagraphStyle(
         "KoTitle", fontName=font, fontSize=24, leading=30,
-        alignment=1, spaceAfter=20, textColor=colors.HexColor("#1a2a4a")
+        alignment=1, spaceAfter=20, textColor=colors.HexColor(INK)
     ))
     styles.add(ParagraphStyle(
         "KoSubtitle", fontName=font, fontSize=14, leading=18,
         alignment=1, spaceAfter=10, textColor=colors.HexColor("#4a6a8a")
     ))
+    # 섹션 제목(좌측 액센트 바 테이블 안에서 사용)
     styles.add(ParagraphStyle(
-        "KoHeading", fontName=font, fontSize=16, leading=20,
-        spaceBefore=16, spaceAfter=8, textColor=colors.HexColor("#1a2a4a")
+        "KoHeading", fontName=font, fontSize=15, leading=19,
+        spaceBefore=0, spaceAfter=0, textColor=colors.HexColor(INK)
     ))
     styles.add(ParagraphStyle(
-        "KoBody", fontName=font, fontSize=10, leading=14,
-        spaceAfter=6, textColor=colors.HexColor("#333333")
+        "KoBody", fontName=font, fontSize=10, leading=15,
+        spaceAfter=6, textColor=colors.HexColor(TEXT)
     ))
     styles.add(ParagraphStyle(
-        "KoSmall", fontName=font, fontSize=8, leading=10,
-        textColor=colors.HexColor("#666666")
+        "KoSmall", fontName=font, fontSize=8, leading=11,
+        textColor=colors.HexColor(MUTED)
     ))
     styles.add(ParagraphStyle(
-        "KoBox", fontName=font, fontSize=10, leading=14,
-        backColor=colors.HexColor("#f0f4f8"), borderPadding=8,
-        borderWidth=1, borderColor=colors.HexColor("#c0d0e0"),
-        spaceAfter=10, textColor=colors.HexColor("#333333"),
+        "KoBox", fontName=font, fontSize=10, leading=15,
+        backColor=colors.HexColor(PANEL), borderPadding=10,
+        leftIndent=2, rightIndent=2,
+        borderWidth=0.5, borderColor=colors.HexColor(BORDER),
+        spaceAfter=10, textColor=colors.HexColor(TEXT),
+    ))
+    # KPI 카드용
+    styles.add(ParagraphStyle(
+        "KpiValue", fontName=font, fontSize=17, leading=20,
+        textColor=colors.HexColor(INK), spaceAfter=0,
+    ))
+    styles.add(ParagraphStyle(
+        "KpiLabel", fontName=font, fontSize=8, leading=11,
+        textColor=colors.HexColor(MUTED), spaceBefore=2,
+    ))
+    styles.add(ParagraphStyle(
+        "KoCaption", fontName=font, fontSize=8.5, leading=12,
+        textColor=colors.HexColor(MUTED), spaceBefore=2, spaceAfter=8,
+        alignment=1,
     ))
     return styles
+
+
+# ══════════════════════════════════════════════════════════════
+# 표지 / 머리글·바닥글 (canvas 콜백)
+# ══════════════════════════════════════════════════════════════
+
+def _draw_cover(canvas, doc):
+    """표지 페이지를 canvas로 직접 렌더링."""
+    info = getattr(doc, "_cover_info", {})
+    font = KOREAN_FONT
+    w, h = A4
+    canvas.saveState()
+
+    # 배경
+    canvas.setFillColor(colors.HexColor(NAVY))
+    canvas.rect(0, 0, w, h, fill=1, stroke=0)
+    # 상단 밴드
+    canvas.setFillColor(colors.HexColor(NAVY_2))
+    canvas.rect(0, h - 74 * mm, w, 74 * mm, fill=1, stroke=0)
+    # 액센트 라인
+    canvas.setFillColor(colors.HexColor(ACCENT))
+    canvas.rect(0, h - 76 * mm, w, 2 * mm, fill=1, stroke=0)
+
+    # 장식용 반투명 사각형 (모서리 포인트)
+    canvas.setFillColor(colors.HexColor("#1B4170"))
+    canvas.rect(w - 46 * mm, h - 46 * mm, 30 * mm, 30 * mm, fill=1, stroke=0)
+    canvas.setFillColor(colors.HexColor(ACCENT))
+    canvas.rect(w - 46 * mm, h - 46 * mm, 30 * mm, 3 * mm, fill=1, stroke=0)
+
+    # 아이브로우 라벨
+    canvas.setFillColor(colors.HexColor("#8FBAEC"))
+    canvas.setFont(font, 12)
+    canvas.drawCentredString(w / 2, h - 42 * mm, "ARCTIC DIGITAL TWIN")
+
+    # 메인 타이틀
+    canvas.setFillColor(colors.white)
+    canvas.setFont(font, 30)
+    canvas.drawCentredString(w / 2, h * 0.55, "북극 항로 AI 동향 보고서")
+
+    # 타이틀 하단 액센트 룰
+    canvas.setFillColor(colors.HexColor(ACCENT))
+    canvas.rect(w / 2 - 27 * mm, h * 0.55 - 8 * mm, 54 * mm, 1.5 * mm, fill=1, stroke=0)
+
+    # 정보 라인
+    canvas.setFillColor(colors.HexColor("#CBD9EC"))
+    canvas.setFont(font, 13)
+    y = h * 0.49
+    for line in info.get("lines", []):
+        canvas.drawCentredString(w / 2, y, line)
+        y -= 8.5 * mm
+
+    # RL 배지
+    if info.get("rl_badge"):
+        bw, bh = 52 * mm, 10 * mm
+        bx, by = w / 2 - bw / 2, h * 0.34
+        canvas.setFillColor(colors.HexColor("#14532D"))
+        canvas.roundRect(bx, by, bw, bh, 2.2 * mm, fill=1, stroke=0)
+        canvas.setFillColor(colors.HexColor("#86EFAC"))
+        canvas.setFont(font, 10)
+        canvas.drawCentredString(w / 2, by + 3.2 * mm, "RL 모델 학습 완료")
+
+    # 바닥 밴드 + 푸터
+    canvas.setFillColor(colors.HexColor(ACCENT))
+    canvas.rect(0, 0, w, 9 * mm, fill=1, stroke=0)
+    canvas.setFillColor(colors.white)
+    canvas.setFont(font, 9)
+    canvas.drawCentredString(w / 2, 3.2 * mm, info.get("footer", ""))
+
+    canvas.restoreState()
+
+
+def _draw_later(canvas, doc):
+    """본문 페이지 머리글/바닥글."""
+    info = getattr(doc, "_cover_info", {})
+    font = KOREAN_FONT
+    w, h = A4
+    canvas.saveState()
+
+    # 머리글
+    canvas.setFillColor(colors.HexColor(MUTED))
+    canvas.setFont(font, 8)
+    canvas.drawString(20 * mm, h - 13 * mm, "북극 항로 AI 동향 보고서")
+    canvas.drawRightString(w - 20 * mm, h - 13 * mm, info.get("date_short", ""))
+    canvas.setStrokeColor(colors.HexColor(BORDER))
+    canvas.setLineWidth(0.6)
+    canvas.line(20 * mm, h - 15 * mm, w - 20 * mm, h - 15 * mm)
+
+    # 바닥글
+    canvas.line(20 * mm, 14 * mm, w - 20 * mm, 14 * mm)
+    canvas.setFillColor(colors.HexColor(MUTED))
+    canvas.setFont(font, 8)
+    canvas.drawString(20 * mm, 9 * mm, "Arctic Digital Twin · AI Generated Report")
+    canvas.drawRightString(w - 20 * mm, 9 * mm, f"— {canvas.getPageNumber()} —")
+
+    canvas.restoreState()
 
 
 # ══════════════════════════════════════════════════════════════
@@ -141,10 +304,16 @@ def _get_styles():
 def _fig_to_image(fig, width=CHART_WIDTH, height=CHART_HEIGHT):
     """Matplotlib Figure → ReportLab Image."""
     buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
+    fig.savefig(buf, format="png", dpi=160, bbox_inches="tight")
     plt.close(fig)
     buf.seek(0)
     return Image(buf, width=width, height=height)
+
+
+def _soft_grid(ax, axis="y"):
+    """막대/선 차트용 옅은 그리드."""
+    ax.set_axisbelow(True)
+    ax.grid(axis=axis, color="#E2E8F0", linewidth=0.8)
 
 
 def chart_monthly_ice(monthly_summary: list[dict]):
@@ -156,14 +325,18 @@ def chart_monthly_ice(monthly_summary: list[dict]):
     fig, ax1 = plt.subplots(figsize=(10, 5))
     ax2 = ax1.twinx()
 
-    bars = ax1.bar(months, coverage, alpha=0.3, color="#3b82f6", label="북극 피복율(%)")
-    line = ax2.plot(months, mean_concs, "o-", color="#ef4444", linewidth=2, label="평균 농도")
+    bars = ax1.bar(months, coverage, alpha=0.85, color=SKY, label="북극 피복율(%)", width=0.6)
+    line = ax2.plot(months, mean_concs, "o-", color=RED, linewidth=2.4,
+                    markersize=6, markerfacecolor="white", markeredgewidth=1.6,
+                    label="평균 농도")
 
     ax1.set_xlabel("월")
-    ax1.set_ylabel("북극 피복율 (%)", color="#3b82f6")
-    ax2.set_ylabel("평균 해빙 농도", color="#ef4444")
+    ax1.set_ylabel("북극 피복율 (%)", color=SKY)
+    ax2.set_ylabel("평균 해빙 농도", color=RED)
     ax1.set_xticks(months)
     ax1.set_xticklabels([f"{m}월" for m in months])
+    ax2.spines["top"].set_visible(False)
+    _soft_grid(ax1)
 
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
@@ -183,15 +356,18 @@ def chart_route_comparison(route_summary: dict):
     fig, ax = plt.subplots(figsize=(10, 4))
     y = np.arange(len(routes))
 
-    ax.barh(y, green, color="#22c55e", label="안전(Green)")
-    ax.barh(y, yellow, left=green, color="#f59e0b", label="주의(Yellow)")
-    ax.barh(y, red, left=[g + y_ for g, y_ in zip(green, yellow)], color="#ef4444", label="위험(Red)")
+    ax.barh(y, green, color=GREEN, label="안전(Green)", height=0.6)
+    ax.barh(y, yellow, left=green, color=AMBER, label="주의(Yellow)", height=0.6)
+    ax.barh(y, red, left=[g + y_ for g, y_ in zip(green, yellow)], color=RED,
+            label="위험(Red)", height=0.6)
 
     ax.set_yticks(y)
     ax.set_yticklabels(routes)
+    ax.invert_yaxis()
     ax.set_xlabel("일수")
     ax.set_title("항로별 안전/주의/위험 일수 비교")
-    ax.legend(loc="lower right")
+    ax.legend(loc="lower right", ncol=3)
+    _soft_grid(ax, axis="x")
     fig.tight_layout()
     return _fig_to_image(fig)
 
@@ -204,7 +380,8 @@ def chart_weather_radar(weather_routes: dict):
     angles += angles[:1]
 
     fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
-    route_colors = {"NSR": "#3b82f6", "NWP": "#22c55e", "TSR": "#a855f7", "SUEZ": "#f59e0b", "CAPE": "#ef4444"}
+    ax.set_facecolor("#FBFCFE")
+    route_colors = {"NSR": SKY, "NWP": GREEN, "TSR": PURPLE, "SUEZ": AMBER, "CAPE": RED}
 
     for route_key, route_data in weather_routes.items():
         s = route_data.get("summary", {})
@@ -216,13 +393,16 @@ def chart_weather_radar(weather_routes: dict):
         ]
         values += values[:1]
         color = route_colors.get(route_key, "#888888")
-        ax.plot(angles, values, "o-", linewidth=1.5, label=route_key, color=color)
-        ax.fill(angles, values, alpha=0.1, color=color)
+        ax.plot(angles, values, "o-", linewidth=1.8, label=route_key, color=color, markersize=4)
+        ax.fill(angles, values, alpha=0.12, color=color)
 
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(categories)
-    ax.set_title("항로별 기상 조건 비교")
-    ax.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1))
+    ax.set_ylim(0, 1)
+    ax.set_yticklabels([])
+    ax.grid(color="#D7E0EA", linewidth=0.8)
+    ax.set_title("항로별 기상 조건 비교", pad=24)
+    ax.legend(loc="upper right", bbox_to_anchor=(1.28, 1.1))
     fig.tight_layout()
     return _fig_to_image(fig, width=CHART_WIDTH, height=CHART_WIDTH * 0.8)
 
@@ -255,11 +435,16 @@ def chart_departure_calendar(calendar: list, rl_scores: dict | None = None):
                 text = f"{rio_val:.1f}"
                 if not np.isnan(rl_data[i, j]):
                     text += f"\nRL:{rl_data[i,j]:.2f}"
-                ax.text(j, i, text, ha="center", va="center", fontsize=7)
+                ax.text(j, i, text, ha="center", va="center", fontsize=7, color="#1F2A37")
 
+    ax.set_xticks(range(cols))
+    ax.set_xticklabels([f"{d+1}" for d in range(cols)])
+    ax.set_yticks(range(rows))
+    ax.set_yticklabels([f"W{r+1}" for r in range(rows)])
     ax.set_title("출항 캘린더 (POLARIS RIO + RL 신뢰도)")
     ax.set_xlabel("일")
     ax.set_ylabel("주")
+    ax.tick_params(length=0)
     fig.colorbar(im, ax=ax, label="RIO 점수", shrink=0.8)
     fig.tight_layout()
     return _fig_to_image(fig)
@@ -285,6 +470,7 @@ def chart_segment_heatmap(calendar: list):
     ax.set_yticklabels(segments)
     ax.set_xlabel("날짜 (일)")
     ax.set_title("구간별 POLARIS RIO 히트맵")
+    ax.tick_params(length=0)
     fig.colorbar(im, ax=ax, label="RIO", shrink=0.8)
     fig.tight_layout()
     return _fig_to_image(fig)
@@ -301,16 +487,17 @@ def chart_rl_training_curve(training_history: list | None):
     completed = [h.get("completed", False) for h in training_history]
     cum_steps = np.cumsum(timesteps)
 
-    bar_colors = ["#22c55e" if c else "#ef4444" for c in completed]
-    ax.bar(stages, timesteps, color=bar_colors, alpha=0.7)
+    bar_colors = [GREEN if c else RED for c in completed]
+    ax.bar(stages, timesteps, color=bar_colors, alpha=0.9, width=0.6)
 
     for i, (s, ts, c) in enumerate(zip(stages, timesteps, completed)):
         status = "완료" if c else "실패"
-        ax.text(i, ts + 1000, f"{ts:,}\n({status})", ha="center", fontsize=9)
+        ax.text(i, ts + 1000, f"{ts:,}\n({status})", ha="center", fontsize=9, color="#334155")
 
     ax.set_xlabel("커리큘럼 단계")
     ax.set_ylabel("학습 스텝 수")
     ax.set_title("출항 RL 커리큘럼 학습 진행")
+    _soft_grid(ax)
     fig.tight_layout()
     return _fig_to_image(fig)
 
@@ -324,19 +511,20 @@ def chart_avoidance_difficulty(difficulties: dict | None):
     values = list(difficulties.values())
 
     fig, ax = plt.subplots(figsize=(10, 5))
-    bar_colors = ["#22c55e" if v < 0.3 else "#f59e0b" if v < 0.6 else "#ef4444" for v in values]
-    bars = ax.bar(segments, values, color=bar_colors)
+    bar_colors = [GREEN if v < 0.3 else AMBER if v < 0.6 else RED for v in values]
+    bars = ax.bar(segments, values, color=bar_colors, width=0.6)
 
     for bar, val in zip(bars, values):
         ax.text(bar.get_x() + bar.get_width()/2, val + 0.02, f"{val:.2f}",
-                ha="center", fontsize=9)
+                ha="center", fontsize=9, color="#334155")
 
     ax.set_ylim(0, 1.1)
     ax.set_xlabel("NSR 구간")
     ax.set_ylabel("빙산 회피 난이도 (0=쉬움, 1=어려움)")
     ax.set_title("RL(SAC) 기반 구간별 빙산 회피 난이도")
-    ax.axhline(y=0.3, color="#22c55e", linestyle="--", alpha=0.5, label="안전 임계값")
-    ax.axhline(y=0.6, color="#f59e0b", linestyle="--", alpha=0.5, label="주의 임계값")
+    ax.axhline(y=0.3, color=GREEN, linestyle="--", alpha=0.6, label="안전 임계값")
+    ax.axhline(y=0.6, color=AMBER, linestyle="--", alpha=0.6, label="주의 임계값")
+    _soft_grid(ax)
     ax.legend()
     fig.tight_layout()
     return _fig_to_image(fig)
@@ -346,6 +534,25 @@ def chart_avoidance_difficulty(difficulties: dict | None):
 # PDF 생성
 # ══════════════════════════════════════════════════════════════
 
+# 공통 테이블 스타일(헤더 네이비 + 줄무늬)
+def _table_style(font):
+    style = [
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor(INK)),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("FONTNAME", (0, 0), (-1, -1), font),
+        ("FONTSIZE", (0, 0), (-1, -1), 8.5),
+        ("TOPPADDING", (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("LINEBELOW", (0, 0), (-1, -1), 0.4, colors.HexColor(BORDER)),
+        ("LINEAFTER", (0, 0), (-2, -1), 0.4, colors.HexColor(BORDER)),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor(PANEL)]),
+        ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor(BORDER)),
+    ]
+    return TableStyle(style)
+
+
 class PdfGenerator:
     """PDF 보고서 생성기."""
 
@@ -353,6 +560,53 @@ class PdfGenerator:
         self.styles = _get_styles()
         # 실제 등록된 폰트 이름 (한글 폰트 또는 Helvetica 폴백). 표 스타일에서 사용.
         self.font = KOREAN_FONT
+
+    def _section_header(self, text):
+        """좌측 액센트 바 + 하단 구분선이 있는 섹션 제목 플로어블."""
+        p = Paragraph(text, self.styles["KoHeading"])
+        t = Table([["", p]], colWidths=[3 * mm, 165 * mm])
+        t.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (0, 0), colors.HexColor(ACCENT)),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING", (1, 0), (1, 0), 7),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("LINEBELOW", (0, 0), (-1, -1), 1.0, colors.HexColor(BORDER)),
+        ]))
+        return t
+
+    def _kpi_cards(self, items):
+        """KPI 카드 행. items = [(value, label, accent_color), ...] (4개 권장)."""
+        cards = []
+        for value, label, color in items:
+            inner = Table(
+                [[Paragraph(str(value), self.styles["KpiValue"])],
+                 [Paragraph(str(label), self.styles["KpiLabel"])]],
+                colWidths=[38 * mm],
+            )
+            inner.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor(PANEL)),
+                ("LINEABOVE", (0, 0), (-1, 0), 2.4, colors.HexColor(color)),
+                ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor(BORDER)),
+                ("TOPPADDING", (0, 0), (-1, 0), 9),
+                ("BOTTOMPADDING", (0, 1), (-1, 1), 9),
+                ("LEFTPADDING", (0, 0), (-1, -1), 9),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 9),
+            ]))
+            cards.append(inner)
+
+        gap = 4 * mm
+        row, widths = [], []
+        for i, c in enumerate(cards):
+            if i:
+                row.append("")
+                widths.append(gap)
+            row.append(c)
+            widths.append(38 * mm)
+        outer = Table([row], colWidths=widths)
+        outer.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")]))
+        return outer
 
     @staticmethod
     def _chart_whatif_comparison(scenarios: list[dict]):
@@ -368,19 +622,21 @@ class PdfGenerator:
         fig, ax = plt.subplots(figsize=(6.5, 2.5))
         x = np.arange(len(names))
         w = 0.25
-        ax.barh(x - w, greens, w, color="#27ae60", label="안전(Green)")
-        ax.barh(x, yellows, w, color="#f39c12", label="주의(Yellow)")
-        ax.barh(x + w, reds, w, color="#e74c3c", label="위험(Red)")
+        ax.barh(x - w, greens, w, color=GREEN, label="안전(Green)")
+        ax.barh(x, yellows, w, color=AMBER, label="주의(Yellow)")
+        ax.barh(x + w, reds, w, color=RED, label="위험(Red)")
         ax.set_yticks(x)
         ax.set_yticklabels(names, fontsize=7)
         ax.set_xlabel("일수", fontsize=8)
         ax.set_title("What-If 시나리오 비교", fontsize=9, fontweight="bold")
         ax.legend(fontsize=7, loc="lower right")
         ax.invert_yaxis()
+        ax.set_axisbelow(True)
+        ax.grid(axis="x", color="#E2E8F0", linewidth=0.7)
         fig.tight_layout()
 
         buf = io.BytesIO()
-        fig.savefig(buf, format="png", dpi=120, bbox_inches="tight")
+        fig.savefig(buf, format="png", dpi=130, bbox_inches="tight")
         plt.close(fig)
         buf.seek(0)
 
@@ -421,31 +677,42 @@ class PdfGenerator:
         doc = SimpleDocTemplate(
             str(output_path), pagesize=A4,
             leftMargin=20*mm, rightMargin=20*mm,
-            topMargin=20*mm, bottomMargin=20*mm,
+            topMargin=22*mm, bottomMargin=22*mm,
         )
+
+        now = datetime.now()
+        # 표지/머리글 정보를 canvas 콜백에서 사용
+        cover_lines = [
+            f"항로  {route}        빙급  {ice_class}",
+            f"출항기간  {departure_date_start}  ~  {forecast_days}일",
+            f"생성일시  {now.strftime('%Y-%m-%d %H:%M')}",
+        ]
+        doc._cover_info = {
+            "lines": cover_lines,
+            "rl_badge": bool(rl_model_info and rl_model_info.get("is_trained")),
+            "footer": "Arctic Digital Twin · AI Generated Report",
+            "date_short": now.strftime("%Y-%m-%d"),
+        }
 
         story = []
         s = self.styles
 
         # ── 섹션 1: 표지 ──────────────────────────────────
-        story.append(Spacer(1, 60*mm))
-        story.append(Paragraph("북극 항로 AI 동향 보고서", s["KoTitle"]))
-        story.append(Spacer(1, 10*mm))
-        story.append(Paragraph(
-            f"항로: {route} | 빙급: {ice_class} | "
-            f"출항기간: {departure_date_start} ~ {forecast_days}일",
-            s["KoSubtitle"]
-        ))
-        story.append(Paragraph(
-            f"생성일시: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-            s["KoSubtitle"]
-        ))
-        if rl_model_info and rl_model_info.get("is_trained"):
-            story.append(Paragraph("RL 모델: 학습 완료 ✓", s["KoSubtitle"]))
+        # 표지는 _draw_cover(canvas)가 그린다. 첫 페이지는 빈 페이지로 두고 넘긴다.
         story.append(PageBreak())
 
         # ── 섹션 2: 현황 요약 ─────────────────────────────
-        story.append(Paragraph("1. 현재 북극해 현황 요약", s["KoHeading"]))
+        story.append(self._section_header("1. 현재 북극해 현황 요약"))
+        story.append(Spacer(1, 5*mm))
+
+        # KPI 카드
+        story.append(self._kpi_cards([
+            (latest_ice_stats.get("mean_conc", "N/A"), "평균 해빙 농도", SKY),
+            (f"{latest_ice_stats.get('high_conc_pct', 'N/A')}%", "고농도(≥80%) 비율", ACCENT),
+            (berg_stats.get("total_count", "N/A"), "관측 빙산 수", PURPLE),
+            (berg_stats.get("arctic_count", "N/A"), "북극권 빙산 수", RED),
+        ]))
+        story.append(Spacer(1, 6*mm))
 
         # 해빙/빙산/기상 테이블
         status_data = [
@@ -457,27 +724,20 @@ class PdfGenerator:
             ["북극권 빙산 수", str(berg_stats.get("arctic_count", "N/A"))],
         ]
         table = Table(status_data, colWidths=[80*mm, 80*mm])
-        table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a2a4a")),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("FONTNAME", (0, 0), (-1, -1), self.font),
-            ("FONTSIZE", (0, 0), (-1, -1), 9),
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c0d0e0")),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f0f4f8")]),
-        ]))
+        table.setStyle(_table_style(self.font))
         story.append(table)
         story.append(Spacer(1, 5*mm))
         story.append(Paragraph(ai_current, s["KoBody"]))
         story.append(PageBreak())
 
         # ── 섹션 3: 월별 해빙 동향 ───────────────────────
-        story.append(Paragraph("2. 월별 해빙 동향", s["KoHeading"]))
+        story.append(self._section_header("2. 월별 해빙 동향"))
+        story.append(Spacer(1, 4*mm))
         chart1 = chart_monthly_ice(monthly_summary)
         if chart1:
             story.append(chart1)
-        story.append(Spacer(1, 5*mm))
+            story.append(Paragraph("그림 1. 월별 평균 해빙 농도 및 북극 피복율 추이", s["KoCaption"]))
+        story.append(Spacer(1, 3*mm))
 
         # 12행 테이블
         ice_table_data = [["월", "평균농도", "최대농도", "셀 수", "고농도(%)", "피복율(%)"]]
@@ -494,38 +754,35 @@ class PdfGenerator:
                     f"{m['arctic_coverage_pct']:.1f}",
                 ])
         table2 = Table(ice_table_data, colWidths=[20*mm, 28*mm, 28*mm, 25*mm, 30*mm, 30*mm])
-        table2.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a2a4a")),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("FONTNAME", (0, 0), (-1, -1), self.font),
-            ("FONTSIZE", (0, 0), (-1, -1), 8),
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c0d0e0")),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f0f4f8")]),
-        ]))
+        table2.setStyle(_table_style(self.font))
         story.append(table2)
         story.append(Spacer(1, 5*mm))
         story.append(Paragraph(ai_monthly, s["KoBody"]))
         story.append(PageBreak())
 
         # ── 섹션 4: 항로별 위험도 비교 ───────────────────
-        story.append(Paragraph("3. 항로별 위험도 비교", s["KoHeading"]))
+        story.append(self._section_header("3. 항로별 위험도 비교"))
+        story.append(Spacer(1, 4*mm))
         chart2 = chart_route_comparison(route_summary)
         if chart2:
             story.append(chart2)
-        story.append(Spacer(1, 5*mm))
+            story.append(Paragraph("그림 2. 항로별 안전/주의/위험 일수", s["KoCaption"]))
+        story.append(Spacer(1, 4*mm))
 
         weather_routes = weather_data.get("routes", {})
         chart3 = chart_weather_radar(weather_routes)
         if chart3:
             story.append(chart3)
+            story.append(Paragraph("그림 3. 항로별 기상 조건 비교", s["KoCaption"]))
         story.append(PageBreak())
 
         # ── 섹션 5: RL 기반 출항 최적화 ──────────────────
-        story.append(Paragraph("4. RL 기반 출항 최적화", s["KoHeading"]))
+        story.append(self._section_header("4. RL 기반 출항 최적화"))
+        story.append(Spacer(1, 4*mm))
         chart4 = chart_departure_calendar(calendar, rl_departure_scores)
         if chart4:
             story.append(chart4)
+            story.append(Paragraph("그림 4. 출항 캘린더 (POLARIS RIO + RL 신뢰도)", s["KoCaption"]))
         story.append(Spacer(1, 3*mm))
 
         if rl_calibration_info:
@@ -535,24 +792,29 @@ class PdfGenerator:
             )
             story.append(Paragraph(cal_text, s["KoSmall"]))
 
+        story.append(Spacer(1, 3*mm))
         story.append(Paragraph(ai_route, s["KoBody"]))
         story.append(PageBreak())
 
         # ── 섹션 6: 구간별 위험 분석 ─────────────────────
-        story.append(Paragraph("5. 구간별 위험 분석", s["KoHeading"]))
+        story.append(self._section_header("5. 구간별 위험 분석"))
+        story.append(Spacer(1, 4*mm))
         chart5 = chart_segment_heatmap(calendar)
         if chart5:
             story.append(chart5)
-        story.append(Spacer(1, 5*mm))
+            story.append(Paragraph("그림 5. 구간별 POLARIS RIO 히트맵", s["KoCaption"]))
+        story.append(Spacer(1, 4*mm))
 
         chart7 = chart_avoidance_difficulty(rl_avoidance_difficulties)
         if chart7:
             story.append(chart7)
+            story.append(Paragraph("그림 6. RL(SAC) 기반 구간별 빙산 회피 난이도", s["KoCaption"]))
         story.append(PageBreak())
 
         # ── 섹션 7: What-If 시나리오 분석 (선택) ──────────
         if whatif_result and whatif_result.get("scenarios"):
-            story.append(Paragraph("6. What-If 시나리오 분석", s["KoHeading"]))
+            story.append(self._section_header("6. What-If 시나리오 분석"))
+            story.append(Spacer(1, 4*mm))
 
             # 비교 테이블
             scenarios = whatif_result["scenarios"]
@@ -568,14 +830,7 @@ class PdfGenerator:
                     sc.get("recommendation", "-"),
                 ])
             wt = Table(tbl_data, colWidths=[45*mm, 22*mm, 18*mm, 18*mm, 18*mm, 22*mm])
-            wt.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a2a4a")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, -1), self.font),
-                ("FONTSIZE", (0, 0), (-1, -1), 8),
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c0d0e0")),
-                ("ALIGN", (1, 1), (-1, -1), "CENTER"),
-            ]))
+            wt.setStyle(_table_style(self.font))
             story.append(wt)
             story.append(Spacer(1, 5*mm))
 
@@ -596,7 +851,8 @@ class PdfGenerator:
             story.append(PageBreak())
 
         # ── 섹션 8: AI 종합 결론 ─────────────────────────
-        story.append(Paragraph("7. AI 종합 결론 및 권고사항", s["KoHeading"]))
+        story.append(self._section_header("7. AI 종합 결론 및 권고사항"))
+        story.append(Spacer(1, 5*mm))
         # 결론을 박스로 표시
         for para in ai_conclusions.split("\n\n"):
             if para.strip():
@@ -604,10 +860,12 @@ class PdfGenerator:
         story.append(PageBreak())
 
         # ── 섹션 9: RL 모델 성능 ─────────────────────────
-        story.append(Paragraph("8. RL 모델 성능 보고", s["KoHeading"]))
+        story.append(self._section_header("8. RL 모델 성능 보고"))
+        story.append(Spacer(1, 4*mm))
         chart6 = chart_rl_training_curve(rl_training_history)
         if chart6:
             story.append(chart6)
+            story.append(Paragraph("그림 7. 출항 RL 커리큘럼 학습 진행", s["KoCaption"]))
 
         if rl_model_info:
             model_table_data = [
@@ -616,17 +874,11 @@ class PdfGenerator:
                 ["모델 경로", str(rl_model_info.get("model_path", "N/A"))],
             ]
             mt = Table(model_table_data, colWidths=[60*mm, 100*mm])
-            mt.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a2a4a")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, -1), self.font),
-                ("FONTSIZE", (0, 0), (-1, -1), 9),
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#c0d0e0")),
-            ]))
+            mt.setStyle(_table_style(self.font))
             story.append(Spacer(1, 5*mm))
             story.append(mt)
 
-        # 빌드
-        doc.build(story)
+        # 빌드 (표지 + 머리글/바닥글 canvas 콜백)
+        doc.build(story, onFirstPage=_draw_cover, onLaterPages=_draw_later)
         logger.info("PDF 생성 완료: %s", output_path)
         return output_path
