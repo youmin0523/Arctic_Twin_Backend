@@ -96,6 +96,30 @@ calibrator = PredictionCalibrator()
 whatif_generator = WhatIfGeneratorOpenAI(route_scorer, data_loader)  # v4: OpenAI gpt-4o-mini + RIO + 6~8개 보장
 
 OUTPUT_DIR = Path(__file__).parent / "output"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+# 생성된 PDF는 timestamp 파일명으로 무한 누적되어 디스크 풀(Errno 28)을 유발한다.
+# 보고서 생성 직전에 최신 N개만 남기고 오래된 파일을 정리한다.
+MAX_KEPT_REPORTS = int(os.getenv("MAX_KEPT_REPORTS", "20"))
+
+
+def _prune_output_dir(keep: int = MAX_KEPT_REPORTS):
+    """OUTPUT_DIR의 오래된 PDF를 정리해 최신 keep개만 유지한다."""
+    try:
+        pdfs = sorted(
+            OUTPUT_DIR.glob("arctic_report_*.pdf"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for stale in pdfs[keep:]:
+            try:
+                stale.unlink()
+                logger.info("오래된 보고서 삭제: %s", stale.name)
+            except OSError as e:
+                logger.warning("보고서 삭제 실패(%s): %s", stale.name, e)
+    except Exception as e:  # 정리 실패가 본 작업을 막지 않도록 방어
+        logger.warning("output 디렉터리 정리 중 오류: %s", e)
+
 
 # ── 인메모리 Job 관리 ────────────────────────────────────────
 jobs: dict[str, dict] = {}
@@ -310,6 +334,7 @@ async def _generate_report(job_id: str, req: ReportRequest):
         _update_job(job_id, 75)
 
         # 6. PDF 생성 (75→100%)
+        _prune_output_dir()  # 오래된 보고서 정리 → 디스크 풀(Errno 28) 방지
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         pdf_filename = f"arctic_report_{req.route}_{timestamp}.pdf"
         pdf_path = OUTPUT_DIR / pdf_filename

@@ -157,6 +157,18 @@ def main():
 
     all_icebergs = []
     sources_used = []
+
+    # 이전 실행이 강제 종료(OOM/컨테이너 재시작)되면 finally 가 안 돌아
+    # cop_icebergs_* 임시폴더(각 ~2~3GB)가 /tmp 에 누출되어 디스크 풀을 유발한다.
+    # 새 실행 전에 이전 잔여 temp 디렉터리를 정리한다.
+    _stale_root = tempfile.gettempdir()
+    for _name in os.listdir(_stale_root):
+        if _name.startswith("cop_icebergs_"):
+            _stale = os.path.join(_stale_root, _name)
+            if os.path.isdir(_stale):
+                shutil.rmtree(_stale, ignore_errors=True)
+                log.info(f"이전 잔여 임시폴더 정리: {_stale}")
+
     tmpdir = tempfile.mkdtemp(prefix="cop_icebergs_")
 
     # //* [Modified Code] 3개 데이터셋(총 ~3.49GB)을 순차 다운로드하면 wall-clock 이
