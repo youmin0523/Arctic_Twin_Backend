@@ -370,6 +370,19 @@ function runSentinel1Fetcher() {
   });
 }
 
+// ── Sentinel-1 아카이브 정리 (주기) ──────────────────────────────
+// 페처는 하루 1회만 돌아 그 사이 .zip.tmp 누수/누적으로 디스크가 찰 수 있다.
+// fetch 와 별개로 정리(.zip.tmp 제거 + 캡 초과분 FIFO 삭제)를 주기 실행한다.
+function runSentinel1Cleanup() {
+  console.log('[Scheduler] Running sentinel1 archive cleanup (cleanup-only)...');
+  const { cmd, args } = uvCommand([SENTINEL1_FETCHER_PATH, '--cleanup-only']);
+  execFile(cmd, args, { env: uvEnv(), timeout: 120000 }, (err, stdout, stderr) => {
+    if (err) console.error('[Scheduler] Sentinel-1 cleanup error:', err.message);
+    if (stdout) console.log('[Sentinel1Cleanup]', stdout.trim().slice(-300));
+    if (stderr) console.error('[Sentinel1Cleanup] stderr:', stderr.trim().slice(-200));
+  });
+}
+
 // ── Weather pipeline scheduler ───────────────────────────────────
 const WEATHER_SCRIPT_PATH = path.join(
   __dirname, '..', 'pipeline', 'fetchers', 'weather_fetcher.py'
@@ -403,6 +416,8 @@ schedule.scheduleJob('0 3 * * *', runIcebergPipeline);
 schedule.scheduleJob('0 4 * * *', runBergFetcher);
 // 6시간마다 기상 파이프라인 (Open-Meteo 전 항로)
 schedule.scheduleJob('30 */6 * * *', runWeatherPipeline);
+// 6시간마다 Sentinel-1 아카이브 정리 (fetch 1am 과 겹치지 않게 15분 오프셋)
+schedule.scheduleJob('15 */6 * * *', runSentinel1Cleanup);
 
 // ── 시스템 리소스 모니터 (10분마다) ──────────────────────────────
 function logSystemResources() {

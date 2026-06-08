@@ -667,7 +667,20 @@ def main():
         "--max-disk-gb", type=int, default=DEFAULT_MAX_DISK_GB,
         help=f"아카이브 디스크 제한 (GB, 기본: {DEFAULT_MAX_DISK_GB})",
     )
+    parser.add_argument(
+        "--cleanup-only", action="store_true",
+        help="다운로드 없이 아카이브 정리만 수행 (.zip.tmp 제거 + 캡 초과분 FIFO 삭제). 스케줄러 주기 정리용",
+    )
     args = parser.parse_args()
+
+    # 정리 전용 모드: fetch 없이 cleanup_old_products 만 실행 (스케줄러가 주기 호출)
+    if args.cleanup_only:
+        before = get_archive_size_gb()
+        log.info("Sentinel-1 아카이브 정리 시작 (cleanup-only) — 현재 %.1fGB / 캡 %dGB", before, args.max_disk_gb)
+        cleanup_old_products(args.max_disk_gb)
+        after = get_archive_size_gb()
+        log.info("Sentinel-1 아카이브 정리 완료 — %.1fGB → %.1fGB", before, after)
+        return
 
     log.info("Sentinel-1 IW GRD 빙하 아카이브 수집 시작")
 
