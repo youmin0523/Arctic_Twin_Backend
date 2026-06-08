@@ -479,6 +479,29 @@ async def download_report(job_id: str):
     )
 
 
+@app.get("/api/report/preview/{job_id}")
+async def preview_report(job_id: str):
+    """생성된 PDF 인라인 미리보기 (다운로드가 아닌 브라우저 내 렌더링)."""
+    if job_id not in jobs:
+        return JSONResponse(status_code=404, content={"error": "Job not found"})
+
+    job = jobs[job_id]
+    if job["status"] != "completed" or not job.get("pdf_path"):
+        return JSONResponse(status_code=400, content={"error": "보고서가 아직 준비되지 않았습니다."})
+
+    pdf_path = Path(job["pdf_path"])
+    if not pdf_path.exists():
+        return JSONResponse(status_code=404, content={"error": "PDF 파일을 찾을 수 없습니다."})
+
+    # Content-Disposition: inline → 브라우저가 다운로드하지 않고 뷰어로 렌더링
+    return FileResponse(
+        str(pdf_path),
+        media_type="application/pdf",
+        filename=pdf_path.name,
+        content_disposition_type="inline",
+    )
+
+
 @app.post("/api/report/rl/train")
 async def rl_train(req: RLTrainRequest, bg: BackgroundTasks):
     """RL(A) 출항 스케줄링 학습 시작."""
