@@ -198,10 +198,10 @@ def _get_styles():
         "KoBody", fontName=font, fontSize=10, leading=15,
         spaceAfter=6, textColor=colors.HexColor(TEXT)
     ))
-    # AI 텍스트 내부 markdown(### ) 소제목용
+    # AI 텍스트 내부 markdown(### ) 소제목용 — bold 폰트 + 진한 네이비
     styles.add(ParagraphStyle(
-        "KoAiHeading", fontName=font, fontSize=11.5, leading=16,
-        spaceBefore=8, spaceAfter=4, textColor=colors.HexColor(ACCENT),
+        "KoAiHeading", fontName=KOREAN_FONT_BOLD, fontSize=11.5, leading=16,
+        spaceBefore=8, spaceAfter=4, textColor=colors.HexColor(INK),
     ))
     styles.add(ParagraphStyle(
         "KoSmall", fontName=font, fontSize=8, leading=11,
@@ -584,16 +584,11 @@ def _table_style(font):
 
 def _inline_md(text):
     """인라인 markdown → ReportLab 미니 HTML.
-    XML 특수문자를 먼저 이스케이프한 뒤 **굵게** 를 강조 태그로 변환한다.
-    bold 폰트가 없을 수도 있으므로 색상까지 입혀 항상 눈에 띄게 한다."""
+    XML 특수문자를 먼저 이스케이프한 뒤 **굵게** 를 <b> 태그로 변환한다.
+    (bold 폰트가 등록돼 있어 실제 굵게 렌더링됨)"""
     text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    # **굵게** / __굵게__ → 색상 강조 + bold
-    text = re.sub(
-        r"(?:\*\*|__)(.+?)(?:\*\*|__)",
-        r'<b><font color="%s">\1</font></b>' % ACCENT,
-        text,
-    )
-    # 잔여 단독 *, _ 강조 표식 제거(불릿 오인 방지 위해 굵게 처리 뒤에 수행)
+    # **굵게** / __굵게__ → bold
+    text = re.sub(r"(?:\*\*|__)(.+?)(?:\*\*|__)", r"<b>\1</b>", text)
     return text
 
 
