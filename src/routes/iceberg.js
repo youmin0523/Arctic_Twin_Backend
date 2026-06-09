@@ -11,9 +11,11 @@ router.get('/latest', async (req, res) => {
     const date = /^\d{4}-\d{2}-\d{2}$/.test(req.query.date || '') ? req.query.date : null;
     const month = /^(?:month-)?\d{2}$/.test(req.query.month || '') ? req.query.month : null;
     const selector = date || month; // 둘 중 하나라도 있으면 과거(아카이브) 모드
+    const hemisphere = req.query.hemisphere === 'south' ? 'south' : 'north';
+    // 남극은 Copernicus SAR(북극 전용) 미적용 → south 빙산 파일만 반환.
     const [nicData, copData] = await Promise.all([
-      getIcebergData(selector),
-      selector ? Promise.resolve(null) : getCopernicusIcebergData(),
+      getIcebergData(selector, hemisphere),
+      (selector || hemisphere === 'south') ? Promise.resolve(null) : getCopernicusIcebergData(),
     ]);
 
     // NIC/IIP 빙산 (남극 이미 필터링됨)
