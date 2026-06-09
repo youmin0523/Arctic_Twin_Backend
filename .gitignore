@@ -59,6 +59,12 @@ data/archive/
 data/coastline/
 # 사용자 편집 항로 런타임 공유 상태 (서버가 기록)
 data/edited_routes.json
+# 실시간 데이터 스냅샷 (fetcher 가 상시 덮어씀) — 재생성 가능, 추적 제외해 dirty 방지.
+#  프로덕션은 docker 볼륨 + 스케줄러가 재생성하므로 git 시드 불필요.
+#  (월별/일별 *_month·아카이브와 달리 이건 '최신' 단일 스냅샷)
+data/realBergData_latest.json
+data/realIceData_latest.json
+pipeline/fetchers/realBergData_latest.json
 # NOTE: backend/model/ is intentionally tracked (RL models incl. replay_buffer.pkl)
 # Downloaded data caches (regenerable .nc fetches)
 pipeline/cache/
