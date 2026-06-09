@@ -21,7 +21,7 @@ DEFAULT_ARCTIC_ROUTES_JS = (
     _THIS.parents[3] / "frontend" / "src" / "data" / "arcticRoutes.js"
 )
 
-_ROUTE_NAMES = ("NSR", "NWP", "TSR", "SUEZ", "CAPE")
+_ROUTE_NAMES = ("NSR", "NWP", "TSR", "SUEZ", "CAPE", "ROSS", "PENINSULA")
 
 # 먼저 `export const ROUTES = { ... };` 블록 전체 추출
 _ROUTES_EXPORT_RE = re.compile(
@@ -29,7 +29,8 @@ _ROUTES_EXPORT_RE = re.compile(
 )
 # 각 경로: NAME: [ ... ], (다음 NAME 또는 블록 끝)
 _ROUTE_BLOCK_RE = re.compile(
-    r"(NSR|NWP|TSR|SUEZ|CAPE)\s*:\s*\[(.*?)\]\s*,?\s*(?=(?:NSR|NWP|TSR|SUEZ|CAPE)\s*:|$)",
+    r"(NSR|NWP|TSR|SUEZ|CAPE|ROSS|PENINSULA)\s*:\s*\[(.*?)\]\s*,?\s*"
+    r"(?=(?:NSR|NWP|TSR|SUEZ|CAPE|ROSS|PENINSULA)\s*:|$)",
     re.DOTALL,
 )
 # 웨이포인트: { lon: X, lat: Y, ... }
@@ -57,7 +58,7 @@ def load_routes(js_path: Path | None = None) -> dict[str, list[Position]]:
 
     # 경로 키 위치 수집 후 각 키 사이 블록을 순차적으로 슬라이스
     key_positions: list[tuple[int, str]] = []
-    for km in re.finditer(r"(NSR|NWP|TSR|SUEZ|CAPE)\s*:\s*\[", routes_body):
+    for km in re.finditer(r"(NSR|NWP|TSR|SUEZ|CAPE|ROSS|PENINSULA)\s*:\s*\[", routes_body):
         key_positions.append((km.start(), km.group(1)))
     key_positions.sort()
 

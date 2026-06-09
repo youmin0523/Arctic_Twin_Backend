@@ -149,6 +149,36 @@ FLEET_BY_ROUTE: dict[str, list[Icebreaker]] = {
             "escorting_ship_id": None,
         },
     ],
+    # ── 남극(양극 운항) 함대 — 아라온이 남반구 여름에 양극 운항 ───────────────
+    # 한국 극지선은 아라온 1척이라 북극(NSR)·남극(ROSS/PENINSULA)을 계절별로 오간다.
+    # 남극 항로에서도 동일 아라온이 호위하되 사전배치 거점만 각 항로 해빙역 입구에 둔다.
+    # 프론트 ESCORT_ASSETS.ROSS/PENINSULA 의 home 좌표와 일치(단일 진실원).
+    "ROSS": [
+        {
+            "id": "ib-araon-ross",
+            "name_ko": "아라온",
+            "position": {"lat": -72.0, "lon": 168.5},  # 빅토리아랜드 외해(로스해 입구)
+            "home_port": "빅토리아랜드 외해 (남극 전진)",
+            "status": "idle",
+            "speed_knots": 16.0,
+            "ice_class": "Arc6",   # KR PL-10 ≈ Arc6
+            "breakable_thickness_m": 1.0,
+            "escorting_ship_id": None,
+        },
+    ],
+    "PENINSULA": [
+        {
+            "id": "ib-araon-pen",
+            "name_ko": "아라온",
+            "position": {"lat": -61.4, "lon": -60.2},  # 사우스셰틀랜드 북방
+            "home_port": "사우스셰틀랜드 북방 (남극 전진)",
+            "status": "idle",
+            "speed_knots": 16.0,
+            "ice_class": "Arc6",   # KR PL-10 ≈ Arc6
+            "breakable_thickness_m": 1.0,
+            "escorting_ship_id": None,
+        },
+    ],
 }
 
 

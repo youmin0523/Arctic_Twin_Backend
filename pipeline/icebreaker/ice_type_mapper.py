@@ -60,6 +60,19 @@ ICE_TYPE_THICKNESS_M: dict[str, float] = {
 
 
 WINTER_MONTHS: frozenset[int] = frozenset({1, 2, 3, 4, 11, 12})
+# 남반구(남극)는 계절이 반대 — austral winter 는 5~10월, 해빙 최대는 9월경.
+SOUTHERN_WINTER_MONTHS: frozenset[int] = frozenset({5, 6, 7, 8, 9, 10})
+
+
+def is_winter(month: int, lat: float) -> bool:
+    """위도 부호로 반구를 판정해 해당 반구의 겨울 여부 반환.
+
+    남극 항로(ROSS/PENINSULA, lat<0)는 austral winter(5~10월)를 겨울로 본다.
+    북반구(lat>=0)는 종전과 동일(boreal winter, 11~4월).
+    """
+    if lat < 0:
+        return month in SOUTHERN_WINTER_MONTHS
+    return month in WINTER_MONTHS
 
 
 def infer_ice_type(
@@ -97,10 +110,11 @@ def infer_ice_type(
 
     thickness 가 없는 레거시 경로에서는 종전 농도+계절+위도 휴리스틱을 사용.
     """
-    winter = month in WINTER_MONTHS
+    winter = is_winter(month, lat)
+    abs_lat = abs(lat)  # 반구 무관 고위도 판정(남극 lat<0 대응)
 
     if thickness is not None and thickness > 0.0:
-        if winter and lat >= 75.0 and thickness >= 2.5:
+        if winter and abs_lat >= 75.0 and thickness >= 2.5:
             return "Glacier Ice"
         if thickness >= 3.0:
             return "Ridged/Hummocked"
@@ -119,11 +133,11 @@ def infer_ice_type(
         return "Open Water"
 
     # ── 레거시 폴백: thickness 미제공 시 농도 기반(보수적 휴리스틱) ──
-    if winter and lat >= 75.0 and concentration >= 0.95:
+    if winter and abs_lat >= 75.0 and concentration >= 0.95:
         return "Glacier Ice"
-    if winter and lat >= 77.0 and concentration >= 0.85:
+    if winter and abs_lat >= 77.0 and concentration >= 0.85:
         return "Ridged/Hummocked"
-    if lat >= 82.0 and concentration >= 0.85:
+    if abs_lat >= 82.0 and concentration >= 0.85:
         return "Multi-Year (MY)"
 
     if winter:
@@ -147,7 +161,7 @@ def infer_ice_type(
 
 
 def winter_effective_concentration(
-    raw_conc: float, thickness: float, month: int
+    raw_conc: float, thickness: float, month: int, lat: float = 90.0
 ) -> float:
     """한겨울 정착빙 보정 — 두꺼운 빙은 밀집빙(고총농도)으로 간주.
 
@@ -162,7 +176,7 @@ def winter_effective_concentration(
     위험을 반영하도록 한다. 여름/박빙역(thickness 낮음)은 보정하지 않아
     개빙수역의 통항성을 그대로 유지한다.
     """
-    if month not in WINTER_MONTHS:
+    if not is_winter(month, lat):
         return raw_conc
     if thickness >= 1.2:        # Thick FY 이상 — 한겨울 압밀 정착빙
         floor = 0.97
@@ -248,7 +262,7 @@ class IceField:
         if ice_type == "Open Water":
             return [{"type": "Open Water", "concentration_tenths": 1.0}]
 
-        eff_conc = winter_effective_concentration(conc, thick, month)
+        eff_conc = winter_effective_concentration(conc, thick, month, pos["lat"])
         conditions: list[IceCondition] = []
         if eff_conc < 0.999:
             conditions.append(
@@ -285,10 +299,11 @@ class IceField:
 
         Returns: [{"lat", "lon", "thickness", "concentration"}], 두께 내림차순.
         """
+        # min_lat 은 반구 무관 절대위도 기준(남극 lat<0 셀도 |lat|>=min_lat 면 포함).
         mask = (
             (self._thick >= min_thick)
             & (self._conc >= min_conc)
-            & (self._lats >= min_lat)
+            & (np.abs(self._lats) >= min_lat)
         )
         idx = np.nonzero(mask)[0]
         cells = [

@@ -65,6 +65,11 @@ data/edited_routes.json
 data/realBergData_latest.json
 data/realIceData_latest.json
 pipeline/fetchers/realBergData_latest.json
+# 남극(남반구) 실시간 스냅샷 — 동일하게 스케줄러 재생성, 추적 제외.
+data/realBergData_south_latest.json
+data/realIceData_south_latest.json
+pipeline/fetchers/realBergData_south_latest.json
+pipeline/fetchers/realIceData_south_latest.json
 # NOTE: backend/model/ is intentionally tracked (RL models incl. replay_buffer.pkl)
 # Downloaded data caches (regenerable .nc fetches)
 pipeline/cache/

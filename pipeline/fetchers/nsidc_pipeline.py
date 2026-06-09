@@ -40,25 +40,42 @@ def _atomic_write_json(path, data, **dump_kwargs) -> None:
         raise
 
 # ─── NSIDC Polar Stereographic 파라미터 (공식) ─────────────────────
-TRUE_LAT = 70.0          # true scale latitude (degrees)
+TRUE_LAT = 70.0          # true scale latitude magnitude (degrees) — 양/남극 공통 |70|
 RE = 6378.273            # Earth radius (km)
 E = 0.081816153          # eccentricity (Hughes 1980 ellipsoid)
 E2 = E * E
 CELL_SIZE_KM = 25.0      # native grid spacing
 
-# 북반구 NSIDC 격자 크기
+# 북반구 NSIDC 격자 크기(하위호환 기본값 — build_xy_grids 가 반구별로 재정의)
 NX, NY = 304, 448
+
+# ── 반구별 극투영 격자/URL 설정 ──────────────────────────────────────────
+# psn25=북극(304×448), pss25=남극(316×332). 원점/그리드폭이 다르므로 분리.
+HEMI = {
+    "north": {
+        "nx": 304, "ny": 448, "x0": -3850.0, "y0": +5850.0,
+        "sign": +1, "grid": "psn25", "dir": "north",
+    },
+    "south": {
+        "nx": 316, "ny": 332, "x0": -3950.0, "y0": +4350.0,
+        "sign": -1, "grid": "pss25", "dir": "south",
+    },
+}
 
 # NOAA CDR (G02202 V5) URL 템플릿 (Earthdata 로그인 불필요)
 # NSIDC-0051은 Earthdata 인증 필요 → 대신 동일 데이터의 NOAA CDR 버전 사용
-URL_TEMPLATES = [
-    # G02202 V5 (F17 위성)
-    "https://noaadata.apps.nsidc.org/NOAA/G02202_V5/north/daily/{year}/"
-    "sic_psn25_{year}{month:02d}{day:02d}_F17_v05r00.nc",
-    # G02202 V5 (am2 위성, 2025~)
-    "https://noaadata.apps.nsidc.org/NOAA/G02202_V5/north/daily/{year}/"
-    "sic_psn25_{year}{month:02d}{day:02d}_am2_v05r00.nc",
-]
+_URL_BASE = "https://noaadata.apps.nsidc.org/NOAA/G02202_V5/{dir}/daily/{year}/"
+
+
+def url_templates(hemisphere="north"):
+    """반구별 NOAA CDR 일별 NetCDF URL 템플릿 목록(F17·am2 위성)."""
+    cfg = HEMI.get(hemisphere, HEMI["north"])
+    base = _URL_BASE + "sic_" + cfg["grid"] + "_{year}{month:02d}{day:02d}_"
+    return [base + "F17_v05r00.nc", base + "am2_v05r00.nc"]
+
+
+# 하위호환: 기존 URL_TEMPLATES 참조는 북극 기본값.
+URL_TEMPLATES = url_templates("north")
 
 # 해빙 농도 변수명 후보 (우선순위 순)
 CONC_VAR_CANDIDATES = [
@@ -70,14 +87,18 @@ CONC_VAR_CANDIDATES = [
 ]
 
 
-def polar_stereo_to_latlon(x_km, y_km):
-    """NSIDC 극좌표 (km) → 위도/경도 변환 (북반구).
+def polar_stereo_to_latlon(x_km, y_km, hemisphere="north"):
+    """NSIDC 극좌표 (km) → 위도/경도 변환 (반구 선택).
+
+    북극(sign=+1): lon = atan2(x, -y), lat = +(...).
+    남극(sign=-1): lon = atan2(x,  y), lat = -(...).
 
     References:
         Snyder, J.P., 1987. Map Projections: A Working Manual.
         NSIDC documentation for EASE/Polar Stereographic grids.
     """
-    slat = np.radians(TRUE_LAT)
+    sign = HEMI.get(hemisphere, HEMI["north"])["sign"]
+    slat = np.radians(TRUE_LAT)  # |true lat| = 70
     rho = np.sqrt(x_km**2 + y_km**2)
 
     # 공식에서 사용하는 스케일 계수
@@ -89,26 +110,25 @@ def polar_stereo_to_latlon(x_km, y_km):
     # rho가 0인 경우 (극점)
     t = rho * tc / (RE * mc)
 
-    # 반복법으로 위도 계산 (3회면 충분)
+    # 반복법으로 위도 계산 (3회면 충분) — 일단 양수 위도로 풀고 부호 적용
     lat = np.pi / 2 - 2 * np.arctan(t)
     for _ in range(3):
         lat = np.pi / 2 - 2 * np.arctan(
             t * ((1 - E * np.sin(lat)) / (1 + E * np.sin(lat))) ** (E / 2)
         )
 
-    lon = np.arctan2(x_km, -y_km)
+    lat = sign * lat
+    lon = np.arctan2(x_km, -sign * y_km)
 
     return np.degrees(lat), np.degrees(lon)
 
 
-def build_xy_grids():
-    """NSIDC 304×448 격자의 x, y 좌표(km) 생성."""
-    # 격자 원점은 좌하단, 중심은 극점
-    # x: -3850 ~ +3750 km,  y: -5350 ~ +5850 km (25km 간격)
-    x0 = -3850.0
-    y0 = +5850.0
-    x = x0 + np.arange(NX) * CELL_SIZE_KM
-    y = y0 - np.arange(NY) * CELL_SIZE_KM
+def build_xy_grids(hemisphere="north"):
+    """NSIDC 극투영 격자의 x, y 좌표(km) 생성 (반구별 크기/원점)."""
+    cfg = HEMI.get(hemisphere, HEMI["north"])
+    nx, ny, x0, y0 = cfg["nx"], cfg["ny"], cfg["x0"], cfg["y0"]
+    x = x0 + np.arange(nx) * CELL_SIZE_KM
+    y = y0 - np.arange(ny) * CELL_SIZE_KM
     xx, yy = np.meshgrid(x, y)
     return xx, yy
 
@@ -135,16 +155,17 @@ def pick_day_for_month(year, month):
     return [15, 1, last_day, 10, 20]
 
 
-def download_nc(year, month, cache_dir="cache"):
+def download_nc(year, month, cache_dir="cache", hemisphere="north"):
     """NOAA CDR 미러에서 NetCDF 다운로드. 캐시 있으면 스킵."""
     import requests
 
     os.makedirs(cache_dir, exist_ok=True)
     days = pick_day_for_month(year, month)
+    templates = url_templates(hemisphere)
 
     # 캐시에 이미 있는 파일 먼저 확인
     for day in days:
-        for tmpl in URL_TEMPLATES:
+        for tmpl in templates:
             fname = os.path.basename(tmpl.format(year=year, month=month, day=day))
             local_path = os.path.join(cache_dir, fname)
             if os.path.exists(local_path):
@@ -153,7 +174,7 @@ def download_nc(year, month, cache_dir="cache"):
 
     # 다운로드 시도: 날짜 × URL 템플릿 조합
     for day in days:
-        for tmpl in URL_TEMPLATES:
+        for tmpl in templates:
             url = tmpl.format(year=year, month=month, day=day)
             fname = os.path.basename(url)
             local_path = os.path.join(cache_dir, fname)
@@ -179,11 +200,12 @@ def download_nc(year, month, cache_dir="cache"):
     )
 
 
-def process_nc(nc_path, date_str, month, step=2, min_conc=0.05, min_lat=60.0):
+def process_nc(nc_path, date_str, month, step=2, min_conc=0.05, min_lat=60.0,
+               hemisphere="north"):
     """NetCDF → JSON dict 변환."""
     import xarray as xr
 
-    print(f"[처리] {nc_path} (step={step})")
+    print(f"[처리][{hemisphere}] {nc_path} (step={step})")
     ds = xr.open_dataset(nc_path)
 
     var_name = find_conc_variable(ds)
@@ -200,22 +222,22 @@ def process_nc(nc_path, date_str, month, step=2, min_conc=0.05, min_lat=60.0):
     elif np.nanmax(conc) > 1.5:
         conc = conc / 100.0  # percent → fraction
 
-    # 격자 좌표 생성
-    xx, yy = build_xy_grids()
+    # 격자 좌표 생성(반구별 크기/원점)
+    xx, yy = build_xy_grids(hemisphere)
 
-    # 극좌표 → 위경도
-    lats, lons = polar_stereo_to_latlon(xx, yy)
+    # 극좌표 → 위경도(반구별 부호)
+    lats, lons = polar_stereo_to_latlon(xx, yy, hemisphere)
 
     # 다운샘플링
     conc_ds = conc[::step, ::step]
     lats_ds = lats[::step, ::step]
     lons_ds = lons[::step, ::step]
 
-    # 필터링
+    # 필터링 — min_lat 은 반구 무관 절대위도(남극 lat<0 대응)
     mask = (
         np.isfinite(conc_ds)
         & (conc_ds >= min_conc)
-        & (lats_ds >= min_lat)
+        & (np.abs(lats_ds) >= min_lat)
         & (conc_ds <= 1.0)
     )
 
@@ -231,6 +253,7 @@ def process_nc(nc_path, date_str, month, step=2, min_conc=0.05, min_lat=60.0):
     result = {
         "source": "NOAA/NSIDC CDR G02202 V5",
         "provider": "NOAA/NSIDC",
+        "hemisphere": hemisphere,
         "date": date_str,
         "month": month,
         "grid_resolution_km": int(CELL_SIZE_KM * step),
@@ -243,11 +266,15 @@ def process_nc(nc_path, date_str, month, step=2, min_conc=0.05, min_lat=60.0):
     return result
 
 
-def save_json(data, month, output_dir="output"):
-    """JSON 파일 저장 (월별은 output_dir/monthly/ 하위에 저장)."""
+def save_json(data, month, output_dir="output", hemisphere="north"):
+    """JSON 파일 저장 (월별은 output_dir/monthly/ 하위에 저장).
+
+    남극은 realIceData_south_monthNN.json 으로 분리 저장(북극 파일 비파괴).
+    """
     monthly_dir = os.path.join(output_dir, "monthly")
     os.makedirs(monthly_dir, exist_ok=True)
-    fname = f"realIceData_month{month:02d}.json"
+    prefix = "realIceData_south" if hemisphere == "south" else "realIceData"
+    fname = f"{prefix}_month{month:02d}.json"
     out_path = os.path.join(monthly_dir, fname)
     _atomic_write_json(out_path, data, ensure_ascii=False)
     size_mb = os.path.getsize(out_path) / (1024 * 1024)
@@ -280,6 +307,10 @@ def main():
         "--min-conc", type=float, default=0.05,
         help="최소 농도 임계값 (기본: 0.05)"
     )
+    parser.add_argument(
+        "--hemisphere", choices=["north", "south"], default="north",
+        help="north=북극(psn25, 기본) | south=남극(pss25, ROSS/PENINSULA)"
+    )
 
     args = parser.parse_args()
 
@@ -302,13 +333,13 @@ def main():
                 nc_path = args.local_file
                 date_str = f"{args.year}{m:02d}15"
             else:
-                nc_path, date_str = download_nc(args.year, m)
+                nc_path, date_str = download_nc(args.year, m, hemisphere=args.hemisphere)
 
             data = process_nc(
                 nc_path, date_str, m,
-                step=args.step, min_conc=args.min_conc
+                step=args.step, min_conc=args.min_conc, hemisphere=args.hemisphere
             )
-            save_json(data, m, args.output_dir)
+            save_json(data, m, args.output_dir, hemisphere=args.hemisphere)
 
         except Exception as e:
             print(f"[오류] {args.year}년 {m}월 처리 실패: {e}")
