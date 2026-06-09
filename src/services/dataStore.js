@@ -73,8 +73,10 @@ async function getIceData(type, month) {
 // month 미지정/'latest': DB(bergs 테이블) 우선 → realBergData_latest.json 폴백.
 // month='YYYY-MM-DD': 날짜별 아카이브(archive/daily/realBergData_YYYYMMDD.json) 우선,
 //   해당 날짜 스냅샷이 아직 없으면 latest 경로로 폴백한다(아카이브 적산 전 과거 날짜 대응).
+// month='month-06'|'06': 월별 레퍼런스(monthly/realBergData_month06.json — NSIDC IIP
+//   다년 누적 월별 분포). 파일이 없으면 latest 경로로 폴백.
 async function getIcebergData(month) {
-  // 날짜별 아카이브 요청 처리 (월별 'month-06' 등은 정규식 불일치 → latest 경로로 폴백)
+  // 날짜별 아카이브 요청 처리
   if (month && /^\d{4}-\d{2}-\d{2}$/.test(month)) {
     const cacheKey = `icebergs_${month}`;
     const cached = getCached(cacheKey);
@@ -91,6 +93,25 @@ async function getIcebergData(month) {
       return dated;
     }
     // 해당 날짜 아카이브 없음 → 아래 latest 경로로 폴백
+  }
+
+  // 월별 레퍼런스 요청 처리 ('month-06' 또는 '06')
+  const mMonthly = month && /^(?:month-)?(\d{2})$/.exec(month);
+  if (mMonthly) {
+    const mm = mMonthly[1];
+    const cacheKey = `icebergs_month_${mm}`;
+    const cached = getCached(cacheKey);
+    if (cached) return cached;
+
+    const file = path.join(DATA_DIR, 'monthly', `realBergData_month${mm}.json`);
+    const monthly = await readJsonFile(file);
+    if (monthly && monthly.bergs) {
+      monthly.bergs = monthly.bergs.filter((b) => b.lat >= 0); // 남극 제외(방어)
+      monthly.berg_count = monthly.bergs.length;
+      setCache(cacheKey, monthly);
+      return monthly;
+    }
+    // 월별 berg 파일 없음 → 아래 latest 경로로 폴백
   }
 
   const cacheKey = 'icebergs_latest';
