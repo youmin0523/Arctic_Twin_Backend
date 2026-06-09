@@ -2,13 +2,16 @@ const express = require('express');
 const router = express.Router();
 const { getIcebergData, getCopernicusIcebergData } = require('../services/dataStore');
 
-// GET /api/icebergs/latest
-// NIC/IIP 빙산 + Copernicus SAR 빙산 통합 반환
+// GET /api/icebergs/latest[?date=YYYY-MM-DD]
+// NIC/IIP 빙산 + Copernicus SAR 빙산 통합 반환.
+// date 지정 시(빙하 아카이브) 해당 날짜 실측 빙산 아카이브를 반환하며,
+//   현재 시점 전용인 Copernicus SAR는 제외한다(과거 날짜에 최신 SAR 혼입 방지).
 router.get('/latest', async (req, res) => {
   try {
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(req.query.date || '') ? req.query.date : null;
     const [nicData, copData] = await Promise.all([
-      getIcebergData(),
-      getCopernicusIcebergData(),
+      getIcebergData(date),
+      date ? Promise.resolve(null) : getCopernicusIcebergData(),
     ]);
 
     // NIC/IIP 빙산 (남극 이미 필터링됨)
