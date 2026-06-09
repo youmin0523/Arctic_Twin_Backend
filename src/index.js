@@ -336,18 +336,27 @@ const ICE_FETCHER_PATH = path.join(
   __dirname, '..', 'pipeline', 'fetchers', 'copernicus_fetcher.py'
 );
 
-function runIceFetcher() {
-  console.log('[Scheduler] Running copernicus_fetcher (sea ice concentration)...');
+// 반구 1개 수집(copernicus_fetcher --hemisphere). north 완료 후 south 를 체인 실행해
+// 동시 다운로드로 인한 EC2 부하/디스크 스파이크를 피한다([ec2-deploy-disk-risk]).
+function runIceFetcherHemisphere(hemisphere, done) {
+  const tag = hemisphere === 'south' ? 'IceFetcher:S' : 'IceFetcher:N';
+  console.log(`[Scheduler] Running copernicus_fetcher (sea ice, ${hemisphere})...`);
   const env = uvEnv({
     COPERNICUSMARINE_SERVICE_USERNAME: process.env.COPERNICUS_MARINE_USER,
     COPERNICUSMARINE_SERVICE_PASSWORD: process.env.COPERNICUS_MARINE_PASSWORD,
   });
-  const { cmd, args } = uvCommand([ICE_FETCHER_PATH]);
+  const { cmd, args } = uvCommand([ICE_FETCHER_PATH, '--hemisphere', hemisphere]);
   execFile(cmd, args, { env, timeout: 600000 }, (err, stdout, stderr) => {
-    if (err) console.error('[Scheduler] Ice fetcher error:', err.message);
-    if (stdout) console.log('[IceFetcher]', stdout.trim().slice(-500));
-    if (stderr) console.error('[IceFetcher] stderr:', stderr.trim().slice(-200));
+    if (err) console.error(`[Scheduler] ${tag} error:`, err.message);
+    if (stdout) console.log(`[${tag}]`, stdout.trim().slice(-500));
+    if (stderr) console.error(`[${tag}] stderr:`, stderr.trim().slice(-200));
+    if (done) done();
   });
+}
+
+function runIceFetcher() {
+  // 북극(NSR/NWP/TSR) 우선, 완료 후 남극(ROSS/PENINSULA, 아라온 양극 운항) 수집.
+  runIceFetcherHemisphere('north', () => runIceFetcherHemisphere('south'));
 }
 
 // ── Sentinel-1 IW Glacier Archive scheduler ─────────────────────

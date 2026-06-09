@@ -4,13 +4,14 @@ const fs = require('fs');
 const path = require('path');
 const { getIceData } = require('../services/dataStore');
 
-// GET /api/ice/concentration?month=2023-03
+// GET /api/ice/concentration?month=2023-03[&hemisphere=south]
 router.get('/concentration', async (req, res) => {
   try {
     const month = req.query.month || 'latest';
-    const data = await getIceData('concentration', month);
+    const hemisphere = req.query.hemisphere === 'south' ? 'south' : 'north';
+    const data = await getIceData('concentration', month, hemisphere);
     if (!data) {
-      return res.status(404).json({ error: `Ice data not found for month: ${month}` });
+      return res.status(404).json({ error: `Ice data not found for ${hemisphere} month: ${month}` });
     }
     res.json(data);
   } catch (err) {

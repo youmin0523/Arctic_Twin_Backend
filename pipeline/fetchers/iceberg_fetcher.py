@@ -259,35 +259,64 @@ def fetch_all():
         print("[ERROR] No iceberg data from any source")
         return None
 
-    # //* [Modified Code] 북극 디지털 트윈이므로 북반구(lat>0) 빙산만 보존.
-    #   NIC/GitHub 소스는 대부분 남극(A-series) 대형 빙산이라 그대로 두면
-    #   북극 지도와 무관한 데이터가 섞인다 → 소스 단계에서 제외.
-    before = len(all_bergs)
-    all_bergs = [b for b in all_bergs if b.get("lat", 0) > 0]
-    dropped = before - len(all_bergs)
-    if dropped:
-        print(f"[FILTER] 남반구 빙산 {dropped}개 제외 (북극 전용)")
-    if not all_bergs:
-        print("[ERROR] 북반구 빙산이 없음 (모든 소스가 남극 데이터)")
-        return None
+    # //* [Modified Code] 양극 운항(아라온) 지원 — 북극(NSR/NWP/TSR)과 남극
+    #   (ROSS/PENINSULA) 모두 다루므로 반구별로 분리해 둘 다 보존한다.
+    #   NIC 소스는 남극 A-series 대형 탁상빙산이 풍부 → 남극 항로의 핵심 위협원.
+    #   각 빙산에 hemisphere 태그를 붙이고, save_json 이 반구별 파일로 나눠 쓴다.
+    for b in all_bergs:
+        b["hemisphere"] = "north" if b.get("lat", 0) >= 0 else "south"
+
+    north = [b for b in all_bergs if b["hemisphere"] == "north"]
+    south = [b for b in all_bergs if b["hemisphere"] == "south"]
+    print(f"\n[SPLIT] 북반구 {len(north)}개 / 남반구 {len(south)}개")
 
     result = {
         "source": " / ".join(sources),
         "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "berg_count": len(all_bergs),
         "bergs": all_bergs,
+        "bergs_north": north,
+        "bergs_south": south,
     }
-    print(f"\n[TOTAL] {len(all_bergs)} 북반구 icebergs from: {', '.join(sources)}")
+    print(f"[TOTAL] {len(all_bergs)} icebergs from: {', '.join(sources)}")
     return result
 
 
+SOUTH_FILENAME = "realBergData_south_latest.json"
+
+
+def _berg_doc(src_data, bergs):
+    """반구별 빙산 문서 생성(원본 메타 보존 + berg_count 재계산)."""
+    return {
+        "source": src_data.get("source", ""),
+        "date": src_data.get("date", ""),
+        "berg_count": len(bergs),
+        "bergs": bergs,
+    }
+
+
 def save_json(data):
-    """JSON 저장."""
+    """JSON 저장 — 북극(realBergData_latest)·남극(realBergData_south_latest) 분리."""
     os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    # 북극: 기존 파일명 유지(프론트 Arctic 호환). bergs 는 북반구만.
+    north = data.get("bergs_north", [b for b in data.get("bergs", []) if b.get("lat", 0) >= 0])
+    south = data.get("bergs_south", [b for b in data.get("bergs", []) if b.get("lat", 0) < 0])
+
+    north_doc = _berg_doc(data, north)
     out_path = os.path.join(OUTPUT_DIR, FILENAME)
-    _atomic_write_json(out_path, data, ensure_ascii=False, indent=2)
+    _atomic_write_json(out_path, north_doc, ensure_ascii=False, indent=2)
     size_kb = os.path.getsize(out_path) / 1024
-    print(f"[saved] {out_path} ({size_kb:.0f} KB)")
+    print(f"[saved] {out_path} ({size_kb:.0f} KB, 북극 {len(north)}개)")
+
+    # 남극: 별도 파일(아라온 ROSS/PENINSULA 위협원).
+    south_doc = _berg_doc(data, south)
+    south_path = os.path.join(OUTPUT_DIR, SOUTH_FILENAME)
+    _atomic_write_json(south_path, south_doc, ensure_ascii=False, indent=2)
+    print(f"[saved] {south_path} (남극 {len(south)}개)")
+
+    # 이하 아카이브/HTML 복사는 북극 문서(data 대신 north_doc) 기준 — 기존과 동일 파일명.
+    data = north_doc
 
     # 날짜별 아카이브 스냅샷도 함께 보관 → 빙하 아카이브(Archives)가 과거 날짜에서
     #   해당 시점 실측 빙산을 그대로 재현할 수 있게 한다(해빙 농도 셀 대체 표시 제거).

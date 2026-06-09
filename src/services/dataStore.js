@@ -34,24 +34,26 @@ async function readJsonFile(filePath) {
 // [의도] 해빙 농도(realIceData_*.json)는 대용량 지오공간 blob 이라 DB 미동기화 — 파일 서빙 전용.
 // (DB-first 는 구조화/쿼리 가능한 데이터셋(icebergs/bergs/sentinel1/sar/simulations)에만 적용.
 //  단일 EC2 운영이므로 fetcher 쓰기 ↔ reader 읽기가 같은 디스크 → 파일 서빙으로 충분)
-async function getIceData(type, month) {
-  const cacheKey = `ice_${type}_${month}`;
+async function getIceData(type, month, hemisphere = 'north') {
+  const cacheKey = `ice_${type}_${hemisphere}_${month}`;
   const cached = getCached(cacheKey);
   if (cached) return cached;
 
   // 월별 레퍼런스는 data/monthly/, latest 라이브 데이터는 data/ 최상위
   const MONTHLY_DIR = path.join(DATA_DIR, 'monthly');
+  // 남극(남반구)은 realIceData_south_* 파일군을 사용(북극 파일 비파괴).
+  const PREFIX = hemisphere === 'south' ? 'realIceData_south' : 'realIceData';
 
   let filePath;
   if (month === 'latest') {
-    filePath = path.join(DATA_DIR, 'realIceData_latest.json');
+    filePath = path.join(DATA_DIR, `${PREFIX}_latest.json`);
   } else if (/^\d{4}-\d{2}-\d{2}$/.test(month)) {
-    // 날짜별 적산 아카이브: "2026-05-26" → archive/daily/realIceData_20260526.json
-    filePath = path.join(DATA_DIR, 'archive', 'daily', `realIceData_${month.replace(/-/g, '')}.json`);
+    // 날짜별 적산 아카이브: "2026-05-26" → archive/daily/{PREFIX}_20260526.json
+    filePath = path.join(DATA_DIR, 'archive', 'daily', `${PREFIX}_${month.replace(/-/g, '')}.json`);
   } else {
     // 월별: "2023-03" 또는 "month-03" → "03"
     const mm = month.includes('-') ? month.split('-')[1] : month;
-    filePath = path.join(MONTHLY_DIR, `realIceData_month${mm}.json`);
+    filePath = path.join(MONTHLY_DIR, `${PREFIX}_month${mm}.json`);
   }
 
   let data = await readJsonFile(filePath);
@@ -60,8 +62,8 @@ async function getIceData(type, month) {
   if (!data && month === 'latest') {
     for (let m = 12; m >= 1; m--) {
       const mm = String(m).padStart(2, '0');
-      data = await readJsonFile(path.join(MONTHLY_DIR, `realIceData_month${mm}.json`));
-      if (data) { console.log(`[DataStore] realIceData_latest.json 없음 → month${mm} 폴백`); break; }
+      data = await readJsonFile(path.join(MONTHLY_DIR, `${PREFIX}_month${mm}.json`));
+      if (data) { console.log(`[DataStore] ${PREFIX}_latest.json 없음 → ${PREFIX}_month${mm} 폴백`); break; }
     }
   }
 
@@ -75,7 +77,23 @@ async function getIceData(type, month) {
 //   해당 날짜 스냅샷이 아직 없으면 latest 경로로 폴백한다(아카이브 적산 전 과거 날짜 대응).
 // month='month-06'|'06': 월별 레퍼런스(monthly/realBergData_month06.json — NSIDC IIP
 //   다년 누적 월별 분포). 파일이 없으면 latest 경로로 폴백.
-async function getIcebergData(month) {
+async function getIcebergData(month, hemisphere = 'north') {
+  // 남극(남반구) — realBergData_south_latest.json 의 Antarctic A-series 대형 탁상빙산.
+  //   DB(bergs 테이블)는 북극(lat>=0)만 적재하므로 남극은 파일 직접 서빙.
+  //   남극 일자별/월별 아카이브는 미생성 → latest 로만 제공.
+  if (hemisphere === 'south') {
+    const cacheKey = 'icebergs_south_latest';
+    const cached = getCached(cacheKey);
+    if (cached) return cached;
+    const data = await readJsonFile(path.join(DATA_DIR, 'realBergData_south_latest.json'));
+    if (data && data.bergs) {
+      data.bergs = data.bergs.filter((b) => b.lat < 0); // 남반구만(방어)
+      data.berg_count = data.bergs.length;
+      setCache(cacheKey, data);
+    }
+    return data;
+  }
+
   // 날짜별 아카이브 요청 처리
   if (month && /^\d{4}-\d{2}-\d{2}$/.test(month)) {
     const cacheKey = `icebergs_${month}`;
