@@ -289,6 +289,17 @@ def save_json(data):
     size_kb = os.path.getsize(out_path) / 1024
     print(f"[saved] {out_path} ({size_kb:.0f} KB)")
 
+    # 날짜별 아카이브 스냅샷도 함께 보관 → 빙하 아카이브(Archives)가 과거 날짜에서
+    #   해당 시점 실측 빙산을 그대로 재현할 수 있게 한다(해빙 농도 셀 대체 표시 제거).
+    #   해빙 농도 아카이브와 동일하게 archive/daily/ 에 realBergData_YYYYMMDD.json 으로 적산.
+    try:
+        dated_name = f"realBergData_{datetime.now(timezone.utc).strftime('%Y%m%d')}.json"
+        archive_path = os.path.join(OUTPUT_DIR, "archive", "daily", dated_name)
+        _atomic_write_json(archive_path, data, ensure_ascii=False, indent=2)
+        print(f"[archived] {archive_path}")
+    except Exception as e:  # 아카이브 실패해도 latest 저장은 유지
+        print(f"[WARN] 날짜별 아카이브 저장 실패(무시): {e}")
+
     # HTML 폴더에도 복사
     html_dir = os.path.dirname(os.path.abspath(__file__))
     html_path = os.path.join(html_dir, FILENAME)
