@@ -59,8 +59,6 @@ logging.basicConfig(
 log = logging.getLogger("ice_fetcher")
 
 # ─── 설정 ────────────────────────────────────────────────────────────
-DATASET_ID = "cmems_mod_arc_phy_anfc_6km_detided_P1D-m"
-PRODUCT_ID = "ARCTIC_ANALYSISFORECAST_PHY_ICE_002_011"
 VARIABLE = "sea_ice_area_fraction"
 # 대체 변수명 후보 (데이터셋 버전에 따라 다를 수 있음)
 VARIABLE_CANDIDATES = [
@@ -69,7 +67,32 @@ VARIABLE_CANDIDATES = [
     "ice_concentration",
     "sic",
 ]
-MIN_LAT = 60.0
+
+# ── 반구별 데이터셋 설정 ─────────────────────────────────────────────────
+# 북극: Arctic 전용 6km 분석예보 product.
+# 남극: 남극 전용 product 부재 → 전지구 물리예보(GLOBAL_ANALYSISFORECAST)의
+#   siconc 변수를 남위 -50° 이남으로 잘라 사용(아라온 ROSS/PENINSULA 항로 커버).
+HEMISPHERES = {
+    "north": {
+        "dataset_id": "cmems_mod_arc_phy_anfc_6km_detided_P1D-m",
+        "product_id": "ARCTIC_ANALYSISFORECAST_PHY_ICE_002_011",
+        "lat_min": 60.0,
+        "lat_max": 90.0,
+        "out_latest": "realIceData_latest.json",
+    },
+    "south": {
+        "dataset_id": "cmems_mod_glo_phy_anfc_0.083deg_P1D-m",
+        "product_id": "GLOBAL_ANALYSISFORECAST_PHY_001_024",
+        "lat_min": -90.0,
+        "lat_max": -50.0,
+        "out_latest": "realIceData_south_latest.json",
+    },
+}
+
+# 하위호환: 기존 참조(DATASET_ID/PRODUCT_ID/MIN_LAT)는 북극 기본값으로 유지.
+DATASET_ID = HEMISPHERES["north"]["dataset_id"]
+PRODUCT_ID = HEMISPHERES["north"]["product_id"]
+MIN_LAT = HEMISPHERES["north"]["lat_min"]
 STEP = 3  # 6km * 3 = 18km 간격 다운샘플링 (파일 크기 관리)
 MIN_CONC = 0.05
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
@@ -129,8 +152,18 @@ def find_variable(ds):
     )
 
 
-def fetch_copernicus(target_date=None, step=STEP, dry_run=False):
-    """Copernicus Marine Service에서 해빙 데이터 수집."""
+def fetch_copernicus(target_date=None, step=STEP, dry_run=False, hemisphere="north"):
+    """Copernicus Marine Service에서 해빙 데이터 수집.
+
+    hemisphere="north"(기본, 북극) | "south"(남극). 남극은 전지구 product 의
+    siconc 를 남위 -50° 이남으로 잘라 사용.
+    """
+    cfg = HEMISPHERES.get(hemisphere, HEMISPHERES["north"])
+    dataset_id = cfg["dataset_id"]
+    product_id = cfg["product_id"]
+    lat_min = cfg["lat_min"]
+    lat_max = cfg["lat_max"]
+
     try:
         import copernicusmarine
     except ImportError:
@@ -152,19 +185,21 @@ def fetch_copernicus(target_date=None, step=STEP, dry_run=False):
 
     date_str = dt.strftime("%Y-%m-%d")
     date_compact = dt.strftime("%Y%m%d")
-    log.info(f"Target date: {date_str}")
+    log.info(f"[{hemisphere}] Target date: {date_str}")
 
     if dry_run:
-        log.info(f"[DRY-RUN] dataset={DATASET_ID} variable={VARIABLE} date={date_str} lat>={MIN_LAT} step={step}(~{6*step}km)")
+        log.info(f"[DRY-RUN][{hemisphere}] dataset={dataset_id} variable={VARIABLE} "
+                 f"date={date_str} lat=[{lat_min},{lat_max}] step={step}(~{6*step}km)")
         return None
 
     # 데이터셋 열기
-    log.info(f"Opening dataset: {DATASET_ID}")
+    log.info(f"Opening dataset: {dataset_id}")
     try:
         ds = copernicusmarine.open_dataset(
-            dataset_id=DATASET_ID,
+            dataset_id=dataset_id,
             variables=[VARIABLE],
-            minimum_latitude=MIN_LAT,
+            minimum_latitude=lat_min,
+            maximum_latitude=lat_max,
             minimum_longitude=-180,
             maximum_longitude=180,
             start_datetime=f"{date_str}T00:00:00",
@@ -177,8 +212,9 @@ def fetch_copernicus(target_date=None, step=STEP, dry_run=False):
         log.info("Retrying without variable filter...")
         try:
             ds = copernicusmarine.open_dataset(
-                dataset_id=DATASET_ID,
-                minimum_latitude=MIN_LAT,
+                dataset_id=dataset_id,
+                minimum_latitude=lat_min,
+                maximum_latitude=lat_max,
                 start_datetime=f"{date_str}T00:00:00",
                 end_datetime=f"{date_str}T23:59:59",
             )
@@ -208,10 +244,10 @@ def fetch_copernicus(target_date=None, step=STEP, dry_run=False):
     if max_val > 1.5:
         conc_ds = conc_ds / 100.0
 
-    # 셀 추출
+    # 셀 추출 — 반구별 위도 범위([lat_min, lat_max]) 안의 셀만.
     cells = []
     for i, lat in enumerate(lats):
-        if lat < MIN_LAT:
+        if not (lat_min <= lat <= lat_max):
             continue
         for j, lon in enumerate(lons):
             c = float(conc_ds[i, j])
@@ -223,8 +259,9 @@ def fetch_copernicus(target_date=None, step=STEP, dry_run=False):
                 })
 
     result = {
-        "source": f"Copernicus Marine Service {PRODUCT_ID}",
+        "source": f"Copernicus Marine Service {product_id}",
         "provider": "EU Copernicus / Mercator Ocean",
+        "hemisphere": hemisphere,
         "date": date_compact,
         "month": dt.month,
         "grid_resolution_km": 6 * step,
@@ -238,20 +275,24 @@ def fetch_copernicus(target_date=None, step=STEP, dry_run=False):
 
 
 def save_json(data, output_dir=OUTPUT_DIR, archive_dir=ARCHIVE_DIR):
-    """JSON 저장: latest + 날짜별 아카이브."""
+    """JSON 저장: latest + 날짜별 아카이브. 남극은 별도 파일(realIceData_south_*)."""
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(archive_dir, exist_ok=True)
 
     date_str = data["date"]
+    hemi = data.get("hemisphere", "north")
+    cfg = HEMISPHERES.get(hemi, HEMISPHERES["north"])
+    latest_name = cfg["out_latest"]
+    archive_prefix = "realIceData_south" if hemi == "south" else "realIceData"
 
     # latest (항상 덮어씀)
-    latest_path = os.path.join(output_dir, "realIceData_latest.json")
+    latest_path = os.path.join(output_dir, latest_name)
     _atomic_write_json(latest_path, data, ensure_ascii=False)
     size_kb = os.path.getsize(latest_path) / 1024
     log.info(f"Saved: {latest_path} ({size_kb:.0f} KB, {data['cell_count']} cells)")
 
     # 날짜별 아카이브 (기존 파일 보존)
-    archive_path = os.path.join(archive_dir, f"realIceData_{date_str}.json")
+    archive_path = os.path.join(archive_dir, f"{archive_prefix}_{date_str}.json")
     if not os.path.exists(archive_path):
         _atomic_write_json(archive_path, data, ensure_ascii=False)
         log.info(f"Archived: {archive_path}")
@@ -261,14 +302,16 @@ def save_json(data, output_dir=OUTPUT_DIR, archive_dir=ARCHIVE_DIR):
     return latest_path
 
 
-def run_once(target_date=None, step=STEP, dry_run=False):
+def run_once(target_date=None, step=STEP, dry_run=False, hemisphere="north"):
     """1회 수집."""
-    data = fetch_copernicus(target_date=target_date, step=step, dry_run=dry_run)
+    data = fetch_copernicus(
+        target_date=target_date, step=step, dry_run=dry_run, hemisphere=hemisphere
+    )
     if data and not dry_run:
         path = save_json(data)
-        # HTML 폴더에도 복사
+        # HTML 폴더에도 복사 (반구별 파일명 유지)
         html_dir = os.path.dirname(os.path.abspath(__file__))
-        html_latest = os.path.join(html_dir, "realIceData_latest.json")
+        html_latest = os.path.join(html_dir, os.path.basename(path))
         import shutil
         shutil.copy2(path, html_latest)
         log.info(f"Copied to: {html_latest}")
@@ -316,13 +359,18 @@ def main():
         "--dry-run", action="store_true",
         help="Check config without downloading"
     )
+    parser.add_argument(
+        "--hemisphere", choices=["north", "south"], default="north",
+        help="north=북극(Arctic, 기본) | south=남극(Antarctic, ROSS/PENINSULA)"
+    )
 
     args = parser.parse_args()
 
     if args.schedule:
         run_scheduled()
     else:
-        data = run_once(target_date=args.date, step=args.step, dry_run=args.dry_run)
+        data = run_once(target_date=args.date, step=args.step, dry_run=args.dry_run,
+                        hemisphere=args.hemisphere)
         if data:
             log.info(f"Done! {data['cell_count']} cells saved.")
         elif not args.dry_run:

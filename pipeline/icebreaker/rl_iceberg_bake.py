@@ -230,6 +230,9 @@ def _load_trainer(route_key: str, verbose: bool):
     global _RL_IMPORT_FAILED
     if _RL_IMPORT_FAILED:
         return None
+    # 남극 항로(ROSS/PENINSULA)는 전용 모델 재학습 없이 북극 NSR 빙산회피 모델을
+    # 재사용한다(빙역 회피 정책은 반구 무관 일반화). 입력 위협셀은 IceField 의
+    # 절대위도 기반 high_threat_cells 가 남극 셀도 포함하므로 동작 정합.
     key = route_key if route_key in ("NSR", "NWP", "TSR") else "NSR"
     if key in _TRAINER_CACHE:
         return _TRAINER_CACHE[key]
