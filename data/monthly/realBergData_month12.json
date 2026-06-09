@@ -1,0 +1,918 @@
+{
+  "source": "NSIDC International Ice Patrol (G00807)",
+  "month": "12",
+  "years": [
+    2021,
+    2020,
+    2019,
+    2018,
+    2017,
+    2016,
+    2015,
+    2014
+  ],
+  "note": "다년 누적 월별 대표 분포(climatology) · 북대서양 IIP 구역",
+  "berg_count": 100,
+  "bergs": [
+    {
+      "id": "IIP-2021-86",
+      "lon": -60.252,
+      "lat": 56.503,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/1/2020"
+    },
+    {
+      "id": "IIP-2021-65",
+      "lon": -57.037,
+      "lat": 54.02,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/1/2020"
+    },
+    {
+      "id": "IIP-2021-75",
+      "lon": -56.835,
+      "lat": 53.893,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/1/2020"
+    },
+    {
+      "id": "IIP-2021-79",
+      "lon": -56.855,
+      "lat": 54.657,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/3/2020"
+    },
+    {
+      "id": "IIP-2021-51",
+      "lon": -64.02,
+      "lat": 60.09,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/6/2020"
+    },
+    {
+      "id": "IIP-2021-61",
+      "lon": -63.723,
+      "lat": 59.728,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/6/2020"
+    },
+    {
+      "id": "IIP-2021-87",
+      "lon": -58.85,
+      "lat": 54.952,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/8/2020"
+    },
+    {
+      "id": "IIP-2021-88",
+      "lon": -55.643,
+      "lat": 55.683,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/10/2020"
+    },
+    {
+      "id": "IIP-2021-80",
+      "lon": -54.187,
+      "lat": 54.447,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/13/2020"
+    },
+    {
+      "id": "IIP-2021-89",
+      "lon": -57.465,
+      "lat": 54.822,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/16/2020"
+    },
+    {
+      "id": "IIP-2021-85",
+      "lon": -58.11,
+      "lat": 55.01,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/19/2020"
+    },
+    {
+      "id": "IIP-2021-90",
+      "lon": -60.178,
+      "lat": 59.55,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/27/2020"
+    },
+    {
+      "id": "IIP-2021-91",
+      "lon": -58.067,
+      "lat": 58.852,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/29/2020"
+    },
+    {
+      "id": "IIP-2021-92",
+      "lon": -57.017,
+      "lat": 54.923,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/31/2020"
+    },
+    {
+      "id": "IIP-2021-61",
+      "lon": -62.598,
+      "lat": 59.655,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/31/2020"
+    },
+    {
+      "id": "IIP-2020-141",
+      "lon": -60.448,
+      "lat": 57.863,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/01/2019"
+    },
+    {
+      "id": "IIP-2020-100",
+      "lon": -60.912,
+      "lat": 57.983,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/06/2019"
+    },
+    {
+      "id": "IIP-2020-135",
+      "lon": -59.857,
+      "lat": 56.633,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/06/2019"
+    },
+    {
+      "id": "IIP-2020-102",
+      "lon": -62.732,
+      "lat": 59.73,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/06/2019"
+    },
+    {
+      "id": "IIP-2020-130",
+      "lon": -61.237,
+      "lat": 58.412,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/08/2019"
+    },
+    {
+      "id": "IIP-2020-134",
+      "lon": -61.202,
+      "lat": 57.345,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/08/2019"
+    },
+    {
+      "id": "IIP-2020-85",
+      "lon": -57.772,
+      "lat": 54.895,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/14/2019"
+    },
+    {
+      "id": "IIP-2020-102",
+      "lon": -63.227,
+      "lat": 59.373,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/25/2019"
+    },
+    {
+      "id": "IIP-2020-142",
+      "lon": -63.435,
+      "lat": 59.572,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/25/2019"
+    },
+    {
+      "id": "IIP-2020-143",
+      "lon": -63.685,
+      "lat": 59.523,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/25/2019"
+    },
+    {
+      "id": "IIP-2019-92",
+      "lon": -59.83,
+      "lat": 58.218,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/2/2018"
+    },
+    {
+      "id": "IIP-2019-93",
+      "lon": -59.397,
+      "lat": 57.188,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/2/2018"
+    },
+    {
+      "id": "IIP-2019-70",
+      "lon": -61.993,
+      "lat": 58.082,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2018"
+    },
+    {
+      "id": "IIP-2017-87",
+      "lon": -57.4,
+      "lat": 51.12,
+      "length_m": 1500,
+      "width_m": 600,
+      "type": "medium",
+      "last_update": "12/3/2016"
+    },
+    {
+      "id": "IIP-2017-95",
+      "lon": -57.52,
+      "lat": 51.0,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/3/2016"
+    },
+    {
+      "id": "IIP-2017-88",
+      "lon": -55.37,
+      "lat": 51.82,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/3/2016"
+    },
+    {
+      "id": "IIP-2017-89",
+      "lon": -61.2,
+      "lat": 59.83,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-90",
+      "lon": -61.62,
+      "lat": 60.52,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-91",
+      "lon": -61.4,
+      "lat": 60.18,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-92",
+      "lon": -63.23,
+      "lat": 59.65,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-93",
+      "lon": -62.8,
+      "lat": 59.63,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-94",
+      "lon": -60.83,
+      "lat": 58.22,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-82",
+      "lon": -59.65,
+      "lat": 55.83,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-86",
+      "lon": -59.97,
+      "lat": 56.0,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-85",
+      "lon": -59.97,
+      "lat": 55.95,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2016"
+    },
+    {
+      "id": "IIP-2017-76",
+      "lon": -56.38,
+      "lat": 54.1,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-78",
+      "lon": -56.9,
+      "lat": 54.73,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-77",
+      "lon": -59.98,
+      "lat": 56.59,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-86",
+      "lon": -59.98,
+      "lat": 56.01,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-81",
+      "lon": -59.83,
+      "lat": 55.97,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-84",
+      "lon": -59.91,
+      "lat": 55.99,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-96",
+      "lon": -59.37,
+      "lat": 55.49,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-91",
+      "lon": -61.35,
+      "lat": 60.19,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-89",
+      "lon": -61.21,
+      "lat": 59.65,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-94",
+      "lon": -60.87,
+      "lat": 57.81,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-97",
+      "lon": -60.07,
+      "lat": 56.74,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-98",
+      "lon": -61.61,
+      "lat": 59.19,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/5/2016"
+    },
+    {
+      "id": "IIP-2017-99",
+      "lon": -54.25,
+      "lat": 52.57,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/6/2016"
+    },
+    {
+      "id": "IIP-2017-81",
+      "lon": -59.82,
+      "lat": 55.97,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/9/2016"
+    },
+    {
+      "id": "IIP-2017-70",
+      "lon": -52.28,
+      "lat": 50.12,
+      "length_m": 1500,
+      "width_m": 600,
+      "type": "medium",
+      "last_update": "12/12/2016"
+    },
+    {
+      "id": "IIP-2017-101",
+      "lon": -51.61,
+      "lat": 49.04,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/14/2016"
+    },
+    {
+      "id": "IIP-2017-100",
+      "lon": -51.17,
+      "lat": 49.2,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/16/2016"
+    },
+    {
+      "id": "IIP-2017-103",
+      "lon": -48.24,
+      "lat": 48.63,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/20/2016"
+    },
+    {
+      "id": "IIP-2017-102",
+      "lon": -48.23,
+      "lat": 48.6,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/20/2016"
+    },
+    {
+      "id": "IIP-2017-105",
+      "lon": -50.9,
+      "lat": 48.77,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/23/2016"
+    },
+    {
+      "id": "IIP-2017-70",
+      "lon": -50.42,
+      "lat": 48.88,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/23/2016"
+    },
+    {
+      "id": "IIP-2016-4",
+      "lon": -61.15,
+      "lat": 59.86,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/1/2015"
+    },
+    {
+      "id": "IIP-2016-3",
+      "lon": -62.15,
+      "lat": 59.97,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/1/2015"
+    },
+    {
+      "id": "IIP-2016-2",
+      "lon": -63.05,
+      "lat": 59.84,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/1/2015"
+    },
+    {
+      "id": "IIP-2016-1",
+      "lon": -61.87,
+      "lat": 59.16,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/1/2015"
+    },
+    {
+      "id": "IIP-2016-6",
+      "lon": -60.33,
+      "lat": 57.78,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/8/2015"
+    },
+    {
+      "id": "IIP-2016-5",
+      "lon": -60.38,
+      "lat": 57.92,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/8/2015"
+    },
+    {
+      "id": "IIP-2016-30012",
+      "lon": -57.84,
+      "lat": 55.32,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/8/2015"
+    },
+    {
+      "id": "IIP-2016-30013",
+      "lon": -59.75,
+      "lat": 56.46,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/11/2015"
+    },
+    {
+      "id": "IIP-2016-30014",
+      "lon": -59.73,
+      "lat": 56.18,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/11/2015"
+    },
+    {
+      "id": "IIP-2016-30015",
+      "lon": -59.2,
+      "lat": 56.0,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/11/2015"
+    },
+    {
+      "id": "IIP-2016-7",
+      "lon": -59.94,
+      "lat": 57.28,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/11/2015"
+    },
+    {
+      "id": "IIP-2016-4",
+      "lon": -59.93,
+      "lat": 58.35,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/11/2015"
+    },
+    {
+      "id": "IIP-2016-1",
+      "lon": -60.46,
+      "lat": 58.22,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/11/2015"
+    },
+    {
+      "id": "IIP-2016-6",
+      "lon": -56.53,
+      "lat": 54.9,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/15/2015"
+    },
+    {
+      "id": "IIP-2016-30016",
+      "lon": -55.66,
+      "lat": 53.56,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/17/2015"
+    },
+    {
+      "id": "IIP-2016-30017",
+      "lon": -55.18,
+      "lat": 53.51,
+      "length_m": 1500,
+      "width_m": 600,
+      "type": "medium",
+      "last_update": "12/17/2015"
+    },
+    {
+      "id": "IIP-2016-8",
+      "lon": -42.48,
+      "lat": 56.13,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/21/2015"
+    },
+    {
+      "id": "IIP-2016-11",
+      "lon": -53.42,
+      "lat": 50.33,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/26/2015"
+    },
+    {
+      "id": "IIP-2016-10",
+      "lon": -52.12,
+      "lat": 50.6,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/26/2015"
+    },
+    {
+      "id": "IIP-2016-9",
+      "lon": -52.94,
+      "lat": 53.36,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/26/2015"
+    },
+    {
+      "id": "IIP-2016-12",
+      "lon": -55.1,
+      "lat": 53.28,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/28/2015"
+    },
+    {
+      "id": "IIP-2016-13",
+      "lon": -53.92,
+      "lat": 50.99,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/28/2015"
+    },
+    {
+      "id": "IIP-2015-1",
+      "lon": -61.18,
+      "lat": 58.32,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/13/2014"
+    },
+    {
+      "id": "IIP-2015-2",
+      "lon": -60.05,
+      "lat": 58.21,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/6/2014"
+    },
+    {
+      "id": "IIP-2015-2",
+      "lon": -59.16,
+      "lat": 57.69,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/16/2014"
+    },
+    {
+      "id": "IIP-2015-5",
+      "lon": -61.05,
+      "lat": 58.34,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/3/2014"
+    },
+    {
+      "id": "IIP-2015-6",
+      "lon": -61.65,
+      "lat": 59.86,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/3/2014"
+    },
+    {
+      "id": "IIP-2015-6",
+      "lon": -60.4,
+      "lat": 58.77,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/13/2014"
+    },
+    {
+      "id": "IIP-2015-7",
+      "lon": -59.9,
+      "lat": 59.41,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/13/2014"
+    },
+    {
+      "id": "IIP-2015-8",
+      "lon": -58.71,
+      "lat": 56.54,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/16/2014"
+    },
+    {
+      "id": "IIP-2015-9",
+      "lon": -58.73,
+      "lat": 55.88,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/16/2014"
+    },
+    {
+      "id": "IIP-2015-10",
+      "lon": -59.03,
+      "lat": 56.12,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/15/2014"
+    },
+    {
+      "id": "IIP-2014-1",
+      "lon": -62.38,
+      "lat": 59.2,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/10/2013"
+    },
+    {
+      "id": "IIP-2014-4",
+      "lon": -60.2,
+      "lat": 59.41,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/4/2013"
+    },
+    {
+      "id": "IIP-2014-5",
+      "lon": -59.42,
+      "lat": 57.41,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/8/2013"
+    },
+    {
+      "id": "IIP-2014-6",
+      "lon": -62.59,
+      "lat": 59.82,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/10/2013"
+    },
+    {
+      "id": "IIP-2014-7",
+      "lon": -56.0,
+      "lat": 54.21,
+      "length_m": 1500,
+      "width_m": 600,
+      "type": "medium",
+      "last_update": "12/12/2013"
+    },
+    {
+      "id": "IIP-2014-7",
+      "lon": -54.54,
+      "lat": 51.52,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/23/2013"
+    },
+    {
+      "id": "IIP-2014-8",
+      "lon": -54.41,
+      "lat": 51.06,
+      "length_m": 500,
+      "width_m": 200,
+      "type": "small",
+      "last_update": "12/23/2013"
+    }
+  ]
+}
