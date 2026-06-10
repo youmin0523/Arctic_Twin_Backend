@@ -235,7 +235,8 @@ def compare_routes(req: RouteCompareRequest):
     thick_penalty = min(0.3, req.nsr_ice_thickness / 3.0 * (0.3 - 0.15 * ice_class_perf))
     ice_speed_factor = max(0.3, 1.0 - conc_penalty - thick_penalty)
     nsr_effective_speed = req.speed_knots * ice_speed_factor
-    nsr_transit_days = (nsr_ice_nm / (nsr_effective_speed * 24)) + (nsr_open_nm / (req.speed_knots * 24))
+    arctic_transit_days = nsr_ice_nm / (nsr_effective_speed * 24)        # 북극 빙해 구간 소요일
+    nsr_transit_days = arctic_transit_days + nsr_open_nm / (req.speed_knots * 24)
 
     suez_transit_days = req.suez_distance_nm / (req.speed_knots * 24)
 
@@ -253,8 +254,10 @@ def compare_routes(req: RouteCompareRequest):
     else:
         escort_mode = "foreign"
         escort_rate = ICEBREAKER_ESCORT_FEE.get(vtype, 85_000)
-    nsr_escort_cost = escort_rate * nsr_transit_days
-    nsr_insurance_cost = ARCTIC_INSURANCE_PER_DAY.get(vtype, 15_000) * nsr_transit_days
+    # 호위·북극보험은 '북극 빙해 구간'에서만 발생한다. 황해·북대서양 등 개수역에선 쇄빙선
+    # 호위도, 북극 특별보험도 불필요 — 전 항해일이 아니라 arctic_transit_days 에만 부과한다.
+    nsr_escort_cost = escort_rate * arctic_transit_days
+    nsr_insurance_cost = ARCTIC_INSURANCE_PER_DAY.get(vtype, 15_000) * arctic_transit_days
     nsr_additional = nsr_escort_cost + nsr_insurance_cost
     nsr_total_cost = nsr_fuel_cost + nsr_additional
 
@@ -280,7 +283,8 @@ def compare_routes(req: RouteCompareRequest):
             "insurance_cost_usd": round(nsr_insurance_cost, 0),
             "additional_cost_usd": round(nsr_additional, 0),
             "total_cost_usd": round(nsr_total_cost, 0),
-            "transit_days": round(nsr_transit_days, 1),
+            "transit_days": round(nsr_transit_days, 1),              # 부산-로테르담 총 항해 소요일
+            "arctic_transit_days": round(arctic_transit_days, 1),    # 그중 북극 빙해 구간(호위·보험 부과 기준)
             "effective_speed_knots": round(nsr_effective_speed, 1),  # 빙해 구간 실효속도
             "ice_route_fraction": ice_frac,                          # 빙해 노출 구간 비율
         },
@@ -298,7 +302,8 @@ def compare_routes(req: RouteCompareRequest):
         "comparison": {
             "cost_saving_usd": round(cost_saving, 0),
             "cost_saving_percent": round(cost_saving / suez_total_cost * 100, 1) if suez_total_cost > 0 else 0,
-            "time_saving_days": round(time_saving, 1),
+            "time_saving_days": round(time_saving, 1),  # 양수 = NSR이 그만큼 더 빠름
+            "nsr_is_faster": time_saving > 0,
             "fuel_saving_tons": round(suez_total_fuel - nsr_total_fuel, 2),
             "nsr_is_cheaper": cost_saving > 0,
         },
