@@ -40,12 +40,13 @@ FUEL_BASE_URL = "http://127.0.0.1:8003"
 # 정식 거리는 frontend/src/data/arcticRoutes.js 웨이포인트 합산이 진실원이나, 백엔드 단독
 # 배포(프론트 폴더 부재) 시를 대비해 널리 인용되는 부산-로테르담 항로별 거리를 폴백으로 둔다.
 # 챗봇 추정 도구이므로 가정을 명시해 사용한다.
+# 값은 arcticRoutes.js 웨이포인트 합산(부산↔로테르담) 실측치 기준. 프론트 부재 시 폴백.
 ROUTE_DISTANCE_NM: dict[str, float] = {
-    "NSR": 7000.0,    # 북동항로 (시베리아 연안)
-    "NWP": 7900.0,    # 북서항로 (캐나다 군도)
-    "TSR": 6500.0,    # 횡단극항로 (북극점 인근, 최단)
-    "SUEZ": 10500.0,  # 수에즈 운하 경유
-    "CAPE": 13500.0,  # 희망봉 우회
+    "NSR": 7974.0,    # 북동항로 (시베리아 연안)
+    "NWP": 8490.0,    # 북서항로 (캐나다 군도)
+    "TSR": 7268.0,    # 횡단극항로 (북극점 인근, 최단)
+    "SUEZ": 11024.0,  # 수에즈 운하 경유
+    "CAPE": 14965.0,  # 희망봉 우회
 }
 
 # 선종별 기본 제원 (사용자가 일부만 줘도 동작하도록) — ML /api/fuel/compare 입력 기준
@@ -224,13 +225,17 @@ class ChatToolExecutor:
         spec = resolve_ship_spec(args)
         ice_code = ice_class_to_code(args.get("ice_class"))
 
-        # NSR 빙질 입력: 최신 해빙 평균 농도(있으면), 두께는 여름철 1년빙 근사 가정
+        # NSR 빙질 입력. load_latest_ice 의 mean_conc 는 '빙존재 셀 평균'이라 항행 구간보다
+        # 과대(전역 팩아이스 포함)하므로, 항행 가능한 빙해 구간 대표 농도로 상한(0.6)을 둔다.
         latest = self.loader.load_latest_ice()
         mean_conc = float(latest.get("stats", {}).get("mean_conc", 0.0) or 0.0)
+        route_conc = min(mean_conc, 0.6)
         assumptions = {
-            "ice_concentration": round(mean_conc, 3),
+            "ice_concentration_used": round(route_conc, 3),
+            "ice_concentration_arctic_mean": round(mean_conc, 3),
             "ice_thickness_m": 1.2,
-            "note": "빙두께는 실측 스칼라 부재로 여름철 1년빙 1.2m 가정",
+            "note": "빙농도는 항행구간 대표값(상한 0.6) 적용 — 전역 평균은 팩아이스 포함이라 과대. "
+                    "빙두께는 실측 스칼라 부재로 여름철 1년빙 1.2m 가정.",
         }
 
         payload = {
@@ -239,11 +244,12 @@ class ChatToolExecutor:
             "engine_power": spec["engine_power"],
             "ice_class_code": ice_code,
             "nsr_ice_thickness": assumptions["ice_thickness_m"],
-            "nsr_ice_concentration": mean_conc,
+            "nsr_ice_concentration": route_conc,
             "nsr_distance_nm": route_total_nm(route, self.loader),
             "suez_distance_nm": route_total_nm("SUEZ", self.loader),
             "vessel_type": spec["vessel_type"],
             "speed_knots": spec["speed_knots"],
+            "route": route,  # 호위비 자국(NSR=아라온)/타국(NWP·TSR) 분기용
         }
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
