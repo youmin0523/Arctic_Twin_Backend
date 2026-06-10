@@ -56,7 +56,8 @@ SYSTEM_PROMPT = """\
 [질문 유형별 도구 선택]
   · 기상·기온·파고·해수온·해상상황 → get_route_weather
   · 특정 날짜의 안전/위험/항행가능/호위필요 → score_route(그 departure_date로) [+ 호위·비용 수치가 필요하면 compare_economics]
-  · 빙산 위험 → get_iceberg_risk   · 현재 해양환경 종합 → get_current_conditions
+  · 빙산 위험·개수·현황(예: '지금 빙산 몇 개?') → get_iceberg_risk(icebergs_total/arctic 반환)
+  · 현재 해양환경 종합(해빙·빙산·기상) → get_current_conditions
   · 출항 적기 추천 → recommend_departure   · 쇄빙선 함대 현황 → get_escort_status
   · 비용·경제성·수에즈 비교 → compare_economics(가능하면 departure_date 전달)
   · '정식 보고서/PDF/다운로드' → launch_full_report, '모든 시나리오' → launch_full_whatif
