@@ -260,8 +260,9 @@ class WhatIfToolExecutor:
         return {
             "ice": {
                 "arctic_cells": ice_stats.get("arctic_cells", 0),
-                "mean_concentration": round(ice_stats.get("mean_concentration", 0), 3),
-                "high_concentration_pct": round(ice_stats.get("high_concentration_pct", 0), 1),
+                # load_latest_ice 가 내보내는 실제 키는 mean_conc / high_conc_pct 다.
+                "mean_concentration": round(ice_stats.get("mean_conc", 0), 3),
+                "high_concentration_pct": round(ice_stats.get("high_conc_pct", 0), 1),
             },
             "icebergs": {
                 "total": berg_stats.get("total_count", 0),
