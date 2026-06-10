@@ -964,15 +964,44 @@ _WHATIF_TOOL_NAMES = {
 }
 
 
+def _season_assessment(date_str: str | None) -> dict:
+    """출항 월 기준 북극항로 계절 항행성 평가. score_route 의 RIO 데이터가 계절에 둔감하므로
+    (겨울에도 안전으로 나옴), 도구 출력에 계절 현실 신호를 주입해 LLM 이 반영하도록 한다."""
+    try:
+        from datetime import date as _date
+        month = _date.fromisoformat(date_str).month if date_str else _date.today().month
+    except Exception:  # noqa: BLE001
+        month = 0
+    if month in (7, 8, 9, 10):
+        nav, level = "항행 적기(해빙 최소 창)", "good"
+        note = "여름 항행 창 — 해빙이 가장 적어 독자 항행이 가장 수월한 시기."
+    elif month in (6, 11):
+        nav, level = "전이기(주의)", "caution"
+        note = "결빙/해빙 전이기 — 가변적 빙질, 일부 구간 호위·감속 가능."
+    elif month in (12, 1, 2, 3, 4, 5):
+        nav, level = "결빙 최성기·고위험", "severe"
+        note = ("한겨울/결빙기 — 두꺼운 빙·극야(특히 12~1월 24시간 어둠)·혹한으로 독자 항행이 매우 어렵고 "
+                "내빙 보강·쇄빙선 호위가 사실상 필수, 보험·비용도 급등. RIO 도구 값이 '안전'이어도 계절 위험을 분명히 알려라.")
+    else:
+        nav, level, note = "미상", "unknown", ""
+    return {"month": month, "navigability": nav, "season_level": level, "note": note}
+
+
 async def _chat_dispatch(name: str, args: dict) -> dict:
     """도구 이름 → 실제 실행. ChatAgent 에 주입된다."""
     if name in _WHATIF_TOOL_NAMES:
         # 기존 What-If 도구 실행기 재사용 (동기) — score_route 등
-        return whatif_generator.tool_executor.execute(name, args)
+        result = whatif_generator.tool_executor.execute(name, args)
+        # score_route 결과에 계절 항행성 신호 주입(RIO 가 계절에 둔감한 한계 보완)
+        if name == "score_route" and isinstance(result, dict):
+            result["seasonal_assessment"] = _season_assessment(args.get("departure_date"))
+        return result
     if name in ChatToolExecutor.NAMES:
         return await _chat_tool_executor.execute(name, args)
     if name == "recommend_departure":
-        return _chat_recommend_departure(args)
+        out = _chat_recommend_departure(args)
+        out["season_guidance"] = "북극항로 항행 적기는 7~10월(해빙 최소). 12~4월은 결빙 최성기로 호위·내빙보강 필수급."
+        return out
     if name == "launch_full_report":
         return _chat_launch_report(args)
     if name == "launch_full_whatif":

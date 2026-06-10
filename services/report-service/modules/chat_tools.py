@@ -117,6 +117,8 @@ CHAT_TOOL_DEFINITIONS = [
             "properties": {
                 "route": {"type": "string", "enum": ["NSR", "NWP", "TSR"],
                           "description": "북극항로 (수에즈와 비교됨)"},
+                "departure_date": {"type": "string",
+                                   "description": "출항일 YYYY-MM-DD (해당 '월'의 해빙 농도로 평가 — 계절 반영). 생략 시 현재."},
                 "vessel_type": {"type": "string", "enum": ["container", "lng", "icebreaker"],
                                 "description": "선종 (기본 container)"},
                 "ice_class": {"type": "string",
@@ -225,10 +227,24 @@ class ChatToolExecutor:
         spec = resolve_ship_spec(args)
         ice_code = ice_class_to_code(args.get("ice_class"))
 
-        # NSR 빙질 입력. load_latest_ice 의 mean_conc 는 '빙존재 셀 평균'이라 항행 구간보다
-        # 과대(전역 팩아이스 포함)하므로, 항행 가능한 빙해 구간 대표 농도로 상한(0.6)을 둔다.
-        latest = self.loader.load_latest_ice()
-        mean_conc = float(latest.get("stats", {}).get("mean_conc", 0.0) or 0.0)
+        # NSR 빙질 입력. 출항일이 주어지면 그 '월'의 해빙 농도(계절 반영), 없으면 현재 스냅샷.
+        # mean_conc 는 '빙존재 셀 평균'이라 항행 구간보다 과대할 수 있어 대표 농도로 상한(0.6).
+        dep = args.get("departure_date")
+        mean_conc = 0.0
+        if dep:
+            try:
+                from datetime import date as _date
+                month = _date.fromisoformat(dep).month
+                monthly = self.loader.load_monthly_ice([month])
+                cells = monthly.get(month, {}).get("cells", [])
+                concs = [c.get("concentration", 0) for c in cells if (c.get("concentration") or 0) > 0]
+                if concs:
+                    mean_conc = sum(concs) / len(concs)
+            except Exception:  # noqa: BLE001  월 데이터 실패 → 현재 스냅샷 폴백
+                mean_conc = 0.0
+        if mean_conc <= 0:
+            latest = self.loader.load_latest_ice()
+            mean_conc = float(latest.get("stats", {}).get("mean_conc", 0.0) or 0.0)
         route_conc = min(mean_conc, 0.6)
         assumptions = {
             "ice_concentration_used": round(route_conc, 3),
