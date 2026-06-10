@@ -18,9 +18,14 @@ def _parse_iso(ts: Optional[str]) -> Optional[datetime]:
         return None
     s = ts.strip().replace("Z", "+00:00")
     try:
-        return datetime.fromisoformat(s)
+        dt = datetime.fromisoformat(s)
     except ValueError:
         return None
+    # naive(타임존 없음) → UTC 로 간주해 aware 와의 뺄셈 오류 방지
+    if dt.tzinfo is None:
+        from datetime import timezone
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 def freshness_hours(detection_time: Optional[str], now_iso: Optional[str]) -> Optional[float]:
