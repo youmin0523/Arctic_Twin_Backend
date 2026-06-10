@@ -105,28 +105,24 @@ class RouteCompareRequest(BaseModel):
 # 벙커유(VLSFO) 단가 (USD/ton) — 2024~2025 평균
 FUEL_PRICE_USD_PER_TON = 600.0
 
-# 수에즈 운하 통행료 (USD) — 선종별
+# 수에즈 운하 통행료 (USD/항차) — 선종별. 실측: 부산-로테르담급 컨테이너선 ~$500k
+# (ShipUniverse/업계 분석). 기존 $300k 는 과소 평가였음 → 현실화.
 SUEZ_TOLL = {
-    "container": 300_000,   # 컨테이너선 (가장 저렴한 선종)
-    "lng": 450_000,         # LNG 운반선
-    "icebreaker": 250_000,  # 쇄빙선
+    "container": 500_000,   # 컨테이너선
+    "lng": 650_000,         # LNG 운반선
+    "icebreaker": 350_000,  # 쇄빙선
 }
 
-# 쇄빙선 에스코트 수수료 (USD/일) — 타국 쇄빙선(시장 수수료) 기준
-# NWP=캐나다 CCGS, TSR=러시아 Rosatom 등 타국 자산을 빌릴 때 지불하는 시장 수수료.
-ICEBREAKER_ESCORT_FEE = {
-    "container": 85_000,    # 일반 상선
-    "lng": 120_000,         # LNG (위험물 할증)
-    "icebreaker": 0,        # 자체 쇄빙 → 면제
+# 쇄빙 호위 — '필요할 때' 항차당 기준요금(USD/항차). 실측: Rosatom 평균 ~$200k/항차,
+# 시간제 ~$15k/h(8h≈$120k, 14h≈$210k)·계절·빙질 따라 변동. 안전(독자항행)하면 0.
+#   own=한국 아라온 자국 운영원가(시장 수수료 아님), foreign=타국(러 Rosatom/캐 CCGS) 시장 수수료.
+ESCORT_FEE_PER_TRANSIT = {
+    "own": 100_000,
+    "foreign": 200_000,
 }
 
-# 자국(한국 아라온, KOPRI) 쇄빙선이 호위하는 항로 — 타국 시장 수수료가 아니라
-# 운영원가만 산정한다(국가 자산이라 수수료 지불 주체가 없음).
+# 자국(한국 아라온, KOPRI) 쇄빙선이 호위하는 항로(국가 자산 → 운영원가).
 OWN_ESCORT_ROUTES = {"NSR", "ROSS", "PENINSULA"}  # 아라온 호위 권역(북동항로 + 남극)
-
-# 자국 쇄빙선 운영원가 (USD/일): 쇄빙선 자체 연료(~20k, 약 33톤/일×$600) + 인건/유지(~10k).
-# 시장 수수료(85k+)와 달리 마진이 없는 실비 — 자국 자산 운용 비용만 반영.
-OWN_ESCORT_OPERATING_COST_PER_DAY = 30_000
 
 # 항로별 '빙해 노출 구간' 비율 — 전체 거리 중 실제 빙해(빙저항·감속 적용) 비중.
 # 나머지(연안·대서양 등)는 개수역으로 기본 연료·명목속도. 전 구간 빙해 가정의 과대평가를 보정한다.
@@ -138,12 +134,19 @@ ROUTE_ICE_FRACTION = {
     "PENINSULA": 0.45,
 }
 
-# 북극해 특별 보험료 (USD/일) — 선종별
-ARCTIC_INSURANCE_PER_DAY = {
-    "container": 15_000,
-    "lng": 45_000,          # LNG 폭발 위험 → 기하급수적 할증
-    "icebreaker": 8_000,
-}
+# 내빙등급(ice_class_code)별 '독자 항행 가능 빙두께'(m) — 이 이하 빙질은 쇄빙선 호위 없이 통과 가능.
+# 빙질이 이 역량을 초과하는 만큼만 호위가 필요하다(안전 조건이면 호위 0).
+INDEP_ICE_CAPABILITY_M = {0: 0.3, 2: 2.0, 4: 1.2}
+
+# 빙해 nm당 연료의 개수역 대비 최대 배율 — ML 예측이 과대(예 3.3배)할 때 현실 범위로 상한.
+MAX_ICE_FUEL_MULTIPLIER = 2.2
+
+# 북극 추가 보험 — 항차당 서차지(USD). 실측: 기본 ~$50k(초기 견적), 우수 빙급·준비 시 ~$30k로
+# 협상, 고위험(두꺼운 빙·지정학)일수록 상향(고위험 사례 ~$175k+). 위험도(escort_factor)로 스케일.
+ARCTIC_INSURANCE_BASE_PER_TRANSIT = 50_000     # 안전 조건 기본 서차지
+ARCTIC_INSURANCE_MAX_PER_TRANSIT = 175_000     # 최고 위험 시 상한
+# LNG 등 위험화물 가산 배수
+ARCTIC_INSURANCE_VTYPE_MULT = {"container": 1.0, "lng": 1.8, "icebreaker": 0.7}
 
 # 수에즈 우회 보안비 (해적 대비, 아덴만 통과)
 SUEZ_SECURITY_COST = {
@@ -219,6 +222,10 @@ def compare_routes(req: RouteCompareRequest):
     open_fuel_per_nm = float(np.exp(y_log_open[0])) if artifact.get("log_transformed") else float(y_log_open[0])
     suez_fuel_per_nm = open_fuel_per_nm
 
+    # ML 빙저항 예측이 과대(예 3.3배)할 수 있어, 빙해 연료율을 개수역의 현실 상한 배율로 캡한다.
+    ice_fuel_mult_raw = nsr_fuel_per_nm / open_fuel_per_nm if open_fuel_per_nm > 0 else 1.0
+    nsr_fuel_per_nm = min(nsr_fuel_per_nm, open_fuel_per_nm * MAX_ICE_FUEL_MULTIPLIER)
+
     # ── 2) NSR 빙해 노출 구간 분리 (전 구간 빙저항 과대평가 보정) ──
     # 북극항로는 일부 구간만 빙해이고 나머지(연안·대서양)는 개수역이다. 빙해 구간 비율만큼만
     # 빙저항 연료·감속을 적용하고, 나머지는 개수역 연료·명목속도로 계산한다.
@@ -245,19 +252,22 @@ def compare_routes(req: RouteCompareRequest):
     nsr_fuel_cost = nsr_total_fuel * FUEL_PRICE_USD_PER_TON
     suez_fuel_cost = suez_total_fuel * FUEL_PRICE_USD_PER_TON
 
-    # NSR 부대비용 — 호위비는 항로별 자국/타국 분기
-    #   자국(NSR/ROSS/PENINSULA, 한국 아라온): 시장 수수료 대신 운영원가만
-    #   타국(NWP=캐 CCGS, TSR=러 Rosatom): 시장 수수료
-    if req.route in OWN_ESCORT_ROUTES:
-        escort_mode = "own"
-        escort_rate = OWN_ESCORT_OPERATING_COST_PER_DAY
-    else:
-        escort_mode = "foreign"
-        escort_rate = ICEBREAKER_ESCORT_FEE.get(vtype, 85_000)
-    # 호위·북극보험은 '북극 빙해 구간'에서만 발생한다. 황해·북대서양 등 개수역에선 쇄빙선
-    # 호위도, 북극 특별보험도 불필요 — 전 항해일이 아니라 arctic_transit_days 에만 부과한다.
-    nsr_escort_cost = escort_rate * arctic_transit_days
-    nsr_insurance_cost = ARCTIC_INSURANCE_PER_DAY.get(vtype, 15_000) * arctic_transit_days
+    # NSR 부대비용
+    # 호위비: 빙질이 선박 독자 내빙능력(INDEP_ICE_CAPABILITY_M)을 초과할 때만 발생(항차당 기준요금).
+    #   안전(독자항행 가능)하면 escort_factor=0 → 호위비 0. 자국(아라온)=운영원가, 타국=시장 수수료.
+    escort_mode = "own" if req.route in OWN_ESCORT_ROUTES else "foreign"
+    cap = INDEP_ICE_CAPABILITY_M.get(req.ice_class_code, 0.8)
+    effective_ice_load = req.nsr_ice_thickness * max(0.3, req.nsr_ice_concentration)  # 두께×농도(유효 빙부하)
+    cap_load = cap * 0.7
+    escort_factor = 0.0 if effective_ice_load <= cap_load else min(1.0, (effective_ice_load - cap_load) / cap_load)
+    escort_needed = escort_factor > 0.0
+    nsr_escort_cost = ESCORT_FEE_PER_TRANSIT[escort_mode] * escort_factor
+
+    # 북극보험: 항차당 서차지. 안전 조건이면 기본, 위험할수록 상향(escort_factor 로 스케일). 선종 가산.
+    insur = ARCTIC_INSURANCE_BASE_PER_TRANSIT + (
+        ARCTIC_INSURANCE_MAX_PER_TRANSIT - ARCTIC_INSURANCE_BASE_PER_TRANSIT) * escort_factor
+    nsr_insurance_cost = insur * ARCTIC_INSURANCE_VTYPE_MULT.get(vtype, 1.0)
+
     nsr_additional = nsr_escort_cost + nsr_insurance_cost
     nsr_total_cost = nsr_fuel_cost + nsr_additional
 
@@ -279,14 +289,16 @@ def compare_routes(req: RouteCompareRequest):
             "fuel_cost_usd": round(nsr_fuel_cost, 0),
             "escort_cost_usd": round(nsr_escort_cost, 0),
             "escort_mode": escort_mode,                       # own(자국 아라온 운영원가) | foreign(타국 시장수수료)
-            "escort_rate_per_day_usd": round(escort_rate, 0),
+            "escort_needed": escort_needed,                   # 빙질이 선박역량 초과 시에만 True(안전 시 False·호위비 0)
+            "escort_factor": round(escort_factor, 2),         # 0=호위 불필요 ~ 1=상시 호위
             "insurance_cost_usd": round(nsr_insurance_cost, 0),
             "additional_cost_usd": round(nsr_additional, 0),
             "total_cost_usd": round(nsr_total_cost, 0),
             "transit_days": round(nsr_transit_days, 1),              # 부산-로테르담 총 항해 소요일
-            "arctic_transit_days": round(arctic_transit_days, 1),    # 그중 북극 빙해 구간(호위·보험 부과 기준)
+            "arctic_transit_days": round(arctic_transit_days, 1),    # 그중 북극 빙해 구간 소요일
             "effective_speed_knots": round(nsr_effective_speed, 1),  # 빙해 구간 실효속도
             "ice_route_fraction": ice_frac,                          # 빙해 노출 구간 비율
+            "ice_fuel_multiplier": round(min(ice_fuel_mult_raw, MAX_ICE_FUEL_MULTIPLIER), 2),  # 적용된 빙저항 연료배율
         },
         "suez": {
             "distance_nm": req.suez_distance_nm,
