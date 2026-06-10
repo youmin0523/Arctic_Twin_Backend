@@ -17,7 +17,7 @@ from typing import cast
 from dotenv import load_dotenv
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
 # ── Python 3.14 + anyio 호환성 패치 ──────────────────────────────────
@@ -82,6 +82,11 @@ from modules.rl.multi_model_trainer import MultiModelIterativeTrainer, ALL_COMBI
 from modules.rl.prediction_calibrator import PredictionCalibrator
 from modules.rl import existing_rl_client
 from modules.whatif_generator_openai import WhatIfGeneratorOpenAI
+from modules.whatif_tools import TOOL_DEFINITIONS
+from modules.chat_tools import (
+    CHAT_TOOL_DEFINITIONS, ChatToolExecutor, to_openai_tools,
+)
+from modules.chat_agent import ChatAgent
 
 # ── 싱글톤 초기화 ────────────────────────────────────────────
 data_loader = DataLoader()
@@ -813,6 +818,211 @@ async def whatif_stats():
         "by_route": by_route,
         "by_ice_class": by_ice,
     }
+
+
+# ══════════════════════════════════════════════════════════════
+# AI 챗봇 — 의도 기반 오케스트레이션 (북극항로 한정, SSE 스트리밍)
+# ══════════════════════════════════════════════════════════════
+# 기존 4개 What-If 도구 + chat_tools 신규 도구 + server 싱글톤 의존 도구를
+# 하나의 디스패치로 묶어 ChatAgent(gpt-4o-mini)에 주입한다.
+
+_chat_tool_executor = ChatToolExecutor(data_loader)
+
+
+def _chat_recommend_departure(args: dict) -> dict:
+    """출항 타이밍 추천 — RIO 캘린더 랭킹 + (학습됐다면) RL 신뢰도."""
+    route = (args.get("route") or "NSR").upper()
+    ice_class = args.get("ice_class") or "PC5"
+    start = (
+        date.fromisoformat(args["departure_date"])
+        if args.get("departure_date") else date.today()
+    )
+    days = int(args.get("forecast_days", 30))
+    calendar = route_scorer.build_departure_calendar(start, days, route, ice_class)
+    order = {"green": 0, "yellow": 1, "red": 2}
+    ranked = sorted(calendar, key=lambda d: (order.get(d.color_code, 3), d.overall_rio))
+    out = {
+        "route": route,
+        "ice_class": ice_class,
+        "green_days": sum(1 for d in calendar if d.color_code == "green"),
+        "total_days": len(calendar),
+        "recommended_dates": [
+            {"date": d.date, "rio": round(d.overall_rio, 3), "color": d.color_code}
+            for d in ranked[:5]
+        ],
+    }
+    try:
+        if departure_agent.is_trained:
+            monthly_ice = data_loader.load_monthly_ice()
+            weather = data_loader.load_weather()
+            obs = _build_rl_obs(start, monthly_ice, weather)
+            if obs is not None:
+                action, _ = departure_agent.predict(obs)
+                if action is not None:
+                    out["rl_confidence"] = round(float((action[0] + 1) / 2), 3)
+    except Exception as e:  # noqa: BLE001
+        logger.debug("recommend_departure RL 신뢰도 계산 실패: %s", e)
+    return out
+
+
+def _chat_launch_report(args: dict) -> dict:
+    """정식 Trend Report PDF 생성을 백그라운드 잡으로 시작."""
+    req = ReportRequest(
+        route=(args.get("route") or "NSR").upper(),
+        ice_class=args.get("ice_class") or "PC5",
+        departure_date_start=args.get("departure_date") or "",
+        forecast_days=int(args.get("forecast_days", 30)),
+        transit_days=int(args.get("transit_days", 14)),
+    )
+    job_id = _create_job()
+    asyncio.create_task(_generate_report(job_id, req))
+    return {
+        "_job": {"kind": "report", "job_id": job_id},
+        "message": f"정식 동향보고서 생성을 시작했습니다 (job {job_id}). 완료되면 패널에 표시됩니다.",
+    }
+
+
+def _chat_launch_whatif(args: dict) -> dict:
+    """전체 What-If 시나리오 스윕을 백그라운드 잡으로 시작."""
+    req = WhatIfRequest(
+        route=(args.get("route") or "NSR").upper(),
+        ice_class=args.get("ice_class") or "PC5",
+        departure_date_start=args.get("departure_date") or "",
+        forecast_days=int(args.get("forecast_days", 30)),
+    )
+    job_id = _create_job()
+    asyncio.create_task(_run_whatif(job_id, req))
+    return {
+        "_job": {"kind": "whatif", "job_id": job_id},
+        "message": f"전체 What-If 시나리오 분석을 시작했습니다 (job {job_id}). 완료되면 패널에 표시됩니다.",
+    }
+
+
+# launch_full_* 도구 스키마 (server 의존 도구 — chat_tools 가 아닌 여기서 정의)
+_LAUNCH_TOOL_DEFINITIONS = [
+    {
+        "name": "recommend_departure",
+        "description": (
+            "주어진 항로·Ice Class·기간에서 RIO가 가장 안전한 출항일 후보(상위 5일)와 "
+            "안전일수를 추천한다. '언제 떠나는 게 좋아?' 같은 출항 타이밍 질문에 사용한다."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "route": {"type": "string", "enum": ["NSR", "NWP", "TSR"]},
+                "ice_class": {"type": "string", "description": "선박 Ice Class (기본 PC5)"},
+                "departure_date": {"type": "string", "description": "검토 시작일 YYYY-MM-DD (기본 오늘)"},
+                "forecast_days": {"type": "integer", "description": "검토 기간 일수 (기본 30)"},
+            },
+            "required": ["route"],
+        },
+    },
+    {
+        "name": "launch_full_report",
+        "description": (
+            "정식 동향보고서(Trend Report) PDF를 백그라운드로 생성한다. 사용자가 '정식 보고서', "
+            "'다운로드', 'PDF', '문서로 만들어줘'처럼 정식 산출물을 명시적으로 원할 때만 사용한다."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "route": {"type": "string", "enum": ["NSR", "NWP", "TSR"]},
+                "ice_class": {"type": "string", "description": "선박 Ice Class (기본 PC5)"},
+                "departure_date": {"type": "string", "description": "출항일 YYYY-MM-DD (기본 오늘)"},
+                "forecast_days": {"type": "integer", "description": "예측 일수 (기본 30)"},
+                "transit_days": {"type": "integer", "description": "항해 소요일 (기본 14)"},
+            },
+            "required": ["route"],
+        },
+    },
+    {
+        "name": "launch_full_whatif",
+        "description": (
+            "전체 What-If 시나리오 스윕(6~8개)을 백그라운드로 실행한다. 사용자가 '모든 시나리오', "
+            "'시나리오 전부 비교', '종합 시나리오 분석'처럼 정식/광범위 분석을 명시적으로 원할 때만 사용한다."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "route": {"type": "string", "enum": ["NSR", "NWP", "TSR"]},
+                "ice_class": {"type": "string", "description": "선박 Ice Class (기본 PC5)"},
+                "departure_date": {"type": "string", "description": "출항일 YYYY-MM-DD (기본 오늘)"},
+                "forecast_days": {"type": "integer", "description": "예측 일수 (기본 30)"},
+            },
+            "required": ["route"],
+        },
+    },
+]
+
+# 전체 도구 스키마(OpenAI 형식) — 기존 What-If 4종 + chat 신규 + launch 3종
+_CHAT_ALL_TOOLS = to_openai_tools(
+    TOOL_DEFINITIONS + CHAT_TOOL_DEFINITIONS + _LAUNCH_TOOL_DEFINITIONS
+)
+
+_WHATIF_TOOL_NAMES = {
+    "score_route", "score_route_modified_ice", "compare_ice_classes", "get_current_conditions",
+}
+
+
+async def _chat_dispatch(name: str, args: dict) -> dict:
+    """도구 이름 → 실제 실행. ChatAgent 에 주입된다."""
+    if name in _WHATIF_TOOL_NAMES:
+        # 기존 What-If 도구 실행기 재사용 (동기) — score_route 등
+        return whatif_generator.tool_executor.execute(name, args)
+    if name in ChatToolExecutor.NAMES:
+        return await _chat_tool_executor.execute(name, args)
+    if name == "recommend_departure":
+        return _chat_recommend_departure(args)
+    if name == "launch_full_report":
+        return _chat_launch_report(args)
+    if name == "launch_full_whatif":
+        return _chat_launch_whatif(args)
+    return {"error": f"알 수 없는 도구: {name}"}
+
+
+chat_agent_engine = ChatAgent(_CHAT_ALL_TOOLS, _chat_dispatch)
+
+
+class ChatRequest(BaseModel):
+    session_id: str
+    message: str
+    ship_spec: dict | None = None
+
+
+class ChatResetRequest(BaseModel):
+    session_id: str
+
+
+@app.post("/api/report/chat/stream")
+async def chat_stream(req: ChatRequest):
+    """북극항로 챗봇 — SSE 스트리밍 응답."""
+    import json as _json
+
+    async def _gen():
+        try:
+            async for ev in chat_agent_engine.stream(
+                req.session_id, req.message, ship_spec=req.ship_spec
+            ):
+                yield f"data: {_json.dumps(ev, ensure_ascii=False)}\n\n"
+        except Exception as e:  # noqa: BLE001
+            yield f"data: {_json.dumps({'type': 'error', 'detail': str(e)}, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        _gen(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # nginx/프록시 버퍼링 방지
+        },
+    )
+
+
+@app.post("/api/report/chat/reset")
+async def chat_reset(req: ChatResetRequest):
+    """대화 세션 초기화."""
+    chat_agent_engine.reset(req.session_id)
+    return {"ok": True}
 
 
 # ══════════════════════════════════════════════════════════════
