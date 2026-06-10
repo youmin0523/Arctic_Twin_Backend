@@ -75,39 +75,63 @@ SAFE_ROUTES = {"SUEZ", "CAPE"}
 
 
 # ── 농도 → 빙종 매핑 ──────────────────────────────────────────
+# 항로 채널 농도 보정 계수 — 세그먼트 박스 P90 도 개수역 섞임으로 항로가 실제 통과하는
+# 빙 채널보다 옅다. 12개월×3항로 실측 검증으로 보정(여름 전부 안전 유지, 겨울 빙급별 차등 위험).
+CHANNEL_DILUTION_FACTOR = 1.6
+
+
 def concentration_to_ice_conditions(conc: float) -> list[dict]:
     """해빙 농도 값(0~1)을 POLARIS IceCondition 리스트로 변환.
 
-    단일 농도 값에서 대표 빙종을 추정한다.
-    실제 해빙 차트처럼 여러 빙종이 혼재한 상황을 근사한다.
+    단일 농도 값에서 대표 빙종 혼재를 추정한다. 농도가 높을수록(특히 고위도·결빙기)
+    노후·다년빙(Multi-Year)·압축빙(Ridged)이 포함된다고 가정한다 — 농도만으로는 빙종을
+    알 수 없으나, 고농도 극지빙은 실제로 다년빙·릿지를 포함하므로(POLARIS상 PC5 같은
+    유능 빙급도 이때만 RIO가 음수로 떨어짐) 계절·빙급별 위험 차등을 반영하기 위함이다.
+    (농도값은 score_departure_day 에서 항로 채널 대표 농도로 보정된 값을 받는다.)
     """
-    if conc < 0.05:
+    c = min(1.0, max(0.0, conc))
+    if c < 0.05:
         return [{"type": "Open Water", "concentration_tenths": 1.0}]
-    elif conc < 0.15:
+    elif c < 0.15:
         return [
-            {"type": "Open Water", "concentration_tenths": 1.0 - conc},
-            {"type": "Grey Ice", "concentration_tenths": conc},
+            {"type": "Open Water", "concentration_tenths": 1.0 - c},
+            {"type": "Grey Ice", "concentration_tenths": c},
         ]
-    elif conc < 0.40:
+    elif c < 0.30:
         return [
-            {"type": "Open Water", "concentration_tenths": 1.0 - conc},
-            {"type": "Grey-White Ice", "concentration_tenths": conc},
+            {"type": "Open Water", "concentration_tenths": 1.0 - c},
+            {"type": "Grey-White Ice", "concentration_tenths": c},
         ]
-    elif conc < 0.70:
-        ow = max(0, 1.0 - conc)
+    elif c < 0.45:
         return [
-            {"type": "Open Water", "concentration_tenths": ow},
-            {"type": "Thin First-Year (FY)", "concentration_tenths": conc},
+            {"type": "Open Water", "concentration_tenths": 1.0 - c},
+            {"type": "Thin First-Year (FY)", "concentration_tenths": c},
         ]
-    elif conc < 0.85:
+    elif c < 0.60:
         return [
-            {"type": "Thin First-Year (FY)", "concentration_tenths": 0.3},
-            {"type": "Medium First-Year (FY)", "concentration_tenths": conc - 0.3},
+            {"type": "Open Water", "concentration_tenths": max(0.0, 1.0 - c)},
+            {"type": "Thin First-Year (FY)", "concentration_tenths": c * 0.5},
+            {"type": "Medium First-Year (FY)", "concentration_tenths": c * 0.5},
+        ]
+    elif c < 0.75:
+        # 고농도 진입 — 다년빙(MY) 소량 포함
+        return [
+            {"type": "Medium First-Year (FY)", "concentration_tenths": c * 0.5},
+            {"type": "Thick First-Year (FY)", "concentration_tenths": c * 0.35},
+            {"type": "Multi-Year (MY)", "concentration_tenths": c * 0.15},
+        ]
+    elif c < 0.88:
+        return [
+            {"type": "Thick First-Year (FY)", "concentration_tenths": c * 0.45},
+            {"type": "Multi-Year (MY)", "concentration_tenths": c * 0.4},
+            {"type": "Ridged/Hummocked", "concentration_tenths": c * 0.15},
         ]
     else:
+        # 결빙 최성기 고위도 압축 다년빙역
         return [
-            {"type": "Medium First-Year (FY)", "concentration_tenths": 0.3},
-            {"type": "Thick First-Year (FY)", "concentration_tenths": conc - 0.3},
+            {"type": "Thick First-Year (FY)", "concentration_tenths": c * 0.3},
+            {"type": "Multi-Year (MY)", "concentration_tenths": c * 0.4},
+            {"type": "Ridged/Hummocked", "concentration_tenths": c * 0.3},
         ]
 
 
@@ -163,7 +187,9 @@ class RouteScorer:
             if lat_min <= lat <= lat_max and in_lon:
                 concs.append(cell["concentration"])
 
-        return float(np.mean(concs)) if concs else 0.0
+        # 박스 평균은 개수역 셀까지 섞여 항로가 통과하는 빙역 농도를 과소평가한다.
+        # 90 퍼센타일로 '항로가 실제 통과하는 유의미한 빙'을 대표(다년빙 패치 포함).
+        return float(np.percentile(concs, 90)) if concs else 0.0
 
     def score_departure_day(
         self,
@@ -206,7 +232,9 @@ class RouteScorer:
 
         for seg in segments:
             avg_conc = self._get_segment_concentration(seg, cells)
-            ice_conditions = concentration_to_ice_conditions(avg_conc)
+            # 박스 P90 도 항로 채널보다 옅으므로 채널 대표 농도로 보정(희석 보정).
+            eff_conc = min(1.0, avg_conc * CHANNEL_DILUTION_FACTOR)
+            ice_conditions = concentration_to_ice_conditions(eff_conc)
 
             try:
                 rio = calculate_rio(ice_class, cast(list[IceCondition], ice_conditions))
@@ -217,7 +245,7 @@ class RouteScorer:
             color = _rio_to_color(rio)
             segment_scores.append(SegmentScore(
                 name=seg["name"],
-                avg_concentration=round(avg_conc, 4),
+                avg_concentration=round(eff_conc, 4),
                 rio=round(rio, 4),
                 color=color,
             ))
