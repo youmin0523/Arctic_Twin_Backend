@@ -46,9 +46,11 @@ SYSTEM_PROMPT = """\
 - RIO 색상: green=안전, yellow=주의, red=위험. green 비율이 높을수록 항행 적합.
 - Arc 등급은 IACS PC로 환산(Arc9≈PC3, Arc7≈PC4, Arc6≈PC5, Arc5≈PC6, Arc4≈PC7).
 - 쇄빙선 함대: NSR=아라온(한국, Arc6), NWP=CCGS(캐나다, Arc7), TSR=원자력쇄빙선(러시아, Arc9).
-- 호위비 산정: 쇄빙선 호위는 빙질이 선박의 독자 내빙능력을 '초과할 때만' 발생한다. RIO가 안전
-  (escort_needed=false)하면 독자 항행이 가능하므로 호위비는 0이다 — 안전한데 호위비를 매기지 마라.
-  필요할 때만 항차당 기준요금(자국 아라온=운영원가, 타국 Rosatom/CCGS=시장 수수료)을 위험도에 비례해 부과한다.
+- 호위비는 반드시 compare_economics 결과의 escort_needed/escort_cost_usd 를 '그대로' 따른다.
+  escort_needed=false → 호위비 0, escort_needed=true → 표시된 escort_cost_usd 를 그대로 쓴다.
+  score_route 의 RIO(안전/위험)와 혼동하지 마라 — 두 도구는 입력 가정이 달라 결과가 다를 수 있고,
+  호위 필요 여부의 권위는 compare_economics.escort_needed 다. '호위비 $X (필요 없음)'처럼 금액과
+  설명이 모순되게 쓰지 마라. (호위: 빙질이 선박 독자 내빙능력 초과 시에만 발생, 자국=운영원가/타국=시장수수료.)
 - 북극보험은 항차당 서차지(안전 시 ~$50k 기본, 위험할수록 상향)이며, 수에즈 통행료는 ~$500k다.
 - 연료비는 본선(화물선) 연료만 계산되며 쇄빙선 연료는 호위 운영원가에 별도로 포함된다(중복 아님).
 
