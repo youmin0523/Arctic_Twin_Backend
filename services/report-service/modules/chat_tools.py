@@ -103,6 +103,18 @@ def resolve_ship_spec(partial: dict | None) -> dict:
     return spec
 
 
+# WMO weather_code → 한국어 날씨 표현 (Open-Meteo current.weather_code)
+_WMO_CODE_KO = {
+    0: "맑음", 1: "대체로 맑음", 2: "부분 흐림", 3: "흐림",
+    45: "안개", 48: "상고대 안개",
+    51: "약한 이슬비", 53: "이슬비", 55: "강한 이슬비", 56: "어는 이슬비", 57: "강한 어는 이슬비",
+    61: "약한 비", 63: "비", 65: "강한 비", 66: "어는 비", 67: "강한 어는 비",
+    71: "약한 눈", 73: "눈", 75: "강한 눈", 77: "싸락눈",
+    80: "약한 소나기", 81: "소나기", 82: "강한 소나기", 85: "약한 눈소나기", 86: "강한 눈소나기",
+    95: "뇌우", 96: "우박 동반 뇌우", 99: "강한 우박 동반 뇌우",
+}
+
+
 # ── 신규 도구 스키마 (Anthropic 형식 — whatif_tools.TOOL_DEFINITIONS 와 동일 컨벤션) ──
 CHAT_TOOL_DEFINITIONS = [
     {
@@ -135,7 +147,7 @@ CHAT_TOOL_DEFINITIONS = [
         "name": "get_route_weather",
         "description": (
             "특정 항로의 실시간 기상 요약(최대 파고, 최저 기온, 최저 가시거리, 평균 해수온)을 반환한다. "
-            "Open-Meteo 기반. 파고·해수온·기상 질문에 사용한다."
+            "Open-Meteo 기반. 항로 전체의 파고·해수온·해상기상 질문에 사용한다."
         ),
         "input_schema": {
             "type": "object",
@@ -143,6 +155,20 @@ CHAT_TOOL_DEFINITIONS = [
                 "route": {"type": "string", "enum": ["NSR", "NWP", "TSR", "SUEZ", "CAPE"]},
             },
             "required": ["route"],
+        },
+    },
+    {
+        "name": "get_location_weather",
+        "description": (
+            "임의의 지역·도시·항구·국가의 실시간 현재 날씨를 반환한다(Open-Meteo 실측). "
+            "예: '부산', '대한민국', '로테르담', '무르만스크' 등 출발/도착지·일반 날씨 질문에 사용한다."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "location": {"type": "string", "description": "지역/도시/항구/국가 이름 (예: 부산, 대한민국, Rotterdam)"},
+            },
+            "required": ["location"],
         },
     },
     {
@@ -201,7 +227,8 @@ class ChatToolExecutor:
     (recommend_departure / launch_full_* 는 server.py 가 별도 핸들러로 주입.)
     """
 
-    NAMES = {"compare_economics", "get_route_weather", "get_escort_status", "get_iceberg_risk"}
+    NAMES = {"compare_economics", "get_route_weather", "get_escort_status",
+             "get_iceberg_risk", "get_location_weather"}
 
     def __init__(self, data_loader):
         self.loader = data_loader
@@ -212,6 +239,8 @@ class ChatToolExecutor:
                 return await self._compare_economics(args)
             if name == "get_route_weather":
                 return self._get_route_weather(args)
+            if name == "get_location_weather":
+                return await self._get_location_weather(args)
             if name == "get_escort_status":
                 return self._get_escort_status(args)
             if name == "get_iceberg_risk":
@@ -292,6 +321,60 @@ class ChatToolExecutor:
             "route": route,
             "fetched_at": weather.get("fetched_at"),
             "summary": rdata.get("summary", {}),
+        }
+
+    # ── get_location_weather (임의 지역 실시간 날씨) ────────────────
+    async def _get_location_weather(self, args: dict) -> dict:
+        loc = (args.get("location") or "").strip() or "Seoul"
+        last_err = ""
+        cur: dict = {}
+        place = loc
+        # Open-Meteo 무료티어 일시적 레이트리밋/네트워크 흔들림 대비 짧은 재시도(지연 상한 관리)
+        for attempt in range(2):
+            try:
+                async with httpx.AsyncClient(timeout=8.0) as client:
+                    g = await client.get(
+                        "https://geocoding-api.open-meteo.com/v1/search",
+                        params={"name": loc, "count": 1, "language": "ko"},
+                    )
+                    g.raise_for_status()
+                    results = g.json().get("results") or []
+                    if not results:
+                        return {"location": loc, "error": f"'{loc}' 위치를 찾을 수 없습니다."}
+                    r0 = results[0]
+                    lat, lon = r0.get("latitude"), r0.get("longitude")
+                    place = ", ".join(x for x in [r0.get("name"), r0.get("admin1"), r0.get("country")] if x)
+                    w = await client.get(
+                        "https://api.open-meteo.com/v1/forecast",
+                        params={
+                            "latitude": lat, "longitude": lon,
+                            "current": ("temperature_2m,apparent_temperature,relative_humidity_2m,"
+                                        "precipitation,weather_code,wind_speed_10m"),
+                            "timezone": "auto",
+                        },
+                    )
+                    w.raise_for_status()
+                    cur = w.json().get("current", {})
+                    break
+            except Exception as e:  # noqa: BLE001
+                last_err = f"{type(e).__name__}: {e}"
+                if attempt < 1:
+                    import asyncio as _a
+                    await _a.sleep(0.8)
+                    continue
+                return {"location": loc, "error": f"날씨 조회 실패({last_err})"}
+
+        code = cur.get("weather_code")
+        condition = _WMO_CODE_KO.get(code, f"코드 {code}") if isinstance(code, int) else "정보 없음"
+        return {
+            "location": place,
+            "observed_at": cur.get("time"),
+            "temperature_c": cur.get("temperature_2m"),
+            "feels_like_c": cur.get("apparent_temperature"),
+            "humidity_pct": cur.get("relative_humidity_2m"),
+            "precipitation_mm": cur.get("precipitation"),
+            "wind_speed_ms": cur.get("wind_speed_10m"),
+            "condition": condition,
         }
 
     # ── get_escort_status ─────────────────────────────────────────
