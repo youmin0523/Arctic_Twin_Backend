@@ -128,10 +128,12 @@
 ### 1. 저장소 클론
 
 ```bash
-git clone https://github.com/Hijin554/digital-twin.git
-cd digital-twin
-git checkout Hijin   # 작업 브랜치
+git clone https://github.com/youmin0523/Arctic_Twin_Backend.git
+cd Arctic_Twin_Backend
+# 기본 브랜치: main
 ```
+
+> 프론트엔드는 별도 저장소입니다: [`youmin0523/Arctic_Twin_Frontend`](https://github.com/youmin0523/Arctic_Twin_Frontend) (step 7 참고).
 
 클론 직후 다음이 있어야 합니다:
 
@@ -142,7 +144,8 @@ git checkout Hijin   # 작업 브랜치
 - `sar_server.py` — SAR 빙산 탐지 서버 (포트 8005)
 - `services-launcher/` — AI 서버 launcher(.ps1) + 모델 테스트 스크립트
 - `tools/` — 개발·학습·모니터링 유틸 스크립트 (모니터·워치독·트리거 등)
-- `frontend/` — React + Vite (포트 5173)
+
+> 프론트엔드(`frontend/` — React + Vite, 포트 5173)는 별도 저장소 [`youmin0523/Arctic_Twin_Frontend`](https://github.com/youmin0523/Arctic_Twin_Frontend) 에 있습니다.
 
 ### 2. 환경변수 (선택)
 
@@ -234,8 +237,11 @@ uv run --no-project --active python services-launcher/test_departure_models.py
 
 ### 7. 프론트엔드 실행
 
+프론트엔드는 별도 저장소입니다. 처음이면 클론부터:
+
 ```bash
-cd frontend
+git clone https://github.com/youmin0523/Arctic_Twin_Frontend.git
+cd Arctic_Twin_Frontend
 npm install
 npm run dev
 ```
@@ -344,7 +350,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 **3) 코드 + 의존성**
 ```bash
-git clone <repo> && cd digital-twin && git lfs pull   # 모델 파일
+git clone https://github.com/youmin0523/Arctic_Twin_Backend.git && cd Arctic_Twin_Backend && git lfs pull   # 모델 파일
 uv venv backend/.venv
 uv pip install --python backend/.venv -r backend/requirements.txt
 cd backend && npm install
@@ -419,9 +425,12 @@ Nginx 는 8000 한 곳만 바라보면 됩니다.
 
 ---
 
-## 🤝 팀
+## 🤝 저장소
 
-원본 저장소: [youmin0523/Digital_twin](https://github.com/youmin0523/Digital_twin)
+| 구분         | 저장소                                                                            |
+| ------------ | --------------------------------------------------------------------------------- |
+| **Backend**  | [youmin0523/Arctic_Twin_Backend](https://github.com/youmin0523/Arctic_Twin_Backend)   |
+| **Frontend** | [youmin0523/Arctic_Twin_Frontend](https://github.com/youmin0523/Arctic_Twin_Frontend) |
 
 ---
 
@@ -434,4 +443,4 @@ MIT License
 ## 🙋 연락처
 
 - GitHub: [@youmin0523](https://github.com/youmin0523)
-- Live Demo: 추후 업데이트 예정
+- Live Demo: https://arctictwin.com
